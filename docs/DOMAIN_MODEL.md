@@ -2,7 +2,7 @@
 
 ## Territory
 
-`Country → Region → Province → Municipality → CensusZone`. `CensusZone ↔ Street` uses `CensusZoneStreet`; `Street → Civic`, where `Civic.number` and optional free-text `Civic.extension` are distinct.
+`Country → Region → Province → Municipality → CensusZone`. `Province` represents the ISTAT unità territoriale sovracomunale valida a fini statistici, including Province, Province autonome, Città metropolitane, Liberi consorzi and the statistical ex Province of Friuli-Venezia Giulia. Italian regions, intermediate units and municipalities carry stable official ISTAT codes, source release metadata and an active flag. NUTS3 is a separate one-to-many code relation because its boundaries are not always identical to the current ISTAT intermediate units. `CensusZone` stores only `municipality_id`: Region and Province are derived through real FKs rather than duplicated text. `CensusZone ↔ Street` uses `CensusZoneStreet`; `Street → Civic`, where `Civic.number` and optional free-text `Civic.extension` are distinct.
 
 ## Subjects and census contexts
 
@@ -19,6 +19,7 @@ Legacy person columns remain on `census_records` only to preserve already-loaded
 ## Important invariants
 
 - `is_appraised` defaults false and is never derived from contact type.
+- Active Italian territory is imported from the persisted official ISTAT/SITUAS archive, never from demo lists or live form-time network calls.
 - Street membership is explicit and not permanently exclusive to a zone.
 - A complex may span multiple civics and extensions.
 - A census record is not automatically a `PropertyUnit`.

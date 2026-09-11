@@ -1,5 +1,17 @@
 # Codex worklog
 
+## 2026-09-11 — Archivio territoriale nazionale ISTAT/SITUAS
+
+**Obiettivo:** replace demo-only territorial choices in the Supabase LAB with the complete official Italian hierarchy while preserving existing zones and Milestone 1 boundaries.
+
+**Modifiche:** incremental official-code/active-state schema; private import audit; repeatable transactional XLSX importer; active Supabase reference queries; hierarchical Nuova zona tests; source, sync and verification runbook. Runtime never calls ISTAT and demo seed remains separate.
+
+**Fonte verificata:** permanent ISTAT municipal-code workbook, sheet `CODICI al 21_02_2026`: 20 Regions, 110 intermediate statistical units, 7,894 Municipalities.
+
+**Migration:** `202609110007_official_istat_territories.sql` after migration `006`.
+
+**Test:** official online importer dry-run passed with SHA-256 verification; live LAB import committed only after reading back 20/110/7,894 rows in the same transaction; ESLint passed; strict TypeScript passed; 82 Vitest tests passed across 16 files; Next.js production build passed.
+
 ## 2026-09-11 — Contact UX correction
 
 **Obiettivo:** restore the A.R.E.A. Censimento operating model after the registry normalization was exposed too prominently.

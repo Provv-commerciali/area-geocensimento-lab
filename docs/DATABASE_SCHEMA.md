@@ -14,4 +14,6 @@ Migration `202609110005_normalize_subjects_and_property_links.sql` introduces `s
 
 Migration `202609110006_restore_contact_ux_and_coownership.sql` preserves the normalized registry and all migrated links, adds `Comproprietario` to the relationship roles and updates the authenticated security-invoker workflows. It does not alter interview ownership or create synthetic events.
 
-`supabase/seed.sql` inserts a deterministic fictional dataset. It is idempotent by stable UUID/key usage and must only be applied to the dedicated Lab project.
+Migration `202609110007_official_istat_territories.sql` extends the existing Country → Region → Province → Municipality hierarchy with official ISTAT identifiers, unit type, useful administrative codes, source date and active state. NUTS3 codes use a separate one-to-many table because the official dataset does not make that relationship functional for every 2026 intermediate unit. It creates a private import-audit table while preserving RLS and browser read-only grants. Existing Bologna demo rows are not replaced or deleted; the importer reconciles them in place so dependent zone FKs remain valid.
+
+`supabase/seed.sql` inserts a deterministic fictional application dataset. Its Bologna territorial anchors are not the national archive. `scripts/sync-istat-territories.ts` separately downloads, validates and transactionally synchronizes the official archive; see `docs/TERRITORIAL_IMPORT.md`.

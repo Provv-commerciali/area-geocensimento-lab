@@ -11,9 +11,9 @@ export type CivicParity = "all" | "even" | "odd";
 
 export interface Operator { id: string; name: string }
 export interface Country { id: string; code: string; name: string }
-export interface Region { id: string; countryId: string; name: string }
-export interface Province { id: string; regionId: string; code?: string; name: string }
-export interface Municipality { id: string; provinceId: string; name: string }
+export interface Region { id: string; countryId: string; name: string; istatCode?: string }
+export interface Province { id: string; regionId: string; code?: string; name: string; istatCode?: string; territorialUnitType?: number }
+export interface Municipality { id: string; provinceId: string; name: string; istatCode?: string; cadastralCode?: string }
 export interface Subject {
   id: string; subjectType: SubjectType; firstName?: string; lastName?: string; companyName?: string;
   taxCode?: string; vatNumber?: string; phone?: string; email?: string; birthDate?: string; notes?: string;

@@ -1,4 +1,6 @@
 -- Controlled fictional LAB seed. Apply only to the dedicated area-geocensimento-lab project.
+-- The four Bologna hierarchy rows only anchor demo entities; they are reconciled
+-- in place by scripts/sync-istat-territories.ts and are not the national archive.
 begin;
 insert into public.operators(id,display_name) values
 ('00000000-0000-4000-8000-000000000001','Elena Rossi'),('00000000-0000-4000-8000-000000000002','Marco Bianchi'),('00000000-0000-4000-8000-000000000003','Sara Conti') on conflict do nothing;

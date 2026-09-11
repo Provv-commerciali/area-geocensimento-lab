@@ -20,3 +20,4 @@
 - **DEC-018** — Normalized CF and P.IVA are strong uniqueness signals. Matching names or company names never cause automatic merge; records without strong identifiers backfill as distinct subjects.
 - **DEC-019** — Interviews remain children of CensusRecord. Subject-level history is an aggregate projection across linked property contexts, preserving the original context.
 - **DEC-020** — The normalized Subject is an internal support entity, not a Milestone 1 navigation paradigm. Dashboard, Contatti, Nuovo contatto, Zone and Complessi remain the primary UX; cross-context registry links appear inside the Contact sheet.
+- **DEC-021** — Italian administrative selection uses a persisted, normalized ISTAT/SITUAS snapshot. A separate privileged importer synchronizes official codes idempotently, marks disappeared entities inactive instead of deleting referenced history, and records release/hash/count audit metadata. Runtime forms never call ISTAT.
