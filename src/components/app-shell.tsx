@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, FlaskConical, LayoutDashboard, Map, MapPinned, Menu, Plus, Users, X } from "lucide-react";
+import { Building2, Contact, FlaskConical, LayoutDashboard, Map, MapPinned, Menu, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 
 const items = [
   { href: "/", label: "Dashboard LAB", icon: LayoutDashboard },
-  { href: "/censimento/contatti", label: "Contatti", icon: Users },
-  { href: "/censimento/contatti/nuovo", label: "Nuovo contatto", icon: Plus },
+  { href: "/censimento/contatti", label: "Proprietà", icon: Building2 },
+  { href: "/censimento/contatti/nuovo", label: "Nuova proprietà", icon: Plus },
+  { href: "/censimento/soggetti", label: "Soggetti", icon: Contact },
   { href: "/censimento/zone", label: "Zone", icon: MapPinned },
   { href: "/censimento/complessi", label: "Complessi", icon: Building2 },
 ];

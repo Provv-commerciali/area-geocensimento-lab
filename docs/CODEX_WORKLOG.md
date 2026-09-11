@@ -1,5 +1,15 @@
 # Codex worklog
 
+## 2026-09-11 — Subject/property normalization
+
+**Obiettivo:** separate unique personal/company registry data from reusable property census contexts.
+
+**Modifiche:** `Subject` private/company model; strong CF/P.IVA duplicate detection; many-to-many property roles; lossless legacy backfill; existing-subject reuse in creation; bidirectional subject/property sheets; context-owned interviews with subject aggregation.
+
+**Migration:** `202609110005_normalize_subjects_and_property_links.sql` after migration `004`.
+
+**Test:** subject-to-many-properties, many-subjects-to-property, schema shapes, strong identifiers, migration/RLS contracts and UI selection flows.
+
 ## 2026-09-11 — Milestone 1 persistence completion
 
 **Obiettivo:** complete real Supabase territory/contact workflows and preserve the domain distinction between a new record and an actual interview.

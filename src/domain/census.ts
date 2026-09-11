@@ -5,6 +5,7 @@ export const occupancies = ["Libero", "Libero al rogito", "Occupato dal propriet
 export type Occupancy = (typeof occupancies)[number];
 export const qualifications = ["Proprietario", "Inquilino"] as const;
 export type Qualification = (typeof qualifications)[number];
+export type SubjectType = "PRIVATO" | "AZIENDA";
 export const floorCodes = ["Interrato", "Seminterrato", "Terra", "Rialzato", ...Array.from({ length: 60 }, (_, index) => `${index + 1}°`)] as const;
 export type CivicParity = "all" | "even" | "odd";
 
@@ -13,6 +14,11 @@ export interface Country { id: string; code: string; name: string }
 export interface Region { id: string; countryId: string; name: string }
 export interface Province { id: string; regionId: string; code?: string; name: string }
 export interface Municipality { id: string; provinceId: string; name: string }
+export interface Subject {
+  id: string; subjectType: SubjectType; firstName?: string; lastName?: string; companyName?: string;
+  taxCode?: string; vatNumber?: string; phone?: string; email?: string; birthDate?: string; notes?: string;
+}
+export interface CensusRecordSubject { subjectId: string; role: Qualification | "Non specificato"; isPrimary: boolean }
 export interface CensusZone { id: string; name: string; municipalityId: string; municipality: string; operator: Operator; streetIds: string[] }
 export interface Street { id: string; municipalityId: string; name: string; municipality: string }
 export interface Civic { id: string; streetId: string; number: string; extension?: string }
@@ -31,7 +37,14 @@ export interface CensusRecord {
   occupancy?: Occupancy; elevator?: boolean; sheet?: string; parcel?: string; subaltern?: string;
   cadastralCategory?: string; isAppraised: boolean; probableAssignment?: boolean;
   engagementType?: string; createdAt: string; interviews: CensusInterview[];
+  subjectLinks: CensusRecordSubject[];
 }
+
+export function subjectDisplayName(subject: Subject): string {
+  return subject.subjectType === "AZIENDA" ? subject.companyName ?? "Azienda" : [subject.lastName, subject.firstName].filter(Boolean).join(" ");
+}
+export function recordsForSubject(records: CensusRecord[], subjectId: string): CensusRecord[] { return records.filter(record=>record.subjectLinks.some(link=>link.subjectId===subjectId)); }
+export function subjectsForRecord(record: Pick<CensusRecord,"subjectLinks">, subjects: Subject[]): Subject[] { return record.subjectLinks.map(link=>subjects.find(subject=>subject.id===link.subjectId)).filter((subject):subject is Subject=>Boolean(subject)); }
 
 export function civicLabel(civic: Pick<Civic, "number" | "extension">): string {
   return [civic.number, civic.extension].filter(Boolean).join("/");

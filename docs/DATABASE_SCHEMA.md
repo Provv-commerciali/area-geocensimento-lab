@@ -10,4 +10,6 @@ Migration `202609110003_complete_milestone_one_workflows.sql` adds structured fl
 
 Migration `202609110004_separate_record_creation_from_interviews.sql` replaces record creation so it rejects bundled interviews, adds the explicit `create_census_interview_lab` command, marks workflow functions as security-invoker and creates the `census_record_contact_status` security-invoker view. The view derives `has_interviews` and latest interview date from real rows while preserving underlying RLS.
 
+Migration `202609110005_normalize_subjects_and_property_links.sql` introduces `subjects` and the many-to-many `census_record_subjects` table. It backfills one private subject per legacy record unless a normalized tax code provides a strong match, preserves legacy columns as snapshots, adds partial unique indexes for CF/P.IVA and replaces record creation with an atomic subject resolution/link workflow. New tables retain RLS and explicit authenticated-only grants.
+
 `supabase/seed.sql` inserts a deterministic fictional dataset. It is idempotent by stable UUID/key usage and must only be applied to the dedicated Lab project.

@@ -12,13 +12,18 @@ export const censusRecordSchema = z.object({
   floorCode: optionalText,
   totalFloors: z.coerce.number().int().positive().optional().or(z.literal("")),
   isTopFloor: z.boolean().default(false),
+  subjectMode: z.enum(["new", "existing"]),
+  existingSubjectId: optionalText,
+  subjectType: z.enum(["PRIVATO", "AZIENDA"]),
   firstName: optionalText,
-  lastName: z.string().trim().min(1, "Il cognome è obbligatorio"),
+  lastName: optionalText,
+  companyName: optionalText,
+  vatNumber: optionalText,
   phone: optionalText,
   email: z.string().email("E-mail non valida").optional().or(z.literal("")),
   taxCode: optionalText,
   contactType: z.enum(contactTypes),
-  qualification: z.enum(qualifications).optional().or(z.literal("")),
+  relationshipRole: z.enum(qualifications),
   inherited: z.boolean().default(false),
   birthDate: optionalText,
   responsibleOperatorId: optionalText,
@@ -33,6 +38,9 @@ export const censusRecordSchema = z.object({
   cadastralCategory: optionalText,
   isAppraised: z.boolean().default(false),
 }).superRefine((record, context) => {
+  if (record.subjectMode === "existing" && !record.existingSubjectId) context.addIssue({ code: "custom", path: ["existingSubjectId"], message: "Seleziona un soggetto esistente" });
+  if (record.subjectMode === "new" && record.subjectType === "PRIVATO" && !record.lastName) context.addIssue({ code: "custom", path: ["lastName"], message: "Il cognome è obbligatorio" });
+  if (record.subjectMode === "new" && record.subjectType === "AZIENDA" && !record.companyName) context.addIssue({ code: "custom", path: ["companyName"], message: "La ragione sociale è obbligatoria" });
   if (record.buildingScope === "Parte di edificio" && !record.floorCode) context.addIssue({ code: "custom", path: ["floorCode"], message: "Seleziona il piano dell'unità" });
   if (record.buildingScope === "Intero edificio" && (record.floorCode || record.isTopFloor)) context.addIssue({ code: "custom", path: ["buildingScope"], message: "Il piano dell'unità è disponibile solo per Parte di edificio" });
   const numericFloor = record.floorCode?.match(/^(\d+)°$/)?.[1];

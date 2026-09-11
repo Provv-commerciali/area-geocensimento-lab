@@ -1,4 +1,4 @@
-import type { CensusRecord, CensusZone, Civic, Complex, Country, Municipality, Operator, Province, Region, Street } from "@/domain/census";
+import type { CensusRecord, CensusZone, Civic, Complex, Country, Municipality, Operator, Province, Region, Street, Subject } from "@/domain/census";
 
 export const operators: Operator[] = [
   { id: "op-1", name: "Elena Rossi" }, { id: "op-2", name: "Marco Bianchi" }, { id: "op-3", name: "Sara Conti" },
@@ -44,6 +44,7 @@ export const records: CensusRecord[] = Array.from({ length: 36 }, (_, index) => 
     sheet: index % 5 === 1 ? undefined : String(10 + (index % 5)), parcel: index % 5 === 1 ? undefined : String(80 + index),
     subaltern: index % 3 === 0 ? String(index + 1) : undefined, cadastralCategory: index % 2 ? "A/2" : "A/3",
     isAppraised: isNews && index % 8 === 7, probableAssignment: index % 5 === 0, createdAt: `2026-0${(index % 8) + 1}-12`,
+    subjectLinks: [{ subjectId: `subject-${index + 1}`, role: index % 3 === 0 ? "Proprietario" : "Inquilino", isPrimary: true }],
     interviews: Array.from({ length: interviewCount }, (_, j) => ({
       id: `int-${index}-${j}`, recordId: `rec-${index + 1}`, operatorId: operators[(index + j) % operators.length].id,
       operatorName: operators[(index + j) % operators.length].name, interviewDate: `2026-0${Math.min(9, (index % 8) + 1)}-${String(8 + j).padStart(2, "0")}`,
@@ -52,3 +53,8 @@ export const records: CensusRecord[] = Array.from({ length: 36 }, (_, index) => 
     })),
   };
 });
+
+export const subjects: Subject[] = records.map((record, index) => ({
+  id: `subject-${index + 1}`, subjectType: "PRIVATO", firstName: record.firstName, lastName: record.lastName,
+  taxCode: index === 0 ? "FRRNNA80A41A944X" : undefined, phone: record.phone, email: record.email,
+}));

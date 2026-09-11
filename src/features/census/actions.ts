@@ -23,8 +23,9 @@ export async function createCensusRecordAction(
     floorCode: buildingScope === "Parte di edificio" ? value(data, "floorCode") : "",
     totalFloors: buildingScope === "Parte di edificio" ? optionalNumber(data, "totalFloors") : undefined,
     isTopFloor: buildingScope === "Parte di edificio" && data.get("isTopFloor") === "on",
-    firstName: value(data, "firstName"), lastName: value(data, "lastName"), phone: value(data, "phone"), email: value(data, "email"), taxCode: value(data, "taxCode"),
-    contactType: value(data, "contactType"), qualification: value(data, "qualification"), inherited: data.get("inherited") === "on",
+    subjectMode:value(data,"subjectMode"),existingSubjectId:value(data,"existingSubjectId"),subjectType:value(data,"subjectType"),
+    firstName: value(data, "firstName"), lastName: value(data, "lastName"), companyName:value(data,"companyName"),vatNumber:value(data,"vatNumber"),phone: value(data, "phone"), email: value(data, "email"), taxCode: value(data, "taxCode"),
+    contactType: value(data, "contactType"), relationshipRole: value(data, "relationshipRole"), inherited: data.get("inherited") === "on",
     birthDate: value(data, "birthDate"), responsibleOperatorId: value(data, "responsibleOperatorId"), notes: value(data, "notes"),
     rooms: optionalNumber(data, "rooms"), surface: optionalNumber(data, "surface"), occupancy: value(data, "occupancy"), elevator: data.get("elevator") === "on",
     sheet: value(data, "sheet"), parcel: value(data, "parcel"), subaltern: value(data, "subaltern"), cadastralCategory: value(data, "cadastralCategory"),
@@ -33,7 +34,7 @@ export async function createCensusRecordAction(
   const db = await createClient();
   const gateway: CensusRecordGateway = {
     async createRecord(payload) {
-      const { data: id, error } = await db.rpc("create_census_record_lab", { p_record: payload, p_interview: null });
+      const { data: id, error } = await db.rpc("create_census_record_lab", { p_record: {...payload,subject:{subjectType:payload.subjectType,firstName:payload.firstName,lastName:payload.lastName,companyName:payload.companyName,vatNumber:payload.vatNumber,phone:payload.phone,email:payload.email,taxCode:payload.taxCode,birthDate:payload.birthDate,notes:payload.notes}}, p_interview: null });
       if (error) throw new Error(error.message);
       if (typeof id !== "string") throw new Error("Supabase non ha restituito l'identificativo del record.");
       return id;

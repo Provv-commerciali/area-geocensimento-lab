@@ -3,7 +3,7 @@
 - **DEC-001** — Next.js App Router + strict TypeScript is the application stack.
 - **DEC-002** — Supabase/PostgreSQL is the persistence and authentication platform.
 - **DEC-003** — PostGIS is enabled from the initial migration, without geometry tables yet.
-- **DEC-004** — `CensusRecord` is the POC's central entity.
+- **DEC-004** — `CensusRecord` is the POC's central operational entity for one property/census context; the authoritative registry identity is separated into `Subject` by DEC-016.
 - **DEC-005** — `CensusInterview` is separate to preserve history.
 - **DEC-006** — Complex ↔ Civic is a many-to-many relationship.
 - **DEC-007** — GeoCensimento is deferred to the next milestone.
@@ -15,3 +15,7 @@
 - **DEC-013** — Contact persistence uses authenticated security-invoker RPCs and reports success only after the database insert; significant duplicate detection is location/property-specific.
 - **DEC-014** — CensusRecord creation and CensusInterview creation are separate commands. “Never contacted” means no real interview child exists and is available through an RLS-aware derived projection.
 - **DEC-015** — Supabase is the primary mode whenever public environment variables are configured; otherwise the UI is an explicitly read-only demo.
+- **DEC-016** — `Subject` is the authoritative unique registry entity, with explicit `PRIVATO` and `AZIENDA` shapes. `CensusRecord` represents the property/census context rather than the person.
+- **DEC-017** — Subject ↔ CensusRecord is many-to-many through `census_record_subjects`; the relationship owns the Proprietario/Inquilino role. `Non specificato` exists only for lossless legacy backfill.
+- **DEC-018** — Normalized CF and P.IVA are strong uniqueness signals. Matching names or company names never cause automatic merge; records without strong identifiers backfill as distinct subjects.
+- **DEC-019** — Interviews remain children of CensusRecord. Subject-level history is an aggregate projection across linked property contexts, preserving the original context.

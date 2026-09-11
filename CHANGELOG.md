@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0] - 2026-09-11
+
+- Separate unique private/company subjects from property census contexts.
+- Add many-to-many subject/property roles and lossless legacy backfill.
+- Detect strong CF/P.IVA matches without merging names automatically.
+- Add subject and property relationship views while keeping interviews context-specific.
+
 ## [0.2.0] - 2026-09-11
 
 - Complete persistent Milestone 1 zone, street, civic and contact workflows on Supabase.
