@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { ArrowRight, Building2, CalendarClock, MapPinned, Users } from "lucide-react";
 import { DemoNotice, PageHeader, StatCard } from "@/components/ui";
-import { complexes, records, zones } from "@/lib/demo-data";
 import { latestInterview, nextRecall } from "@/domain/census";
+import { loadCensusData } from "@/services/census-data";
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  const { complexes, records, zones } = await loadCensusData();
   const interviewed = records.filter((r) => latestInterview(r)).length; const recalls = records.filter((r) => nextRecall(r)).length;
   return <><PageHeader eyebrow="Quadro operativo" title="Censimento LAB" description="Territorio, contatti e attività in un’unica vista di lavoro." action={<Link className="button primary" href="/censimento/contatti/nuovo">Nuovo contatto <ArrowRight size={17}/></Link>}/><DemoNotice/>
     <section className="stats-grid"><StatCard label="Contatti censiti" value={records.length} detail={`${interviewed} con almeno un'intervista`} /><StatCard label="Zone attive" value={zones.length} detail="Comune di Bologna" tone="blue"/><StatCard label="Complessi" value={complexes.length} detail="Tutti con collegamenti multicivico" tone="amber"/><StatCard label="Ricontatti" value={recalls} detail="Programmati nel dataset" tone="green"/></section>

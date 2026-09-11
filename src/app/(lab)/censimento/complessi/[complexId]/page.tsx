@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/ui";
 import { ContactsTable } from "@/features/census/contacts-table";
-import { civics, complexes, operators, records, streets, zones } from "@/lib/demo-data";
 import { civicLabel } from "@/domain/census";
-export default async function ComplexPage({params}:{params:Promise<{complexId:string}>}){const {complexId}=await params;const complex=complexes.find(c=>c.id===complexId);if(!complex)notFound();const linked=civics.filter(c=>complex.civicIds.includes(c.id));return <><PageHeader eyebrow="Complesso / Mostra interni" title={complex.name} description={`${linked.length} civici collegati: ${linked.map(civicLabel).join(", ")}`}/><ContactsTable records={records.filter(r=>r.complexId===complexId)} {...{zones,streets,complexes,operators}}/></>}
+import { loadCensusData } from "@/services/census-data";
+export default async function ComplexPage({params}:{params:Promise<{complexId:string}>}){const [{complexId},{civics,complexes,operators,records,streets,zones}]=await Promise.all([params,loadCensusData()]);const complex=complexes.find(c=>c.id===complexId);if(!complex)notFound();const linked=civics.filter(c=>complex.civicIds.includes(c.id));return <><PageHeader eyebrow="Complesso / Mostra interni" title={complex.name} description={`${linked.length} civici collegati: ${linked.map(civicLabel).join(", ")}`}/><ContactsTable records={records.filter(r=>r.complexId===complexId)} {...{zones,streets,complexes,operators}}/></>}
