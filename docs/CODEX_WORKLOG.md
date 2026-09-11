@@ -1,5 +1,13 @@
 # Codex worklog
 
+## 2026-09-11 — GeoCensimento layout, persisted point and Contact correction
+
+**Obiettivo:** correct the four production regressions reported after the verified-location migration: narrow map/sidebar filters, an invisible persisted Via Francesca 59 point, missing Contact editing and incomplete cadastral click detail.
+
+**Risultato:** filters now wrap horizontally above a full-width map; the Supabase repository decodes GeoJSON, WKT and EWKB PostGIS points instead of discarding non-object representations; Contact detail exposes a prefilled atomic editor; cadastral detail adds Province, Comune and returned feature type. Migration `202609110014_contact_updates.sql` grants only the Subject update columns needed by the authenticated security-invoker edit command.
+
+**Verifica:** parser/schema/migration tests and the complete 15-test Playwright Chromium Censimento smoke suite pass. Live Via Francesca 59 verification remains a post-deploy readback against the dedicated LAB database.
+
 ## 2026-09-11 — Verified civic location and confirmed cadastral association
 
 **Obiettivo:** integrate geocoder-assisted but operator-verified civic positioning into Nuovo Contatto, and add a normal Contact workflow for previewing and confirming an official free cadastral parcel.

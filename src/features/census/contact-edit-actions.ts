@@ -1,0 +1,12 @@
+"use server";
+
+import{revalidatePath}from"next/cache";import{redirect}from"next/navigation";import{createClient,hasSupabaseEnvironment}from"@/lib/supabase/server";import{contactUpdateSchema}from"./schemas";
+export type ContactEditState={error?:string};
+const value=(data:FormData,key:string)=>String(data.get(key)??"").trim();
+export async function updateContactAction(_state:ContactEditState,data:FormData):Promise<ContactEditState>{
+  if(!hasSupabaseEnvironment())return{error:"Database LAB non configurato"};
+  const parsed=contactUpdateSchema.safeParse({recordId:value(data,"recordId"),subjectId:value(data,"subjectId"),subjectType:value(data,"subjectType"),firstName:value(data,"firstName"),lastName:value(data,"lastName"),companyName:value(data,"companyName"),taxCode:value(data,"taxCode"),vatNumber:value(data,"vatNumber"),phone:value(data,"phone"),email:value(data,"email"),birthDate:value(data,"birthDate"),notes:value(data,"notes"),zoneId:value(data,"zoneId"),streetId:value(data,"streetId"),civicId:value(data,"civicId"),complexId:value(data,"complexId"),buildingScope:value(data,"buildingScope"),levels:value(data,"levels"),floorCode:value(data,"floorCode"),totalFloors:value(data,"totalFloors"),isTopFloor:data.get("isTopFloor")==="on",rooms:value(data,"rooms"),surface:value(data,"surface"),occupancy:value(data,"occupancy"),elevator:data.get("elevator")==="on",contactType:value(data,"contactType"),relationshipRole:value(data,"relationshipRole"),responsibleOperatorId:value(data,"responsibleOperatorId"),inherited:data.get("inherited")==="on",isAppraised:data.get("isAppraised")==="on",sheet:value(data,"sheet"),parcel:value(data,"parcel"),subaltern:value(data,"subaltern"),cadastralCategory:value(data,"cadastralCategory")});
+  if(!parsed.success)return{error:parsed.error.issues[0]?.message??"Dati non validi"};
+  const{recordId,...payload}=parsed.data;const db=await createClient();const{error}=await db.rpc("update_census_contact_lab",{p_record_id:recordId,p_contact:payload});if(error)return{error:error.message};
+  revalidatePath(`/censimento/contatti/${recordId}`);revalidatePath("/censimento/contatti");revalidatePath("/geocensimento");redirect(`/censimento/contatti/${recordId}?updated=1`);
+}

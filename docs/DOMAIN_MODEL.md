@@ -16,6 +16,8 @@ Legacy person columns remain on `census_records` only to preserve already-loaded
 
 `Subject N ↔ N CensusRecord` is traversed internally in both directions. In the UX this appears inside the Contact sheet as “Altri immobili / contesti collegati”; there is no autonomous Subjects macro-area in Milestone 1. `CensusRecord 1 → N CensusInterview` preserves context-specific history: interviews never move to or become shared through the registry subject. A record starts with zero interviews; latest interview, next recall and “Non ancora contattato” remain derived from actual children.
 
+Editing a Contact is one atomic command over its primary `Subject`, `CensusRecord` and primary `CensusRecordSubject` relationship. Subject identity changes therefore remain shared registry changes, while address/property/operational changes remain scoped to the selected record. The command does not create, alter or synthesize interviews.
+
 `Complex ↔ Civic` is many-to-many through `complex_civics`; creation may attach the first selected civic but does not designate a “primary” civic.
 
 ## GeoCensimento civic location

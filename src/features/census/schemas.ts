@@ -81,3 +81,18 @@ export const cadastralAssociationSchema = z.object({
   section: optionalText, sheet: z.string().trim().min(1), parcel: z.string().trim().min(1), featureType: optionalText,
   sourceReference: z.object({ longitude: z.number().min(-180).max(180), latitude: z.number().min(-90).max(90) }).optional(),
 });
+
+export const contactUpdateSchema=z.object({
+  recordId:z.string().min(1),subjectId:z.string().min(1),subjectType:z.enum(["PRIVATO","AZIENDA"]),
+  firstName:optionalText,lastName:optionalText,companyName:optionalText,taxCode:optionalText,vatNumber:optionalText,
+  phone:optionalText,email:z.string().email("E-mail non valida").optional().or(z.literal("")),birthDate:optionalText,notes:optionalText,
+  zoneId:z.string().min(1,"Seleziona una zona"),streetId:z.string().min(1,"Seleziona una via"),civicId:z.string().min(1,"Seleziona un civico"),complexId:optionalText,
+  buildingScope:z.enum(["Intero edificio","Parte di edificio"]),levels:z.coerce.number().int().positive().optional().or(z.literal("")),floorCode:optionalText,totalFloors:z.coerce.number().int().positive().optional().or(z.literal("")),isTopFloor:z.boolean(),
+  rooms:z.coerce.number().nonnegative().optional().or(z.literal("")),surface:z.coerce.number().nonnegative().optional().or(z.literal("")),occupancy:z.enum(occupancies).optional().or(z.literal("")),elevator:z.boolean(),
+  contactType:z.enum(contactTypes),relationshipRole:z.enum(qualifications),responsibleOperatorId:optionalText,inherited:z.boolean(),isAppraised:z.boolean(),
+  sheet:optionalText,parcel:optionalText,subaltern:optionalText,cadastralCategory:optionalText,
+}).superRefine((value,context)=>{
+  if(value.subjectType==="PRIVATO"&&!value.lastName)context.addIssue({code:"custom",path:["lastName"],message:"Il cognome è obbligatorio"});
+  if(value.subjectType==="AZIENDA"&&!value.companyName)context.addIssue({code:"custom",path:["companyName"],message:"La ragione sociale è obbligatoria"});
+  if(value.buildingScope==="Parte di edificio"&&!value.floorCode)context.addIssue({code:"custom",path:["floorCode"],message:"Seleziona il piano"});
+});

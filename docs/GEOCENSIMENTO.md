@@ -9,11 +9,13 @@ GeoCensimento is the map projection of existing Censimento contacts. The page lo
 3. One vector feature per geolocated civic. It contains references to all matching CensusRecords and any associated Complex names.
 4. OpenLayers density clustering at 48 px. A cluster count is the number of contacts, not merely civic features. Click zooms into a multi-feature cluster; at detail scale it lists individual contacts.
 
-The primary marker/cluster color follows operational precedence. A purple ring indicates at least one Complex without replacing operational meaning. Every feature also carries `VERIFIED` or `AUTO_GEOLOCATED`; counters separate verified, to-verify and missing civics, and the detail never presents an automatic point as certain. Cadastral clicks on the general map remain informative only.
+The primary marker/cluster color follows operational precedence. A purple ring indicates at least one Complex without replacing operational meaning. Every feature also carries `VERIFIED` or `AUTO_GEOLOCATED`; counters separate verified, to-verify and missing civics, and the detail never presents an automatic point as certain. The persistence adapter accepts PostGIS points returned as GeoJSON, serialized GeoJSON, WKT or EWKB. Cadastral clicks on the general map remain informative only and show Province, Comune, cadastral identifiers and provider feature type when available.
 
 ## URL filters
 
 Stable parameters are `zone`, `street`, `type`, `operator`, `activity` (`never`, `staleNews`, `recallOverdue`, `actionRequired`), `appraised`, `complex` and `q`. Contacts, Zone, Via and Complex pages provide contextual links. The browser updates the URL as map filters change, making the view reproducible. Changing Zone clears the dependent Via selection so an invisible stale street filter cannot suppress valid results.
+
+The filter controls occupy a wrapping horizontal bar above the map. The map workspace uses the complete available content width; at narrower viewports the controls wrap without restoring a permanent side column.
 
 ## Location and performance
 
