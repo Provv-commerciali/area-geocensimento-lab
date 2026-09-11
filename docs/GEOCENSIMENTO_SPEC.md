@@ -1,5 +1,5 @@
-# GeoCensimento specification — deferred
+# GeoCensimento specification
 
-GeoCensimento is the future geographic representation of the existing Censimento domain. It must reuse records, zones, streets and civics rather than creating a parallel truth. Map UX, cadastral identity, cadastral parcels, providers and geometry require a separate reviewed milestone.
+Milestone 2 is explicitly authorized and implemented as the geographic representation of the existing Censimento domain. It reuses records, zones, streets, civics and shared operational state rather than creating a parallel truth. The verified implementation is documented in `GEOCENSIMENTO.md`; provider evidence is in `MAP_SERVICES.md`.
 
-No implementation is authorized in Milestones 0–1.
+Cadastral identity, ownership, paid OpenAPI data and automatic parcel/property matching remain outside this milestone.

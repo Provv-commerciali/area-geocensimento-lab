@@ -16,6 +16,12 @@ Legacy person columns remain on `census_records` only to preserve already-loaded
 
 `Complex ↔ Civic` is many-to-many through `complex_civics`; creation may attach the first selected civic but does not designate a “primary” civic.
 
+## GeoCensimento civic location
+
+`Civic` optionally owns one cached `geography(Point, 4326)` plus geocoding source, timestamp, optional 0–1 quality and the explicit state `GEOLOCATED`, `NOT_GEOLOCATED` or `NEEDS_REVIEW`. Only `GEOLOCATED` civics are projected. Contacts never store duplicate coordinates; several contacts at one civic become one civic feature whose details retain the original record identifiers.
+
+Map operational status is not new domain state. Each associated record is passed to `deriveCensusOperationalStatus`; a mixed civic/cluster uses the same precedence (`RICONTATTO_SCADUTO`, `NOTIZIA_NON_AGGIORNATA`, `MAI_CONTATTATO`, `ORDINARIO`) for its primary color. A purple ring is only a secondary Complex indicator.
+
 ## Derived operational status
 
 Operational state is a projection of one `CensusRecord`, its real `CensusInterview` children, the persisted `stale_news_days` setting and an explicit Europe/Rome civil date. It is never stored on the contact. `deriveCensusOperationalStatus` is the shared domain function for lists, detail views and a future map consumer.
@@ -38,6 +44,7 @@ A recall is overdue when its date is before today and there is no different inte
 - Operational flags and day counts are derived, never persisted on `census_records`.
 - Streets are unique by municipality plus normalized name; civics by street plus normalized number/extension.
 - Record duplicate protection prevents the same subject from being linked twice to the same location, building scope, floor and subaltern; subject uniqueness remains governed separately by strong identifiers.
+- A cadastral WMS feature is external cartography and never creates a CensusRecord, property, subject or ownership link.
 
 ## Future boundary (documentation only)
 

@@ -8,14 +8,16 @@ import type { CensusRecord, CensusZone, Complex, Operator, Street } from "@/doma
 import { deriveCensusOperationalStatus, unresolvedRecallDate, type CensusOperationalSettings } from "@/domain/census-operational-status";
 import { OperationalStatusBadge } from "./operational-status-badge";
 import { filterCensusRecords, type CensusFilters } from "./filters";
+import { geoCensusHref } from "@/domain/geocensus";
 
 type Props = {
   records: CensusRecord[]; zones: CensusZone[]; streets: Street[]; complexes: Complex[]; operators: Operator[];
   operationalSettings: CensusOperationalSettings; operationalToday: string; fixedZoneId?: string; fixedStreetId?: string;
+  initialFilters?: CensusFilters;
 };
 
-export function ContactsTable({ records, zones, streets, complexes, operators, operationalSettings, operationalToday, fixedZoneId, fixedStreetId }: Props) {
-  const [filters, setFilters] = useState<CensusFilters>({ zoneId: fixedZoneId, streetId: fixedStreetId });
+export function ContactsTable({ records, zones, streets, complexes, operators, operationalSettings, operationalToday, fixedZoneId, fixedStreetId, initialFilters }: Props) {
+  const [filters, setFilters] = useState<CensusFilters>({ ...initialFilters, zoneId: fixedZoneId ?? initialFilters?.zoneId, streetId: fixedStreetId ?? initialFilters?.streetId });
   const [advanced, setAdvanced] = useState(false);
   const [sort, setSort] = useState<"name" | "created">("name");
   const visible = useMemo(
@@ -40,7 +42,7 @@ export function ContactsTable({ records, zones, streets, complexes, operators, o
         <fieldset><legend>Catasto</legend><label>Foglio<input value={filters.sheet ?? ""} onChange={(event) => update("sheet", event.target.value)}/></label><label>Particella<input value={filters.parcel ?? ""} onChange={(event) => update("parcel", event.target.value)}/></label><label>Subalterno<input value={filters.subaltern ?? ""} onChange={(event) => update("subaltern", event.target.value)}/></label></fieldset>
         <fieldset><legend>Gestione e stato</legend><label>Responsabile<select value={filters.operatorId ?? ""} onChange={(event) => update("operatorId", event.target.value)}><option value="">Tutti</option>{operators.map((operator) => <option value={operator.id} key={operator.id}>{operator.name}</option>)}</select></label><label>Storico<select aria-label="Stato contatto" value={filters.contactStatus ?? ""} onChange={(event) => update("contactStatus", event.target.value)}><option value="">Tutti</option><option value="never">Non ancora contattati</option><option value="contacted">Con almeno un'intervista</option></select></label><label>Ereditato<select value={filters.inherited ?? ""} onChange={(event) => update("inherited", event.target.value)}><option value="">Tutti</option><option value="true">Sì</option><option value="false">No</option></select></label><label>Perizia<select value={filters.appraised ?? ""} onChange={(event) => update("appraised", event.target.value)}><option value="">Tutte</option><option value="true">Sì</option><option value="false">No</option></select></label></fieldset>
       </div>}
-      <div className="filter-actions"><span><Filter size={15}/>{visible.length} risultati</span><button className="text-button" onClick={reset}><RotateCcw size={15}/> Reimposta filtri</button></div>
+      <div className="filter-actions"><span><Filter size={15}/>{visible.length} risultati</span><div className="button-row"><Link className="button secondary" href={geoCensusHref(filters)}>Visualizza in GeoCensimento</Link><button className="text-button" onClick={reset}><RotateCcw size={15}/> Reimposta filtri</button></div></div>
     </section>
     <section className="table-panel">
       <div className="table-toolbar"><strong>Contatti censimento</strong><label>Ordina per <select value={sort} onChange={(event) => setSort(event.target.value as "name" | "created")}><option value="name">Cognome / ragione sociale</option><option value="created">Inserimento</option></select></label></div>

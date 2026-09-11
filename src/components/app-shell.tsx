@@ -12,6 +12,7 @@ const items = [
   { href: "/censimento/contatti/nuovo", label: "Nuovo contatto", icon: Plus },
   { href: "/censimento/zone", label: "Zone", icon: MapPinned },
   { href: "/censimento/complessi", label: "Complessi", icon: Building2 },
+  { href: "/geocensimento", label: "GeoCensimento", icon: Map },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -22,7 +23,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="lab-tag"><FlaskConical size={15}/> Ambiente sperimentale</div>
       <p className="nav-heading">Censimento</p>
       <nav>{items.map(({ href, label, icon: Icon }) => <Link key={href} href={href} onClick={() => setOpen(false)} className={path === href ? "active" : ""}><Icon size={19}/><span>{label}</span></Link>)}</nav>
-      <div className="coming-soon"><Map size={20}/><div><strong>GeoCensimento</strong><span>Prossima milestone</span></div></div>
       <div className="sidebar-foot"><span className={`status-dot ${databaseMode?"online":""}`}/>{databaseMode?"Database Supabase LAB":"Dataset demo LAB"}</div>
     </aside>
     <div className="content-wrap">

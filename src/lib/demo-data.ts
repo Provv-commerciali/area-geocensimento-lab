@@ -19,6 +19,8 @@ export const zones: CensusZone[] = [
 export const civics: Civic[] = Array.from({ length: 20 }, (_, index) => ({
   id: `cv-${index + 1}`, streetId: streets[index % streets.length].id, number: String(2 + index * 2),
   ...(index % 6 === 0 ? { extension: index % 12 === 0 ? "A" : "bis" } : {}),
+  geocodingStatus: index === 19 ? "NOT_GEOLOCATED" : "GEOLOCATED",
+  ...(index === 19 ? {} : { location: { longitude: 11.3425 + (index % 5) * 0.0022, latitude: 44.4937 + Math.floor(index / 5) * 0.0018, source: "fixture LAB", geocodedAt: "2026-09-11", quality: 1 } }),
 }));
 export const complexes: Complex[] = [
   { id: "cx-1", name: "Corte Mercanti", zoneId: "zone-1", civicIds: ["cv-1", "cv-6", "cv-11"], sheet: "12", parcel: "88", units: 18, description: "Complesso multicivico LAB" },
@@ -32,7 +34,7 @@ export const records: CensusRecord[] = Array.from({ length: 36 }, (_, index) => 
   const zone = zones.find((z) => z.streetIds.includes(street.id))!; const complex = complexes.find((c) => c.civicIds.includes(civic.id));
   const isNews = index % 4 === 3; const interviewCount = index % 7 === 0 ? 2 : index % 3 === 0 ? 1 : 0;
   return {
-    id: `rec-${index + 1}`, firstName: names[index % names.length], lastName: surnames[(index * 3) % surnames.length],
+    id: `rec-${index + 1}`, subjectType: "PRIVATO", firstName: names[index % names.length], lastName: surnames[(index * 3) % surnames.length],
     phone: `051 555 ${String(1000 + index)}`, email: index % 5 ? undefined : `contatto${index + 1}@example.test`,
     contactType: isNews ? "Notizia" : (["Generico", "Informatore", "Informazione"] as const)[index % 3],
     inherited: index % 11 === 0, responsibleOperatorId: operators[index % operators.length].id,

@@ -1,3 +1,3 @@
-# Map architecture — future boundary
+# Map architecture
 
-OpenLayers is the intended future map engine, subject to the next milestone review. WMS/WFS, provider APIs and cadastral geometry will be isolated behind server-side adapters. Paid provider calls must be explicit user actions with caching/audit controls, never automatic pan/zoom effects. No map dependency or geometry table is present now.
+Milestone 2 implements the reviewed OpenLayers boundary, civic PostGIS locations, OSM LAB basemap and official cadastral WMS proxy. See `ARCHITECTURE.md`, `GEOCENSIMENTO.md` and `MAP_SERVICES.md` for the authoritative implementation and verified-provider details. Paid provider calls remain absent and future paid calls must be explicit server-side actions with cache/audit controls, never pan/zoom effects.

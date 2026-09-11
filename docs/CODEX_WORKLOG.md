@@ -1,5 +1,19 @@
 # Codex worklog
 
+## 2026-09-11 — Milestone 2 GeoCensimento
+
+**Obiettivo:** deliver the first operational geographic view of the existing Censimento with free providers and no parallel domain.
+
+**Modifiche:** OpenLayers client boundary; OSM LAB basemap; verified AdE parcel WMS through an allowlisted server proxy; civic-level aggregation and clustering; shared operational marker visuals; URL filters and contextual Censimento links; explicit missing-geolocation counters; on-demand geocoding adapter; provider-error handling.
+
+**Migration:** `202609110009_geocensus_civic_locations.sql`; cached WGS84 PostGIS geography and provenance on Civic with GiST index. No coordinates on CensusRecord.
+
+**Servizi verificati:** AdE WMS capabilities, PNG GetMap and plain-text GetFeatureInfo succeeded; upstream CORS header absent. WFS probe returned Access Denied and is not integrated. OSM/Nominatim remain LAB-limited.
+
+**Hard stop:** no OpenAPI Catasto, paid service, owner/visura, scraping, automatic match or new cadastral identity.
+
+**Quality gate:** ESLint passed; strict TypeScript passed; 105 Vitest tests passed across 20 files; 13 Playwright Chromium smoke tests passed against the production build; Next.js production build passed. Live AdE WMS and Nominatim probes passed; WFS remained unavailable.
+
 ## 2026-09-11 — Milestone 1B operational contact state
 
 **Obiettivo:** add actionable age, stale Notizia and overdue recall semantics without redesigning the approved Censimento workflow.

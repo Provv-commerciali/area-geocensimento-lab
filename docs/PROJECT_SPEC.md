@@ -4,7 +4,7 @@
 
 Milestone 0 establishes a deployable Next.js/Supabase foundation. Milestone 1 reproduces only the known Censimento domain: LAB login, zones and their streets, civics, contacts (`CensusRecord`), interview history, complexes with multiple civics, filters, contextual street views and controlled seed data.
 
-The current delivery must stop before GeoCensimento. It contains no maps, map engines, WMS/WFS, cadastral API, cadastral identity/parcel implementation, geometry, geocoding or thematic overlays.
+Milestone 2 adds GeoCensimento as a geographic projection of this same domain. It introduces OpenLayers, cached civic points, an OSM LAB basemap, the official free cadastral WMS and map filters. It does not introduce cadastral identity/property ownership, paid APIs or a parallel map database.
 
 ## Confirmed flows
 

@@ -18,4 +18,6 @@ Migration `202609110007_official_istat_territories.sql` extends the existing Cou
 
 Migration `202609110008_census_operational_status.sql` adds the singleton `census_operational_settings` table with validated `stale_news_days` (LAB default 30, range 1–3650). It enables RLS, denies anonymous access, grants authenticated operators read access and column-level update of the threshold only, and provides no browser INSERT/DELETE privilege. Status, interview age and overdue days remain derived in the domain layer and are not added to `census_records`.
 
+Migration `202609110009_geocensus_civic_locations.sql` adds an optional `geography(Point,4326)` to `civics`, explicit geocoding state, source, timestamp, optional quality/review note and a GiST spatial index. A consistency constraint requires provenance for `GEOLOCATED` rows. Existing Civic grants and RLS remain in force; coordinates are not duplicated on contacts.
+
 `supabase/seed.sql` inserts a deterministic fictional application dataset. Its Bologna territorial anchors are not the national archive. `scripts/sync-istat-territories.ts` separately downloads, validates and transactionally synchronizes the official archive; see `docs/TERRITORIAL_IMPORT.md`.

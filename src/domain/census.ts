@@ -21,14 +21,18 @@ export interface Subject {
 export interface CensusRecordSubject { subjectId: string; role: Qualification | "Non specificato"; isPrimary: boolean; ownershipShare?: number }
 export interface CensusZone { id: string; name: string; municipalityId: string; municipality: string; operator: Operator; streetIds: string[] }
 export interface Street { id: string; municipalityId: string; name: string; municipality: string }
-export interface Civic { id: string; streetId: string; number: string; extension?: string }
+export type GeocodingStatus = "GEOLOCATED" | "NOT_GEOLOCATED" | "NEEDS_REVIEW";
+export interface CivicLocation {
+  longitude: number; latitude: number; source?: string; geocodedAt?: string; quality?: number;
+}
+export interface Civic { id: string; streetId: string; number: string; extension?: string; geocodingStatus?: GeocodingStatus; location?: CivicLocation }
 export interface Complex { id: string; name: string; zoneId: string; civicIds: string[]; sheet?: string; parcel?: string; units?: number; description?: string }
 export interface CensusInterview {
   id: string; recordId: string; operatorId: string; operatorName: string;
   interviewDate: string; recallDate?: string; response?: string; reason?: string; outcome?: string;
 }
 export interface CensusRecord {
-  id: string; firstName?: string; lastName: string; phone?: string; email?: string;
+  id: string; subjectType?: SubjectType; firstName?: string; lastName: string; phone?: string; email?: string;
   taxCode?: string; contactType: ContactType; qualification?: string; inherited: boolean;
   birthDate?: string; responsibleOperatorId?: string; responsibleOperatorName?: string; notes?: string;
   zoneId: string; zoneName: string; streetId: string; streetName: string; civicId: string;
