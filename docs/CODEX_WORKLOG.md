@@ -18,9 +18,9 @@
 
 **Problema:** OpenLayers did not know EPSG:4258 and silently requested the cadastral proxy in EPSG:3857, which the verified allowlist correctly rejected. Tiled loading then also produced request bursts and intermittent upstream 502 responses. Zone changes could retain an invalid Via filter, while real post-migration civics without coordinates left the view on the default city.
 
-**Correzione:** explicit ETRS89 registration and transforms; single-image composite AdE WMS with separate parcel query source; dependent Via reset; explicit missing-coordinate notice and one bounded context-centering lookup without marker creation or persistence; resource-scoped repository reads for heavy Censimento pages.
+**Correzione:** explicit ETRS89 registration and transforms; single-image orange `fabbricati` AdE WMS with separate parcel query source; dependent Via reset; explicit missing-coordinate notice and one bounded first-address centering lookup without marker creation or persistence; resource-scoped repository reads for heavy Censimento pages. The initially selected composite parent was rejected after browser review because it produced an unreadable administrative overlay.
 
-**Verifica:** live local request reached the same-origin proxy with `CRS=EPSG:4258`, `LAYERS=Cartografia_Catastale`, returned HTTP 200 and set the UI state to `Catasto: disponibile`. The integrated automated gate is recorded above.
+**Verifica:** live close-scale `fabbricati` request returned the expected transparent orange building footprints; the local same-origin request uses `CRS=EPSG:4258` and the UI reaches `Catasto: disponibile`. The integrated automated gate is recorded above.
 
 ## 2026-09-11 — Milestone 2 GeoCensimento
 

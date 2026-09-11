@@ -14,10 +14,10 @@ Verification date: 2026-09-11. These facts come from live official capabilities 
 - Official endpoint: `https://wms.cartografia.agenziaentrate.gov.it/inspire/wms/ows01.php`.
 - Verified `GetCapabilities`: HTTP 200, WMS 1.3.0, title `Cartografia Catastale`, CC BY 4.0, public data, mandatory owner citation, maximum width/height 2048.
 - Supported operations: `GetMap` PNG/JPEG and `GetFeatureInfo` HTML, plain text or GML.
-- Visual layer: `Cartografia_Catastale`, the verified composite parent that exposes scale-appropriate roads, waters, buildings, parcel codes and boundaries. Point information uses queryable `CP.CadastralParcel` (`Particelle`).
+- Visual layer: `fabbricati`, whose verified default style produces orange building footprints at scale denominator 20–5000. Point information uses queryable `CP.CadastralParcel` (`Particelle`). The composite parent is intentionally not used because its territorial labels obscure the basemap.
 - Advertised CRS: EPSG:6706, 4258, 3044, 3045, 3046, 25832, 25833 and 25834. EPSG:3857 is not advertised.
 - Coverage described by the service: Italy except the autonomous provinces of Trento and Bolzano.
-- Live `GetMap` probe in EPSG:4258: HTTP 200, `image/png`, 2,747 bytes.
+- Live close-scale `fabbricati` `GetMap` probe in EPSG:4258: HTTP 200, `image/png`, 184,372 bytes, with orange footprints over transparency.
 - Live `GetFeatureInfo` probe in EPSG:4258/plain text: HTTP 200; the sample point returned no feature, which is a valid empty result.
 - CORS: the responses did not expose `Access-Control-Allow-Origin`; the app therefore uses `/api/map/cadastral` with an operation/layer/parameter allowlist and a 12-second timeout.
 - Same-origin proxy probe: the valid EPSG:4258 request returned HTTP 200 and the same 2,747-byte PNG; an EPSG:3857 request was rejected locally with HTTP 400.
@@ -25,7 +25,7 @@ Verification date: 2026-09-11. These facts come from live official capabilities 
 - Attribution: `Agenzia delle Entrate — CC BY 4.0`.
 - `GetFeatureInfo` output is shown as external data and never creates internal entities.
 
-The composite visual layer contains advertised children including `CP.CadastralZoning`, `province`, `acque`, `strade`, `fabbricati`, `codice_plla`, `simbolo_graffa` and `copyright`; individual children are not exposed as independently selectable application layers.
+Other advertised layers include the composite parent, `CP.CadastralZoning`, `province`, `acque`, `strade`, `codice_plla`, `simbolo_graffa` and `copyright`; they are not silently added to the visual overlay.
 
 ## WFS
 

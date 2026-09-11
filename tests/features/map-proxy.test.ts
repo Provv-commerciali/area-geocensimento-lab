@@ -16,11 +16,11 @@ describe("cadastral WMS proxy", () => {
     expect(upstream.searchParams.get("FORMAT")).toBe("image/png");
   });
 
-  it("allows the verified composite cadastral cartography layer", async () => {
+  it("allows the verified cadastral building layer", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(new Uint8Array([137, 80, 78, 71]), { status: 200, headers: { "Content-Type": "image/png" } }));
-    const response = await GET(new Request(valid.replace("CP.CadastralParcel", "Cartografia_Catastale")));
+    const response = await GET(new Request(valid.replace("CP.CadastralParcel", "fabbricati")));
     expect(response.status).toBe(200);
-    expect(new URL(String(fetchMock.mock.calls[0][0])).searchParams.get("LAYERS")).toBe("Cartografia_Catastale");
+    expect(new URL(String(fetchMock.mock.calls[0][0])).searchParams.get("LAYERS")).toBe("fabbricati");
   });
 
   it("rejects unverified CRS, layers and oversized images before fetching", async () => {

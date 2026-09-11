@@ -23,6 +23,6 @@ authenticated page → CensusRepository → shared operational-state derivation 
                                                      explicit search → same-origin geocoding route → provider adapter
 ```
 
-The browser receives serializable domain data and never a Supabase service-role key. One WGS84 PostGIS point is cached on `Civic`, reused by all associated contacts. EPSG:4258 is registered explicitly in OpenLayers before an `ImageWMS` requests the official composite cadastral cartography and reprojects its single view image onto EPSG:3857; parcel queries use the separate queryable layer. WMS parameters are allowlisted by a same-origin route because the verified upstream response does not expose CORS. Provider failures are non-fatal.
+The browser receives serializable domain data and never a Supabase service-role key. One WGS84 PostGIS point is cached on `Civic`, reused by all associated contacts. EPSG:4258 is registered explicitly in OpenLayers before an `ImageWMS` requests the official orange `fabbricati` overlay and reprojects its single view image onto EPSG:3857; parcel queries use the separate queryable layer. WMS parameters are allowlisted by a same-origin route because the verified upstream response does not expose CORS. Provider failures are non-fatal.
 
 The first LAB projection loads the authenticated repository snapshot once per page navigation and filters it locally; it does not reload the database on pan. The GiST index and provider boundary prepare viewport queries for larger volumes without making an unverified RPC part of this milestone.

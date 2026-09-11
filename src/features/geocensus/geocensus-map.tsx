@@ -46,7 +46,7 @@ export function GeoCensusMap({ records, civics, zones, streets, complexes, opera
       const hasComplex = payloads.some((payload) => payload.complexNames.length > 0);
       return new Style({ image: new CircleStyle({ radius: Math.min(24, 10 + Math.sqrt(count) * 3), fill: new Fill({ color: markerColor(status) }), stroke: new Stroke({ color: hasComplex ? "#6f46a5" : "white", width: hasComplex ? 4 : 2 }) }), text: new Text({ text: String(count), fill: new Fill({ color: "white" }), font: "700 12px sans-serif" }) });
     } });
-    const map = new Map({ target: targetRef.current, layers: [new TileLayer({ source: new OSM({ url: osmBasemapProvider.tileUrl, attributions: osmBasemapProvider.attribution }) }), new ImageLayer({ source: cadastral, opacity: 0.78, visible: true }), vector], view: new View({ center: fromLonLat([11.3426, 44.4949]), zoom: 14, minZoom: 5, maxZoom: 20 }) });
+    const map = new Map({ target: targetRef.current, layers: [new TileLayer({ source: new OSM({ url: osmBasemapProvider.tileUrl, attributions: osmBasemapProvider.attribution }) }), new ImageLayer({ source: cadastral, opacity: 0.92, visible: true }), vector], view: new View({ center: fromLonLat([12.5, 42]), zoom: 6, minZoom: 5, maxZoom: 20 }) });
     map.on("singleclick", async (event) => {
       const hit = map.forEachFeatureAtPixel(event.pixel, (feature) => feature);
       if (hit) {
@@ -72,8 +72,8 @@ export function GeoCensusMap({ records, civics, zones, streets, complexes, opera
   useEffect(() => { window.history.replaceState(null, "", geoCensusHref(filters)); }, [filters]);
 
   useEffect(() => {
-    if (projection.features.length > 0 || !filters.zoneId) { return; }
-    const zone = zones.find((item) => item.id === filters.zoneId); if (!zone) return;
+    if (projection.features.length > 0) { return; }
+    const zone = zones.find((item) => item.id === filters.zoneId) ?? zones.find((item) => item.id === records[0]?.zoneId) ?? zones[0]; if (!zone) return;
     const street = streets.find((item) => item.id === filters.streetId);
     const query = `${projection.firstMissingAddress ?? street?.name ?? zone.name}, ${zone.municipality}, Italia`;
     const controller = new AbortController();
@@ -86,7 +86,7 @@ export function GeoCensusMap({ records, civics, zones, streets, complexes, opera
       } catch (error) { if ((error as Error).name !== "AbortError") setContextState("error"); }
     })();
     return () => controller.abort();
-  }, [filters.streetId, filters.zoneId, projection.features.length, projection.firstMissingAddress, streets, zones]);
+  }, [filters.streetId, filters.zoneId, projection.features.length, projection.firstMissingAddress, records, streets, zones]);
 
   const update = (key: keyof GeoCensusFilters, value: string | boolean) => {
     setSelected([]); setContextState("idle");
@@ -116,7 +116,7 @@ export function GeoCensusMap({ records, civics, zones, streets, complexes, opera
     <section className="map-workspace">
       <div className="map-toolbar"><strong>{projection.visibleRecordCount} contatti · {projection.features.length} civici visibili</strong><span>{projection.notGeolocatedRecordCount} contatti / {projection.notGeolocatedCivicCount} civici non geolocalizzati</span><label><input type="checkbox" checked={cadastralVisible} onChange={(event) => setCadastralVisible(event.target.checked)}/> Cartografia catastale</label><small className={`service-state ${cadastralState}`}>Catasto: {cadastralState === "ready" ? "disponibile" : cadastralState === "error" ? "errore gestito" : "caricamento"}</small></div>
       <div ref={targetRef} className="geocensus-map" aria-label="Mappa GeoCensimento"/>
-      {projection.visibleRecordCount > 0 && projection.features.length === 0 && <div className="map-empty-notice"><strong>Filtro applicato: i risultati non hanno ancora coordinate persistenti.</strong><span>{contextState === "locating" ? "Centro la vista sul contesto…" : contextState === "centered" ? "Vista centrata sull’indirizzo tramite ricerca geografica; il civico resta da verificare e salvare." : contextState === "error" ? "Non è stato possibile centrare automaticamente il contesto." : "I record restano conteggiati e non vengono nascosti."}</span></div>}
+      {projection.visibleRecordCount > 0 && projection.features.length === 0 && <div className="map-empty-notice"><strong>{filters.zoneId ? "Filtro applicato" : "Risultati caricati"}: i civici non hanno ancora coordinate persistenti.</strong><span>{contextState === "locating" ? "Centro la vista sul primo indirizzo…" : contextState === "centered" ? "Vista centrata sull’indirizzo. I fabbricati catastali ufficiali sono evidenziati in arancione; il civico resta da verificare e salvare." : contextState === "error" ? "Non è stato possibile centrare automaticamente il contesto." : "I record restano conteggiati e non vengono nascosti."}</span></div>}
       <div className="map-legend"><strong>Legenda</strong>{Object.entries(CENSUS_OPERATIONAL_STATUS_VISUALS).map(([status, visual]) => <span key={status}><i style={{ background: visual.markerColor }}/>{visual.label}</span>)}<span><i className="complex-ring"/> Complesso</span></div>
       {(selected.length > 0 || cadastralInfo) && <aside className="map-detail">{selected.flatMap((feature) => feature.records).map((record) => { const status = deriveCensusOperationalStatus({ contactType: record.contactType, interviews: record.interviews, staleNewsDays: settings.staleNewsDays, today }); const recall = unresolvedRecallDate(record.interviews, today); return <article key={record.id}><strong>{record.lastName} {record.firstName}</strong><span>{record.streetName}, {record.civicNumber}{record.civicExtension ? `/${record.civicExtension}` : ""}</span><small>{record.subjectType ? (record.subjectType === "AZIENDA" ? "Azienda" : "Privato") : "Soggetto"} · {record.contactType} · {operationalStatusLabel(status)}</small><small>Ultima intervista: {status.lastInterviewAt ?? "mai"} · Giorni: {status.daysSinceLastInterview ?? "—"}</small><small>Ricontatto: {status.isRecallOverdue ? `scaduto da ${status.overdueRecallDays} gg` : recall ?? "—"}</small>{record.complexName && <small>Complesso: {record.complexName}</small>}<Link href={`/censimento/contatti/${record.id}`}>Apri contatto</Link></article>; })}{selected.reduce((total, item) => total + item.records.length, 0) > 1 && selected[0] && <Link className="button secondary full" href={`/censimento/zone/${selected[0].zoneId}/vie/${selected[0].streetId}?q=${encodeURIComponent(selected[0].records[0].civicNumber)}`}>Visualizza contatti del civico</Link>}{cadastralInfo && <article><strong>Dati catastali disponibili</strong><pre>{cadastralInfo}</pre><small>Nessuna entità Censimento viene creata dal click.</small></article>}</aside>}
     </section>

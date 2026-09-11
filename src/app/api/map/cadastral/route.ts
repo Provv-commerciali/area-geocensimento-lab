@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const allowedLayers = new Set(["Cartografia_Catastale", "CP.CadastralParcel"]);
+const allowedLayers = new Set(["fabbricati", "CP.CadastralParcel"]);
 const allowedRequests = new Set(["GetMap", "GetFeatureInfo"]);
 const numberList = z.string().regex(/^-?\d+(?:\.\d+)?(?:,-?\d+(?:\.\d+)?){3}$/);
 const dimension = z.coerce.number().int().min(1).max(2048);

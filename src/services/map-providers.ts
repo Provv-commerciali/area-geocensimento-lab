@@ -7,6 +7,6 @@ export const osmBasemapProvider: BasemapProvider = {
 };
 
 export const italianRevenueCadastralProvider: CadastralMapProvider = {
-  id: "ade-inspire-wms", title: "Particelle catastali — Agenzia delle Entrate", proxyUrl: "/api/map/cadastral",
-  layer: "Cartografia_Catastale", queryLayer: "CP.CadastralParcel", version: "1.3.0", attribution: "Agenzia delle Entrate — CC BY 4.0",
+  id: "ade-inspire-wms", title: "Fabbricati catastali — Agenzia delle Entrate", proxyUrl: "/api/map/cadastral",
+  layer: "fabbricati", queryLayer: "CP.CadastralParcel", version: "1.3.0", attribution: "Agenzia delle Entrate — CC BY 4.0",
 };
