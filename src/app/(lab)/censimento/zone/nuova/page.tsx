@@ -1,0 +1,1 @@
+import { PageHeader } from "@/components/ui";import { ZoneForm } from "@/features/zones/zone-form";export default function NewZone(){return <><PageHeader eyebrow="Censimento / Zone" title="Nuova zona" description="Definisci territorio, assegnatario e collegamenti alle vie."/><ZoneForm/></>}
