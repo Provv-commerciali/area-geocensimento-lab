@@ -1,5 +1,25 @@
 # Codex worklog
 
+## 2026-09-11 — Runtime performance pass
+
+**Obiettivo:** remove the request amplification and unnecessary full-snapshot reads found by the application/database performance audit, without overlapping the separate cadastral-map correction.
+
+**Modifiche:** use-case-scoped data loader; PostgREST record constraints for Zone, Street and Complex pages; Municipality loading only after Province selection; runtime payload validation; linear link aggregation; bounded Contact table rendering; disabled speculative prefetch on authenticated heavy navigation; locally verifiable JWT claims in the Supabase proxy.
+
+**Migration:** `202609110010_runtime_performance_indexes.sql`; reverse many-to-many traversal, record-filter and Subject-order indexes only. No domain or geometry change.
+
+**Esclusione esplicita:** cadastral WMS CRS behavior and map implementation files remain owned by the separate map task.
+
+**Quality gate integrato:** ESLint passed; strict TypeScript passed; 112 Vitest tests passed across 23 files; 15 Playwright Chromium tests passed; Next.js production build passed.
+
+## 2026-09-11 — GeoCensimento production correction
+
+**Problema:** OpenLayers did not know EPSG:4258 and silently requested the cadastral proxy in EPSG:3857, which the verified allowlist correctly rejected. Tiled loading then also produced request bursts and intermittent upstream 502 responses. Zone changes could retain an invalid Via filter, while real post-migration civics without coordinates left the view on the default city.
+
+**Correzione:** explicit ETRS89 registration and transforms; single-image composite AdE WMS with separate parcel query source; dependent Via reset; explicit missing-coordinate notice and one bounded context-centering lookup without marker creation or persistence; resource-scoped repository reads for heavy Censimento pages.
+
+**Verifica:** live local request reached the same-origin proxy with `CRS=EPSG:4258`, `LAYERS=Cartografia_Catastale`, returned HTTP 200 and set the UI state to `Catasto: disponibile`. The integrated automated gate is recorded above.
+
 ## 2026-09-11 — Milestone 2 GeoCensimento
 
 **Obiettivo:** deliver the first operational geographic view of the existing Censimento with free providers and no parallel domain.

@@ -10,7 +10,8 @@ import { hasSupabaseEnvironment } from "@/lib/supabase/server";
 import { loadCensusData } from "@/services/census-data";
 
 export default async function RecordPage({params,searchParams}:{params:Promise<{recordId:string}>;searchParams:Promise<{interviewCreated?:string}>}){
-  const [{recordId},{interviewCreated},{records,operators,subjects,operationalSettings,operationalToday}]=await Promise.all([params,searchParams,loadCensusData()]);
+  const [{recordId},{interviewCreated}]=await Promise.all([params,searchParams]);
+  const {records,operators,subjects,operationalSettings,operationalToday}=await loadCensusData(["records","operators","subjects","operationalSettings"]);
   const record=records.find(item=>item.id===recordId);if(!record)notFound();
   const latest=latestInterview(record);
   const linked=record.subjectLinks.map(link=>({link,subject:subjects.find(subject=>subject.id===link.subjectId)})).filter(item=>item.subject);

@@ -9,7 +9,7 @@ export interface CivicMapFeature {
   civicId: string; longitude: number; latitude: number; address: string; zoneId: string; streetId: string;
   records: CensusRecord[]; status: CensusOperationalStatus; complexNames: string[];
 }
-export interface GeoCensusProjection { features: CivicMapFeature[]; visibleRecordCount: number; notGeolocatedCivicCount: number; notGeolocatedRecordCount: number }
+export interface GeoCensusProjection { features: CivicMapFeature[]; visibleRecordCount: number; notGeolocatedCivicCount: number; notGeolocatedRecordCount: number; firstMissingAddress?: string }
 
 export function dominantOperationalStatus(records: CensusRecord[], settings: CensusOperationalSettings, today: string): CensusOperationalStatus {
   const present = new Set(records.map((record) => deriveCensusOperationalStatus({ contactType: record.contactType, interviews: record.interviews, staleNewsDays: settings.staleNewsDays, today }).status));
@@ -24,16 +24,16 @@ export function projectGeoCensus(input: {
     .filter((record) => !input.filters.onlyComplexes || Boolean(record.complexId));
   const byCivic = new Map<string, CensusRecord[]>();
   filtered.forEach((record) => byCivic.set(record.civicId, [...(byCivic.get(record.civicId) ?? []), record]));
-  let notGeolocatedCivicCount = 0; let notGeolocatedRecordCount = 0;
+  let notGeolocatedCivicCount = 0; let notGeolocatedRecordCount = 0; let firstMissingAddress: string | undefined;
   const features: CivicMapFeature[] = [];
   byCivic.forEach((records, civicId) => {
     const civic = input.civics.find((item) => item.id === civicId);
-    if (!civic?.location || civic.geocodingStatus !== "GEOLOCATED") { notGeolocatedCivicCount += 1; notGeolocatedRecordCount += records.length; return; }
-    const street = input.streets.find((item) => item.id === civic.streetId);
+    const street = input.streets.find((item) => item.id === (civic?.streetId ?? records[0].streetId));
+    if (!civic?.location || civic.geocodingStatus !== "GEOLOCATED") { notGeolocatedCivicCount += 1; notGeolocatedRecordCount += records.length; firstMissingAddress ??= `${street?.name ?? records[0].streetName}, ${civic?.number ?? records[0].civicNumber}${civic?.extension ? `/${civic.extension}` : ""}`; return; }
     const complexNames = [...new Set(records.map((record) => record.complexName).filter((value): value is string => Boolean(value)))];
     features.push({ civicId, longitude: civic.location.longitude, latitude: civic.location.latitude, address: `${street?.name ?? "Via"}, ${civic.number}${civic.extension ? `/${civic.extension}` : ""}`, zoneId: records[0].zoneId, streetId: civic.streetId, records, status: dominantOperationalStatus(records, input.settings, input.today), complexNames });
   });
-  return { features, visibleRecordCount: filtered.length, notGeolocatedCivicCount, notGeolocatedRecordCount };
+  return { features, visibleRecordCount: filtered.length, notGeolocatedCivicCount, notGeolocatedRecordCount, firstMissingAddress };
 }
 
 export function markerColor(status: CensusOperationalStatus): string { return CENSUS_OPERATIONAL_STATUS_VISUALS[status].markerColor }

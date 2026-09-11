@@ -6,10 +6,11 @@ export async function proxy(request: NextRequest) {
   if (!url || !key) return NextResponse.next({ request });
   let response = NextResponse.next({ request });
   const supabase = createServerClient(url, key, { cookies: { getAll: () => request.cookies.getAll(), setAll: (items) => { items.forEach(({name,value}) => request.cookies.set(name,value)); response=NextResponse.next({request}); items.forEach(({name,value,options})=>response.cookies.set(name,value,options)); } } });
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data, error } = await supabase.auth.getClaims();
+  const authenticated = !error && Boolean(data?.claims?.sub);
   const isLogin = request.nextUrl.pathname.startsWith("/login");
-  if (!user && !isLogin) { const target=request.nextUrl.clone(); target.pathname="/login"; target.searchParams.set("returnTo",request.nextUrl.pathname); return NextResponse.redirect(target); }
-  if (user && isLogin) { const target=request.nextUrl.clone(); target.pathname="/"; target.search=""; return NextResponse.redirect(target); }
+  if (!authenticated && !isLogin) { const target=request.nextUrl.clone(); target.pathname="/login"; target.searchParams.set("returnTo",request.nextUrl.pathname); return NextResponse.redirect(target); }
+  if (authenticated && isLogin) { const target=request.nextUrl.clone(); target.pathname="/"; target.search=""; return NextResponse.redirect(target); }
   return response;
 }
 

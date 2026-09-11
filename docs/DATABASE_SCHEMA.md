@@ -20,4 +20,6 @@ Migration `202609110008_census_operational_status.sql` adds the singleton `censu
 
 Migration `202609110009_geocensus_civic_locations.sql` adds an optional `geography(Point,4326)` to `civics`, explicit geocoding state, source, timestamp, optional quality/review note and a GiST spatial index. A consistency constraint requires provenance for `GEOLOCATED` rows. Existing Civic grants and RLS remain in force; coordinates are not duplicated on contacts.
 
+Migration `202609110010_runtime_performance_indexes.sql` adds non-invasive B-tree indexes for reverse Zone/Street and Complex/Civic traversal, independent Complex/operator/contact-type record filters and deterministic Subject registry ordering. It does not alter entities, RLS, grants or map geometry.
+
 `supabase/seed.sql` inserts a deterministic fictional application dataset. Its Bologna territorial anchors are not the national archive. `scripts/sync-istat-territories.ts` separately downloads, validates and transactionally synchronizes the official archive; see `docs/TERRITORIAL_IMPORT.md`.

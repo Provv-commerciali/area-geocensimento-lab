@@ -13,6 +13,8 @@ Territorial master data has a separate administration path: an offline Node impo
 
 The demo adapter is a documented LAB EXPERIMENT: deterministic fictional records make review possible before infrastructure credentials are present. It does not claim persistence and is visibly labeled.
 
+Runtime pages request only the repository resources they render. Contextual Zone, Street and Complex pages push their record constraints into PostgREST instead of downloading the national snapshot and filtering it afterward. Municipalities and Streets are loaded incrementally after their parent selection through authenticated, runtime-validated routes. Heavy navigation links do not prefetch complete authenticated data trees speculatively.
+
 GeoCensimento reuses these identifiers and relationships through a client-only OpenLayers boundary fed by server-loaded, authenticated Censimento data. External providers remain isolated behind adapters and server routes.
 
 ```text
@@ -21,6 +23,6 @@ authenticated page → CensusRepository → shared operational-state derivation 
                                                      explicit search → same-origin geocoding route → provider adapter
 ```
 
-The browser receives serializable domain data and never a Supabase service-role key. One WGS84 PostGIS point is cached on `Civic`, reused by all associated contacts. The official cadastral WMS is requested in EPSG:4258 and reprojected by OpenLayers onto its EPSG:3857 view. WMS parameters are allowlisted by a same-origin route because the verified upstream response does not expose CORS. Provider failures are non-fatal.
+The browser receives serializable domain data and never a Supabase service-role key. One WGS84 PostGIS point is cached on `Civic`, reused by all associated contacts. EPSG:4258 is registered explicitly in OpenLayers before an `ImageWMS` requests the official composite cadastral cartography and reprojects its single view image onto EPSG:3857; parcel queries use the separate queryable layer. WMS parameters are allowlisted by a same-origin route because the verified upstream response does not expose CORS. Provider failures are non-fatal.
 
 The first LAB projection loads the authenticated repository snapshot once per page navigation and filters it locally; it does not reload the database on pan. The GiST index and provider boundary prepare viewport queries for larger volumes without making an unverified RPC part of this milestone.

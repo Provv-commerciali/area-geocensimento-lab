@@ -1,17 +1,24 @@
 import type { CensusRecord, CensusZone, Civic, Complex, Country, Municipality, Operator, Province, Region, Street, Subject } from "@/domain/census";
 import type { CensusOperationalSettings } from "@/domain/census-operational-status";
 
+export type CensusRecordQuery = {
+  recordId?: string;
+  zoneId?: string;
+  streetId?: string;
+  complexId?: string;
+};
+
 export interface CensusRepository {
-  listRecords(): Promise<CensusRecord[]>;
+  listRecords(query?: CensusRecordQuery): Promise<CensusRecord[]>;
   listZones(): Promise<CensusZone[]>;
-  listStreets(): Promise<Street[]>;
+  listStreets(municipalityId?: string): Promise<Street[]>;
   listCivics(): Promise<Civic[]>;
   listComplexes(): Promise<Complex[]>;
   listOperators(): Promise<Operator[]>;
   listCountries(): Promise<Country[]>;
   listRegions(): Promise<Region[]>;
   listProvinces(): Promise<Province[]>;
-  listMunicipalities(): Promise<Municipality[]>;
+  listMunicipalities(provinceId?: string): Promise<Municipality[]>;
   listSubjects(): Promise<Subject[]>;
   getOperationalSettings(): Promise<CensusOperationalSettings>;
 }

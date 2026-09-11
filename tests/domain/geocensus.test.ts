@@ -25,6 +25,7 @@ describe("GeoCensimento domain projection", () => {
     const result = projectGeoCensus({ records, civics, streets, complexes, filters: {}, settings, today });
     expect(result.notGeolocatedCivicCount).toBe(1);
     expect(result.notGeolocatedRecordCount).toBeGreaterThan(0);
+    expect(result.firstMissingAddress).toMatch(/Via /);
   });
 
   it("round-trips stable URL filters", () => {

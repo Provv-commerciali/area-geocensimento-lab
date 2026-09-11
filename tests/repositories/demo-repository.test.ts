@@ -7,4 +7,8 @@ describe("demo repository contract", () => {
   it("supports multi-civic complexes", async () => expect((await demoCensusRepository.listComplexes()).some(c=>c.civicIds.length>1)).toBe(true));
   it("contains repeated interview history", async () => expect((await demoCensusRepository.listRecords()).some(r=>r.interviews.length>1)).toBe(true));
   it("provides the documented operational default without embedding it in the derivation",async()=>expect(await demoCensusRepository.getOperationalSettings()).toEqual({staleNewsDays:30}));
+  it("applies contextual record and territory filters at the repository boundary",async()=>{
+    expect((await demoCensusRepository.listRecords({zoneId:"zone-1"})).every(record=>record.zoneId==="zone-1")).toBe(true);
+    expect(await demoCensusRepository.listMunicipalities("missing-province")).toEqual([]);
+  });
 });

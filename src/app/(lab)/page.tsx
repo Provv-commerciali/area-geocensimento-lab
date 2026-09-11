@@ -7,7 +7,7 @@ import { loadCensusData } from "@/services/census-data";
 import { hasSupabaseEnvironment } from "@/lib/supabase/server";
 
 export default async function Dashboard() {
-  const { complexes, records, zones, operationalToday } = await loadCensusData();
+  const { complexes, records, zones, operationalToday } = await loadCensusData(["records", "zones", "complexes"]);
   const interviewed = records.filter((record) => latestInterview(record)).length;
   const recalls = records.map((record) => ({ record, recallDate: unresolvedRecallDate(record.interviews, operationalToday) })).filter((item) => item.recallDate);
   return <><PageHeader eyebrow="Quadro operativo" title="Censimento LAB" description="Territorio, contatti e attività in un’unica vista di lavoro." action={<Link className="button primary" href="/censimento/contatti/nuovo">Nuovo contatto <ArrowRight size={17}/></Link>}/><DataModeNotice databaseMode={hasSupabaseEnvironment()}/>

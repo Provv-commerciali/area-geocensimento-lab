@@ -5,7 +5,7 @@ GeoCensimento is the map projection of existing Censimento contacts. The page lo
 ## Layers and interaction
 
 1. Replaceable OSM LAB basemap with required attribution.
-2. Toggleable official AdE parcel WMS through a same-origin proxy; failure leaves the app usable and is displayed.
+2. Toggleable official AdE composite cadastral WMS through a same-origin proxy; the queryable parcel layer is used for point information. Failure leaves the app usable and is displayed.
 3. One vector feature per geolocated civic. It contains references to all matching CensusRecords and any associated Complex names.
 4. OpenLayers density clustering at 48 px. A cluster count is the number of contacts, not merely civic features. Click zooms into a multi-feature cluster; at detail scale it lists individual contacts.
 
@@ -13,11 +13,11 @@ The primary marker/cluster color follows operational precedence. A purple ring i
 
 ## URL filters
 
-Stable parameters are `zone`, `street`, `type`, `operator`, `activity` (`never`, `staleNews`, `recallOverdue`, `actionRequired`), `appraised`, `complex` and `q`. Contacts, Zone, Via and Complex pages provide contextual links. The browser updates the URL as map filters change, making the view reproducible.
+Stable parameters are `zone`, `street`, `type`, `operator`, `activity` (`never`, `staleNews`, `recallOverdue`, `actionRequired`), `appraised`, `complex` and `q`. Contacts, Zone, Via and Complex pages provide contextual links. The browser updates the URL as map filters change, making the view reproducible. Changing Zone clears the dependent Via selection so an invisible stale street filter cannot suppress valid results.
 
 ## Location and performance
 
-Migration `202609110009_geocensus_civic_locations.sql` adds one `geography(Point,4326)` per Civic, metadata and a GiST index. `NOT_GEOLOCATED` and `NEEDS_REVIEW` civics are counted explicitly and not rendered. Opening/panning never calls geocoding. This LAB loads one repository snapshot; future bounding-box reads can use the existing spatial index without changing the map projection contract.
+Migration `202609110009_geocensus_civic_locations.sql` adds one `geography(Point,4326)` per Civic, metadata and a GiST index. `NOT_GEOLOCATED` and `NEEDS_REVIEW` civics are counted explicitly and not rendered as markers. When an explicit Zone/Via context has matching records but no persisted coordinates, the UI performs one bounded geographic lookup to center the view and clearly states that the civic is still unverified and unsaved. Panning never calls geocoding and no lookup result is persisted automatically. This LAB loads one repository snapshot; future bounding-box reads can use the existing spatial index without changing the map projection contract.
 
 ## Security and hard stops
 
