@@ -3,10 +3,12 @@ import { filterCensusRecords } from "@/features/census/filters";
 import { records } from "@/lib/demo-data";
 
 describe("census filters", () => {
-  it("searches across person and address", () => expect(filterCensusRecords(records,{query:"Via Roma"}).every(r=>r.streetName==="Via Roma")).toBe(true));
-  it("combines territory and contact type", () => { const result=filterCensusRecords(records,{zoneId:"zone-1",contactType:"Notizia"}); expect(result.length).toBeGreaterThan(0); expect(result.every(r=>r.zoneId==="zone-1"&&r.contactType==="Notizia")).toBe(true) });
-  it("filters numeric ranges", () => expect(filterCensusRecords(records,{surfaceFrom:80,surfaceTo:100}).every(r=>(r.surface??0)>=80&&(r.surface??0)<=100)).toBe(true));
-  it("keeps manually appraised and non-appraised Notizia distinct", () => { const news=filterCensusRecords(records,{contactType:"Notizia"}); expect(news.some(r=>r.isAppraised)).toBe(true); expect(news.some(r=>!r.isAppraised)).toBe(true) });
-  it("derives never contacted only from the absence of real interviews", () => { const result=filterCensusRecords(records,{contactStatus:"never"}); expect(result.length).toBeGreaterThan(0); expect(result.every(r=>r.interviews.length===0)).toBe(true) });
-  it("derives contacted only from actual interview rows", () => expect(filterCensusRecords(records,{contactStatus:"contacted"}).every(r=>r.interviews.length>0)).toBe(true));
+  const context={staleNewsDays:30,today:"2026-09-11"};
+  it("searches across person and address", () => expect(filterCensusRecords(records,{query:"Via Roma"},context).every(r=>r.streetName==="Via Roma")).toBe(true));
+  it("combines territory and contact type", () => { const result=filterCensusRecords(records,{zoneId:"zone-1",contactType:"Notizia"},context); expect(result.length).toBeGreaterThan(0); expect(result.every(r=>r.zoneId==="zone-1"&&r.contactType==="Notizia")).toBe(true) });
+  it("filters numeric ranges", () => expect(filterCensusRecords(records,{surfaceFrom:80,surfaceTo:100},context).every(r=>(r.surface??0)>=80&&(r.surface??0)<=100)).toBe(true));
+  it("keeps manually appraised and non-appraised Notizia distinct", () => { const news=filterCensusRecords(records,{contactType:"Notizia"},context); expect(news.some(r=>r.isAppraised)).toBe(true); expect(news.some(r=>!r.isAppraised)).toBe(true) });
+  it("I: derives never contacted only from the absence of real interviews", () => { const result=filterCensusRecords(records,{operationalStatus:"never"},context); expect(result.length).toBeGreaterThan(0); expect(result.every(r=>r.interviews.length===0)).toBe(true) });
+  it("derives contacted only from actual interview rows", () => expect(filterCensusRecords(records,{contactStatus:"contacted"},context).every(r=>r.interviews.length>0)).toBe(true));
+  it("filters overdue recalls, stale news and the combined work queue via the shared derivation",()=>{const overdue=filterCensusRecords(records,{operationalStatus:"recallOverdue"},context);const stale=filterCensusRecords(records,{operationalStatus:"staleNews"},context);const work=filterCensusRecords(records,{operationalStatus:"actionRequired"},context);expect(work.length).toBeGreaterThanOrEqual(overdue.length);expect(work.length).toBeGreaterThanOrEqual(stale.length);expect(work.length).toBeGreaterThan(0)});
 });

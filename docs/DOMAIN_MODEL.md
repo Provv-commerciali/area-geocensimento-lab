@@ -16,6 +16,14 @@ Legacy person columns remain on `census_records` only to preserve already-loaded
 
 `Complex ↔ Civic` is many-to-many through `complex_civics`; creation may attach the first selected civic but does not designate a “primary” civic.
 
+## Derived operational status
+
+Operational state is a projection of one `CensusRecord`, its real `CensusInterview` children, the persisted `stale_news_days` setting and an explicit Europe/Rome civil date. It is never stored on the contact. `deriveCensusOperationalStatus` is the shared domain function for lists, detail views and a future map consumer.
+
+The precedence is `RICONTATTO_SCADUTO` → `NOTIZIA_NON_AGGIORNATA` → `MAI_CONTATTATO` → `ORDINARIO`. The booleans remain independent so that a stale Notizia with an overdue recall exposes both facts while presenting the recall as its primary state. “Mai contattato” means exactly zero real interview children. Days since last contact use the most recent interview date, never record timestamps or technical events.
+
+A recall is overdue when its date is before today and there is no different interview dated on or after that recall date. An interview on the scheduled date therefore fulfils it. When several recalls remain unfulfilled, the oldest controls overdue days. A Notizia is stale only when it has an interview and its age is strictly greater than the configured threshold. The LAB default is 30 days and is editable; it is not embedded in the derivation.
+
 ## Important invariants
 
 - `is_appraised` defaults false and is never derived from contact type.
@@ -27,6 +35,7 @@ Legacy person columns remain on `census_records` only to preserve already-loaded
 - Strong CF/P.IVA matches prompt reuse of the existing subject.
 - One subject can link to many property contexts and one context to many subjects.
 - A CensusRecord creation cannot create a CensusInterview.
+- Operational flags and day counts are derived, never persisted on `census_records`.
 - Streets are unique by municipality plus normalized name; civics by street plus normalized number/extension.
 - Record duplicate protection prevents the same subject from being linked twice to the same location, building scope, floor and subaltern; subject uniqueness remains governed separately by strong identifiers.
 

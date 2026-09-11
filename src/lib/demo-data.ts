@@ -48,7 +48,7 @@ export const records: CensusRecord[] = Array.from({ length: 36 }, (_, index) => 
     interviews: Array.from({ length: interviewCount }, (_, j) => ({
       id: `int-${index}-${j}`, recordId: `rec-${index + 1}`, operatorId: operators[(index + j) % operators.length].id,
       operatorName: operators[(index + j) % operators.length].name, interviewDate: `2026-0${Math.min(9, (index % 8) + 1)}-${String(8 + j).padStart(2, "0")}`,
-      recallDate: j === interviewCount - 1 && index % 2 === 0 ? "2026-12-15" : undefined,
+      recallDate: j === interviewCount - 1 ? (index === 7 ? "2026-08-15" : index % 2 === 0 ? "2026-12-15" : undefined) : undefined,
       response: j ? "Interessato" : "Da ricontattare", reason: "Verifica disponibilità", outcome: j ? "Positivo" : "In attesa",
     })),
   };

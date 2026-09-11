@@ -1,5 +1,15 @@
 # Codex worklog
 
+## 2026-09-11 — Milestone 1B operational contact state
+
+**Obiettivo:** add actionable age, stale Notizia and overdue recall semantics without redesigning the approved Censimento workflow.
+
+**Modifiche:** pure shared operational derivation with explicit Europe/Rome date; centralized accessible visual tokens; Contact list/detail badges and day counts; real-repository operational filters; minimal persistent threshold screen; Dashboard activity projection; no synthetic interviews and no map implementation.
+
+**Migration:** `202609110008_census_operational_status.sql` after migration `007`; adds only the RLS-protected singleton configuration.
+
+**Test:** deterministic cases A–I, threshold/RLS migration contracts, operational filters and Playwright smoke coverage. Final gate results are recorded in the delivery report.
+
 ## 2026-09-11 — Archivio territoriale nazionale ISTAT/SITUAS
 
 **Obiettivo:** replace demo-only territorial choices in the Supabase LAB with the complete official Italian hierarchy while preserving existing zones and Milestone 1 boundaries.

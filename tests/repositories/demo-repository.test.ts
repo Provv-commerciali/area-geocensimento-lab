@@ -6,4 +6,5 @@ describe("demo repository contract", () => {
   it("supports explicit zone-to-street relationships", async () => expect((await demoCensusRepository.listZones()).every(z=>z.streetIds.length>0)).toBe(true));
   it("supports multi-civic complexes", async () => expect((await demoCensusRepository.listComplexes()).some(c=>c.civicIds.length>1)).toBe(true));
   it("contains repeated interview history", async () => expect((await demoCensusRepository.listRecords()).some(r=>r.interviews.length>1)).toBe(true));
+  it("provides the documented operational default without embedding it in the derivation",async()=>expect(await demoCensusRepository.getOperationalSettings()).toEqual({staleNewsDays:30}));
 });

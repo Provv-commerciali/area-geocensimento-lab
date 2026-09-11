@@ -58,10 +58,6 @@ export function hasBeenContacted(record: Pick<CensusRecord, "interviews">): bool
   return record.interviews.length > 0;
 }
 
-export function nextRecall(record: CensusRecord): string | undefined {
-  return record.interviews.filter((i) => i.recallDate).sort((a, b) => a.recallDate!.localeCompare(b.recallDate!))[0]?.recallDate;
-}
-
 export function canShowAppraisal(type: ContactType): boolean { return type === "Notizia"; }
 export function normalizeAppraisal(type: ContactType, manuallyChecked: boolean): boolean {
   return type === "Notizia" ? manuallyChecked : false;

@@ -62,3 +62,7 @@ export const interviewSchema = z.object({
   operatorId: z.string().min(1), interviewDate: z.string().date(), recallDate: z.string().date().optional().or(z.literal("")),
   response: optionalText, reason: optionalText, outcome: optionalText,
 });
+
+export const operationalSettingsSchema = z.object({
+  staleNewsDays: z.coerce.number().int("Inserisci un numero intero").min(1, "Il valore minimo è 1 giorno").max(3650, "Il valore massimo è 3650 giorni"),
+});
