@@ -12,3 +12,4 @@ test-results/
 .sites-runtime/
 *.tsbuildinfo
 npm-debug.log*
+debug.log
