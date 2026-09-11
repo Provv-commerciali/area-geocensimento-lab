@@ -23,6 +23,8 @@ describe("cadastral WMS proxy", () => {
     expect(new URL(String(fetchMock.mock.calls[0][0])).searchParams.get("LAYERS")).toBe("fabbricati");
   });
 
+  it("validates and normalizes GetFeatureInfo attributes",async()=>{const fetchMock=vi.spyOn(globalThis,"fetch").mockResolvedValue(new Response("<title>CP.CadastralParcel</title><table><tr><th>Label</th><td>1</td></tr><tr><th>NationalCadastralReference</th><td>G628_001800.1</td></tr></table>",{status:200,headers:{"Content-Type":"text/html"}}));const info=valid.replace("REQUEST=GetMap","REQUEST=GetFeatureInfo").replace("&WIDTH=256","&QUERY_LAYERS=CP.CadastralParcel&I=10&J=10&WIDTH=256");const response=await GET(new Request(info));expect(await response.json()).toEqual({feature:{municipalityCode:"G628",sheet:"18",parcel:"1",featureType:"PARTICELLA"}});expect(new URL(String(fetchMock.mock.calls[0][0])).searchParams.get("INFO_FORMAT")).toBe("text/html")});
+
   it("rejects unverified CRS, layers and oversized images before fetching", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch");
     expect((await GET(new Request(valid.replace("EPSG%3A4258", "EPSG%3A3857")))).status).toBe(400);

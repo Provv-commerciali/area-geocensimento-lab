@@ -1,5 +1,15 @@
 # Codex worklog
 
+## 2026-09-11 — Verified civic location and confirmed cadastral association
+
+**Obiettivo:** integrate geocoder-assisted but operator-verified civic positioning into Nuovo Contatto, and add a normal Contact workflow for previewing and confirming an official free cadastral parcel.
+
+**Risultato:** Civic remains the only coordinate owner and now distinguishes `NOT_GEOLOCATED`, `AUTO_GEOLOCATED` and `VERIFIED` with method/audit metadata. A reusable OpenLayers picker supports address centering, click, drag, cancel and explicit confirmation. GeoCensimento distinguishes verified, to-verify and missing civics. Contact detail adds a separate cadastral picker using the existing orange AdE WMS and validated `GetFeatureInfo`; confirmation creates/corrects one RLS-protected association per CensusRecord and synchronizes only sheet/parcel.
+
+**Performance e sicurezza:** no bulk geocoding, no map-pan geocoding, no duplicated contact coordinates, no automatic cadastral match, targeted Contact/Subject-context reads, provider calls behind existing same-origin boundaries, authenticated security-invoker writes.
+
+**Hard stop:** no OpenAPI Catasto, paid API, visura, ownership data, scraping, invented subaltern/category, or parallel property/contact archive.
+
 ## 2026-09-11 — Runtime performance pass
 
 **Obiettivo:** remove the request amplification and unnecessary full-snapshot reads found by the application/database performance audit, without overlapping the separate cadastral-map correction.

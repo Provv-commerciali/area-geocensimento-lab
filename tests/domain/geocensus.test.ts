@@ -28,6 +28,12 @@ describe("GeoCensimento domain projection", () => {
     expect(result.firstMissingAddress).toMatch(/Via /);
   });
 
+  it("distinguishes verified, automatic and missing civic locations",()=>{
+    const result=projectGeoCensus({records,civics,streets,complexes,filters:{},settings,today});
+    expect(result.verifiedCivicCount).toBeGreaterThan(0);expect(result.autoGeolocatedCivicCount).toBe(1);expect(result.notGeolocatedCivicCount).toBe(1);
+    expect(result.features.find(feature=>feature.locationStatus==="AUTO_GEOLOCATED")).toBeDefined();
+  });
+
   it("round-trips stable URL filters", () => {
     const href = geoCensusHref({ zoneId: zones[0].id, streetId: streets[0].id, operatorId: operators[0].id, operationalStatus: "actionRequired", onlyComplexes: true });
     const query = Object.fromEntries(new URL(`https://lab.test${href}`).searchParams);

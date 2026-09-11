@@ -21,11 +21,16 @@ export interface Subject {
 export interface CensusRecordSubject { subjectId: string; role: Qualification | "Non specificato"; isPrimary: boolean; ownershipShare?: number }
 export interface CensusZone { id: string; name: string; municipalityId: string; municipality: string; operator: Operator; streetIds: string[] }
 export interface Street { id: string; municipalityId: string; name: string; municipality: string }
-export type GeocodingStatus = "GEOLOCATED" | "NOT_GEOLOCATED" | "NEEDS_REVIEW";
+export type GeocodingStatus = "NOT_GEOLOCATED" | "AUTO_GEOLOCATED" | "VERIFIED";
+export type GeocodingMethod = "GEOCODER" | "MANUAL_MAP" | "CADASTRAL";
 export interface CivicLocation {
-  longitude: number; latitude: number; source?: string; geocodedAt?: string; quality?: number;
+  longitude: number; latitude: number; source?: string; method?: GeocodingMethod; geocodedAt?: string; verifiedAt?: string; quality?: number;
 }
 export interface Civic { id: string; streetId: string; number: string; extension?: string; geocodingStatus?: GeocodingStatus; location?: CivicLocation }
+export interface CadastralAssociation {
+  recordId: string; municipalityCode: string; municipalityName?: string; section?: string; sheet: string; parcel: string;
+  featureType?: string; source: string; sourceLayer: string; verifiedAt: string;
+}
 export interface Complex { id: string; name: string; zoneId: string; civicIds: string[]; sheet?: string; parcel?: string; units?: number; description?: string }
 export interface CensusInterview {
   id: string; recordId: string; operatorId: string; operatorName: string;
@@ -41,7 +46,7 @@ export interface CensusRecord {
   occupancy?: Occupancy; elevator?: boolean; sheet?: string; parcel?: string; subaltern?: string;
   cadastralCategory?: string; isAppraised: boolean; probableAssignment?: boolean;
   engagementType?: string; createdAt: string; interviews: CensusInterview[];
-  subjectLinks: CensusRecordSubject[];
+  subjectLinks: CensusRecordSubject[]; cadastralAssociation?: CadastralAssociation;
 }
 
 export function subjectDisplayName(subject: Subject): string {

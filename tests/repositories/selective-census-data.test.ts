@@ -16,4 +16,6 @@ describe("selective census data loading", () => {
     expect(data.records.length).toBeGreaterThan(0);
     expect(data.records.every((record) => record.streetId === "st-1")).toBe(true);
   });
+
+  it("loads only requested civics and linked subjects for contact detail",async()=>{const data=await loadCensusData(["civics","subjects"],{civicId:"cv-1",subjectIds:["subject-1"]});expect(data.civics.map(item=>item.id)).toEqual(["cv-1"]);expect(data.subjects.map(item=>item.id)).toEqual(["subject-1"])});
 });

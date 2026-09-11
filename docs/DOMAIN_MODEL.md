@@ -20,7 +20,9 @@ Legacy person columns remain on `census_records` only to preserve already-loaded
 
 ## GeoCensimento civic location
 
-`Civic` optionally owns one cached `geography(Point, 4326)` plus geocoding source, timestamp, optional 0–1 quality and the explicit state `GEOLOCATED`, `NOT_GEOLOCATED` or `NEEDS_REVIEW`. Only `GEOLOCATED` civics are projected. Contacts never store duplicate coordinates; several contacts at one civic become one civic feature whose details retain the original record identifiers.
+`Civic` optionally owns one cached `geography(Point, 4326)` plus source, method, timestamp, optional 0–1 quality and the explicit state `NOT_GEOLOCATED`, `AUTO_GEOLOCATED` or `VERIFIED`. `GEOCODER` may only produce an automatic candidate; only an explicit operator confirmation with `MANUAL_MAP` or `CADASTRAL` may produce `VERIFIED`. Contacts and Subjects never store duplicate coordinates. Several contacts at one civic reuse the same point and become one civic feature; automatic features remain visibly uncertain and verified features have priority.
+
+`CadastralAssociation` belongs one-to-one to a `CensusRecord`, because a parcel selection describes the property/census context rather than a person and is distinct from the civic point. It stores only attributes actually returned and explicitly confirmed from the free AdE WMS: cadastral municipality code/name, optional section, sheet, parcel, optional feature type, source/layer, query reference and verification audit. Confirmation synchronizes the existing canonical `CensusRecord.sheet` and `parcel`; it never invents or overwrites unavailable subaltern, category, ownership or visura data. A later paid enrichment must extend this association rather than create a parallel identity.
 
 Map operational status is not new domain state. Each associated record is passed to `deriveCensusOperationalStatus`; a mixed civic/cluster uses the same precedence (`RICONTATTO_SCADUTO`, `NOTIZIA_NON_AGGIORNATA`, `MAI_CONTATTATO`, `ORDINARIO`) for its primary color. A purple ring is only a secondary Complex indicator.
 
@@ -47,6 +49,7 @@ A recall is overdue when its date is before today and there is no different inte
 - Streets are unique by municipality plus normalized name; civics by street plus normalized number/extension.
 - Record duplicate protection prevents the same subject from being linked twice to the same location, building scope, floor and subaltern; subject uniqueness remains governed separately by strong identifiers.
 - A cadastral WMS feature is external cartography and never creates a CensusRecord, property, subject or ownership link.
+- A map click is an external preview. Only the separate confirmation command creates or corrects a CadastralAssociation.
 
 ## Future boundary (documentation only)
 
@@ -54,4 +57,4 @@ A recall is overdue when its date is before today and there is no different inte
 CENSIMENTO ↔ CADASTRAL IDENTITY ↔ CADASTRAL CARTOGRAPHY
 ```
 
-A future milestone may introduce `CadastralIdentity`, `CadastralParcel`, geometry and source/provider. These do not exist in the current schema. Manual census data is not assumed to be the sole authoritative cadastral source, and a parcel is not assumed to represent one unit.
+A future milestone may enrich the current minimal `CadastralAssociation` with provider-backed identity or geometry. Manual census data is not assumed to be the sole authoritative cadastral source, and a parcel is not assumed to represent one unit.

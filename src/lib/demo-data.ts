@@ -19,8 +19,8 @@ export const zones: CensusZone[] = [
 export const civics: Civic[] = Array.from({ length: 20 }, (_, index) => ({
   id: `cv-${index + 1}`, streetId: streets[index % streets.length].id, number: String(2 + index * 2),
   ...(index % 6 === 0 ? { extension: index % 12 === 0 ? "A" : "bis" } : {}),
-  geocodingStatus: index === 19 ? "NOT_GEOLOCATED" : "GEOLOCATED",
-  ...(index === 19 ? {} : { location: { longitude: 11.3425 + (index % 5) * 0.0022, latitude: 44.4937 + Math.floor(index / 5) * 0.0018, source: "fixture LAB", geocodedAt: "2026-09-11", quality: 1 } }),
+  geocodingStatus: index === 19 ? "NOT_GEOLOCATED" : index === 18 ? "AUTO_GEOLOCATED" : "VERIFIED",
+  ...(index === 19 ? {} : { location: { longitude: 11.3425 + (index % 5) * 0.0022, latitude: 44.4937 + Math.floor(index / 5) * 0.0018, source: "fixture LAB", method: index === 18 ? "GEOCODER" : "MANUAL_MAP", geocodedAt: "2026-09-11", verifiedAt: index === 18 ? undefined : "2026-09-11", quality: 1 } }),
 }));
 export const complexes: Complex[] = [
   { id: "cx-1", name: "Corte Mercanti", zoneId: "zone-1", civicIds: ["cv-1", "cv-6", "cv-11"], sheet: "12", parcel: "88", units: 18, description: "Complesso multicivico LAB" },

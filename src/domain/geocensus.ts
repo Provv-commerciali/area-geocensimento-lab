@@ -7,9 +7,9 @@ export const MAP_STATUS_PRECEDENCE: CensusOperationalStatus[] = ["RICONTATTO_SCA
 export interface GeoCensusFilters extends CensusFilters { onlyComplexes?: boolean }
 export interface CivicMapFeature {
   civicId: string; longitude: number; latitude: number; address: string; zoneId: string; streetId: string;
-  records: CensusRecord[]; status: CensusOperationalStatus; complexNames: string[];
+  records: CensusRecord[]; status: CensusOperationalStatus; locationStatus: "AUTO_GEOLOCATED" | "VERIFIED"; complexNames: string[];
 }
-export interface GeoCensusProjection { features: CivicMapFeature[]; visibleRecordCount: number; notGeolocatedCivicCount: number; notGeolocatedRecordCount: number; firstMissingAddress?: string }
+export interface GeoCensusProjection { features: CivicMapFeature[]; visibleRecordCount: number; verifiedCivicCount: number; autoGeolocatedCivicCount: number; notGeolocatedCivicCount: number; notGeolocatedRecordCount: number; firstMissingAddress?: string }
 
 export function dominantOperationalStatus(records: CensusRecord[], settings: CensusOperationalSettings, today: string): CensusOperationalStatus {
   const present = new Set(records.map((record) => deriveCensusOperationalStatus({ contactType: record.contactType, interviews: record.interviews, staleNewsDays: settings.staleNewsDays, today }).status));
@@ -24,16 +24,17 @@ export function projectGeoCensus(input: {
     .filter((record) => !input.filters.onlyComplexes || Boolean(record.complexId));
   const byCivic = new Map<string, CensusRecord[]>();
   filtered.forEach((record) => byCivic.set(record.civicId, [...(byCivic.get(record.civicId) ?? []), record]));
-  let notGeolocatedCivicCount = 0; let notGeolocatedRecordCount = 0; let firstMissingAddress: string | undefined;
+  let verifiedCivicCount = 0; let autoGeolocatedCivicCount = 0; let notGeolocatedCivicCount = 0; let notGeolocatedRecordCount = 0; let firstMissingAddress: string | undefined;
   const features: CivicMapFeature[] = [];
   byCivic.forEach((records, civicId) => {
     const civic = input.civics.find((item) => item.id === civicId);
     const street = input.streets.find((item) => item.id === (civic?.streetId ?? records[0].streetId));
-    if (!civic?.location || civic.geocodingStatus !== "GEOLOCATED") { notGeolocatedCivicCount += 1; notGeolocatedRecordCount += records.length; firstMissingAddress ??= `${street?.name ?? records[0].streetName}, ${civic?.number ?? records[0].civicNumber}${civic?.extension ? `/${civic.extension}` : ""}`; return; }
+    if (!civic?.location || civic.geocodingStatus === "NOT_GEOLOCATED" || !civic.geocodingStatus) { notGeolocatedCivicCount += 1; notGeolocatedRecordCount += records.length; firstMissingAddress ??= `${street?.name ?? records[0].streetName}, ${civic?.number ?? records[0].civicNumber}${civic?.extension ? `/${civic.extension}` : ""}`; return; }
+    if (civic.geocodingStatus === "VERIFIED") verifiedCivicCount += 1; else autoGeolocatedCivicCount += 1;
     const complexNames = [...new Set(records.map((record) => record.complexName).filter((value): value is string => Boolean(value)))];
-    features.push({ civicId, longitude: civic.location.longitude, latitude: civic.location.latitude, address: `${street?.name ?? "Via"}, ${civic.number}${civic.extension ? `/${civic.extension}` : ""}`, zoneId: records[0].zoneId, streetId: civic.streetId, records, status: dominantOperationalStatus(records, input.settings, input.today), complexNames });
+    features.push({ civicId, longitude: civic.location.longitude, latitude: civic.location.latitude, address: `${street?.name ?? "Via"}, ${civic.number}${civic.extension ? `/${civic.extension}` : ""}`, zoneId: records[0].zoneId, streetId: civic.streetId, records, status: dominantOperationalStatus(records, input.settings, input.today), locationStatus: civic.geocodingStatus, complexNames });
   });
-  return { features, visibleRecordCount: filtered.length, notGeolocatedCivicCount, notGeolocatedRecordCount, firstMissingAddress };
+  return { features, visibleRecordCount: filtered.length, verifiedCivicCount, autoGeolocatedCivicCount, notGeolocatedCivicCount, notGeolocatedRecordCount, firstMissingAddress };
 }
 
 export function markerColor(status: CensusOperationalStatus): string { return CENSUS_OPERATIONAL_STATUS_VISUALS[status].markerColor }

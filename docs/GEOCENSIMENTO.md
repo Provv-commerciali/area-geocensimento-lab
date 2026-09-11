@@ -9,7 +9,7 @@ GeoCensimento is the map projection of existing Censimento contacts. The page lo
 3. One vector feature per geolocated civic. It contains references to all matching CensusRecords and any associated Complex names.
 4. OpenLayers density clustering at 48 px. A cluster count is the number of contacts, not merely civic features. Click zooms into a multi-feature cluster; at detail scale it lists individual contacts.
 
-The primary marker/cluster color follows operational precedence. A purple ring indicates at least one Complex without replacing operational meaning. The detail drawer shows address, contact/private-or-company display, type, operational state, latest interview, age, recall/overdue delay, Complex and links to the existing contact sheet. Cadastral click results are external information only.
+The primary marker/cluster color follows operational precedence. A purple ring indicates at least one Complex without replacing operational meaning. Every feature also carries `VERIFIED` or `AUTO_GEOLOCATED`; counters separate verified, to-verify and missing civics, and the detail never presents an automatic point as certain. Cadastral clicks on the general map remain informative only.
 
 ## URL filters
 
@@ -17,7 +17,9 @@ Stable parameters are `zone`, `street`, `type`, `operator`, `activity` (`never`,
 
 ## Location and performance
 
-Migration `202609110009_geocensus_civic_locations.sql` adds one `geography(Point,4326)` per Civic, metadata and a GiST index. `NOT_GEOLOCATED` and `NEEDS_REVIEW` civics are counted explicitly and not rendered as markers. When matching records have no persisted coordinates, the UI performs one bounded lookup for the first matching address, centers at cadastral zoom and clearly states that the civic is still unverified and unsaved. Panning never calls geocoding and no lookup result is persisted automatically. This LAB loads one repository snapshot; future bounding-box reads can use the existing spatial index without changing the map projection contract.
+Migration `202609110009_geocensus_civic_locations.sql` adds one `geography(Point,4326)` per Civic and the GiST index; migration `202609110012_verified_locations_and_cadastral_associations.sql` makes its state machine explicit. Nuovo Contatto shows the selected civic’s state. Opening its picker performs at most one address lookup when needed and caches the result as `AUTO_GEOLOCATED`; clicking or dragging changes only the candidate until “Conferma posizione”, which writes `VERIFIED`. A second contact at the same civic reuses that row without another lookup. Panning never calls geocoding and proximity never verifies.
+
+The Contact sheet provides the separate cadastral workflow. It centers on the civic point when available, activates the official orange overlay, validates `GetFeatureInfo`, previews municipality code/name, optional section, sheet, parcel and optional type, then requires “Conferma particella”. Cancel and ordinary map clicks write nothing. Manual correction repeats the same audited command.
 
 ## Security and hard stops
 

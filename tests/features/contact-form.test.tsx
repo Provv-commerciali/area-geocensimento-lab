@@ -19,7 +19,10 @@ describe("contact form", () => {
     await user.selectOptions(screen.getByLabelText("Via *"),"st-1");
     await user.selectOptions(screen.getByLabelText("Civico *"),"cv-1");
     expect(screen.getByRole("textbox",{name:/Estensione/})).toHaveValue("A");
+    expect(screen.getByText("Posizione geografica verificata")).toBeInTheDocument();
   });
+
+  it("shows an explicit map action for an unlocated civic",async()=>{const user=userEvent.setup();render(<ContactForm/>);await user.selectOptions(screen.getByLabelText("Zona di censimento *"),"zone-1");await user.selectOptions(screen.getByLabelText("Via *"),"st-5");await user.selectOptions(screen.getByLabelText("Civico *"),"cv-20");expect(screen.getByText("Posizione non verificata")).toBeInTheDocument();expect(screen.getByRole("button",{name:"Individua sulla mappa"})).toBeInTheDocument()});
 
   it("shows structured floor controls only for a partial building", async () => {
     const user=userEvent.setup(); render(<ContactForm/>);

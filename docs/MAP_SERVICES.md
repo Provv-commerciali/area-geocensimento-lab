@@ -18,12 +18,12 @@ Verification date: 2026-09-11. These facts come from live official capabilities 
 - Advertised CRS: EPSG:6706, 4258, 3044, 3045, 3046, 25832, 25833 and 25834. EPSG:3857 is not advertised.
 - Coverage described by the service: Italy except the autonomous provinces of Trento and Bolzano.
 - Live close-scale `fabbricati` `GetMap` probe in EPSG:4258: HTTP 200, `image/png`, 184,372 bytes, with orange footprints over transparency.
-- Live `GetFeatureInfo` probe in EPSG:4258/plain text: HTTP 200; the sample point returned no feature, which is a valid empty result.
+- Live `GetFeatureInfo` probe in EPSG:4258: plain text identified a feature but exposed no attributes; HTML returned the official `Label` and `NationalCadastralReference` (`1` and `G628_001800.1` at the verified sample). The proxy therefore requests HTML and normalizes that reference to cadastral code `G628`, sheet `18`, parcel `1`.
 - CORS: the responses did not expose `Access-Control-Allow-Origin`; the app therefore uses `/api/map/cadastral` with an operation/layer/parameter allowlist and a 12-second timeout.
 - Same-origin proxy probe: the valid EPSG:4258 request returned HTTP 200 and the same 2,747-byte PNG; an EPSG:3857 request was rejected locally with HTTP 400.
 - Projection and load strategy: the app explicitly registers EPSG:4258 (including WMS 1.3 axis order) before creating one `ImageWMS` per view. OpenLayers reprojects it onto EPSG:3857. A single image avoids the burst of concurrent tile requests that caused intermittent upstream 502 responses.
 - Attribution: `Agenzia delle Entrate — CC BY 4.0`.
-- `GetFeatureInfo` output is shown as external data and never creates internal entities.
+- `GetFeatureInfo` plain text is parsed and runtime-validated into only municipality code/name, optional section, sheet, parcel and optional type. The general map remains read-only; the Contact picker creates/corrects an association only after a separate confirmation.
 
 Other advertised layers include the composite parent, `CP.CadastralZoning`, `province`, `acque`, `strade`, `codice_plla`, `simbolo_graffa` and `copyright`; they are not silently added to the visual overlay.
 
@@ -33,6 +33,6 @@ The probed endpoint `https://wfs.cartografia.agenziaentrate.gov.it/inspire/wfs/o
 
 ## Geocoding
 
-`GeocodingProvider` separates external search from the domain. The LAB adapter uses Nominatim for user searches and a single lookup after an explicit Zone/Via context produces only unlocated matches. Requests are restricted to Italy and at most five results. It sends an identifying User-Agent, never runs on pan and does not perform bulk geocoding. Context lookup only centers the view; accepted civic coordinates must be cached in PostGIS through the still-TBD human acceptance workflow.
+`GeocodingProvider` separates external search from the domain. The LAB adapter uses Nominatim for explicit searches and at most one picker lookup for an unlocated civic. Requests are restricted to Italy and at most five results. It sends an identifying User-Agent, never runs on pan and does not perform bulk geocoding. A candidate is cached once as `AUTO_GEOLOCATED`; only explicit operator confirmation changes it to `VERIFIED`.
 
 A single identified live search probe returned HTTP 200 and one structured Italian result. This verifies limited on-demand search availability, not a production SLA or permission for batch use.

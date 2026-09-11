@@ -66,3 +66,18 @@ export const interviewSchema = z.object({
 export const operationalSettingsSchema = z.object({
   staleNewsDays: z.coerce.number().int("Inserisci un numero intero").min(1, "Il valore minimo è 1 giorno").max(3650, "Il valore massimo è 3650 giorni"),
 });
+
+export const civicLocationSchema = z.object({
+  civicId: z.string().min(1), longitude: z.number().min(-180).max(180), latitude: z.number().min(-90).max(90),
+  status: z.enum(["AUTO_GEOLOCATED", "VERIFIED"]), method: z.enum(["GEOCODER", "MANUAL_MAP", "CADASTRAL"]),
+  source: z.string().trim().min(1), quality: z.number().min(0).max(1).optional(),
+}).superRefine((value, context) => {
+  if (value.status === "VERIFIED" && value.method === "GEOCODER") context.addIssue({ code: "custom", path: ["method"], message: "Il geocoder non può verificare una posizione" });
+  if (value.status === "AUTO_GEOLOCATED" && value.method !== "GEOCODER") context.addIssue({ code: "custom", path: ["method"], message: "Una posizione automatica deve provenire dal geocoder" });
+});
+
+export const cadastralAssociationSchema = z.object({
+  recordId: z.string().min(1), municipalityCode: z.string().trim().min(1), municipalityName: optionalText,
+  section: optionalText, sheet: z.string().trim().min(1), parcel: z.string().trim().min(1), featureType: optionalText,
+  sourceReference: z.object({ longitude: z.number().min(-180).max(180), latitude: z.number().min(-90).max(90) }).optional(),
+});

@@ -24,4 +24,6 @@ Migration `202609110010_runtime_performance_indexes.sql` adds non-invasive B-tre
 
 Migration `202609110011_subject_search_projection.sql` adds a generated Subject search projection with a `pg_trgm` GIN index so forms retrieve at most 20 matching registry entries instead of transferring the full registry. The projection is derived from authoritative registry columns and does not change RLS or domain identity.
 
+Migration `202609110012_verified_locations_and_cadastral_associations.sql` replaces the ambiguous legacy civic states with `NOT_GEOLOCATED`, `AUTO_GEOLOCATED` and `VERIFIED`, adds method and verification audit, and enforces that a geocoder cannot verify a point. It creates the RLS-protected one-to-one `cadastral_associations` relation on `census_records` plus authenticated security-invoker commands for explicit civic-location and parcel confirmation. Parcel confirmation updates only existing sheet/parcel fields; unavailable subaltern/category data is untouched.
+
 `supabase/seed.sql` inserts a deterministic fictional application dataset. Its Bologna territorial anchors are not the national archive. `scripts/sync-istat-territories.ts` separately downloads, validates and transactionally synchronizes the official archive; see `docs/TERRITORIAL_IMPORT.md`.
