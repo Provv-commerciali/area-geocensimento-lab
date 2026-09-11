@@ -1,10 +1,20 @@
 export const contactTypes = ["Generico", "Informatore", "Informazione", "Notizia"] as const;
 export type ContactType = (typeof contactTypes)[number];
 export type BuildingScope = "Intero edificio" | "Parte di edificio";
+export const occupancies = ["Libero", "Libero al rogito", "Occupato dal proprietario", "Occupato dall'inquilino", "Inagibile"] as const;
+export type Occupancy = (typeof occupancies)[number];
+export const qualifications = ["Proprietario", "Inquilino"] as const;
+export type Qualification = (typeof qualifications)[number];
+export const floorCodes = ["Interrato", "Seminterrato", "Terra", "Rialzato", ...Array.from({ length: 60 }, (_, index) => `${index + 1}°`)] as const;
+export type CivicParity = "all" | "even" | "odd";
 
 export interface Operator { id: string; name: string }
-export interface CensusZone { id: string; name: string; municipality: string; operator: Operator; streetIds: string[] }
-export interface Street { id: string; name: string; municipality: string }
+export interface Country { id: string; code: string; name: string }
+export interface Region { id: string; countryId: string; name: string }
+export interface Province { id: string; regionId: string; code?: string; name: string }
+export interface Municipality { id: string; provinceId: string; name: string }
+export interface CensusZone { id: string; name: string; municipalityId: string; municipality: string; operator: Operator; streetIds: string[] }
+export interface Street { id: string; municipalityId: string; name: string; municipality: string }
 export interface Civic { id: string; streetId: string; number: string; extension?: string }
 export interface Complex { id: string; name: string; zoneId: string; civicIds: string[]; sheet?: string; parcel?: string; units?: number; description?: string }
 export interface CensusInterview {
@@ -17,8 +27,8 @@ export interface CensusRecord {
   birthDate?: string; responsibleOperatorId?: string; responsibleOperatorName?: string; notes?: string;
   zoneId: string; zoneName: string; streetId: string; streetName: string; civicId: string;
   civicNumber: string; civicExtension?: string; complexId?: string; complexName?: string;
-  buildingScope: BuildingScope; levels?: number; floorLabel?: string; rooms?: number; surface?: number;
-  occupancy?: string; elevator?: boolean; sheet?: string; parcel?: string; subaltern?: string;
+  buildingScope: BuildingScope; levels?: number; floorCode?: string; totalFloors?: number; isTopFloor: boolean; floorLabel?: string; rooms?: number; surface?: number;
+  occupancy?: Occupancy; elevator?: boolean; sheet?: string; parcel?: string; subaltern?: string;
   cadastralCategory?: string; isAppraised: boolean; probableAssignment?: boolean;
   engagementType?: string; createdAt: string; interviews: CensusInterview[];
 }
@@ -31,6 +41,10 @@ export function latestInterview(record: CensusRecord): CensusInterview | undefin
   return [...record.interviews].sort((a, b) => b.interviewDate.localeCompare(a.interviewDate))[0];
 }
 
+export function hasBeenContacted(record: Pick<CensusRecord, "interviews">): boolean {
+  return record.interviews.length > 0;
+}
+
 export function nextRecall(record: CensusRecord): string | undefined {
   return record.interviews.filter((i) => i.recallDate).sort((a, b) => a.recallDate!.localeCompare(b.recallDate!))[0]?.recallDate;
 }
@@ -38,4 +52,9 @@ export function nextRecall(record: CensusRecord): string | undefined {
 export function canShowAppraisal(type: ContactType): boolean { return type === "Notizia"; }
 export function normalizeAppraisal(type: ContactType, manuallyChecked: boolean): boolean {
   return type === "Notizia" ? manuallyChecked : false;
+}
+
+export function formatFloor(floorCode?: string, totalFloors?: number, isTopFloor = false): string | undefined {
+  if (!floorCode) return undefined;
+  return `${floorCode}${totalFloors ? ` di ${totalFloors}` : ""}${isTopFloor ? " · ultimo piano" : ""}`;
 }

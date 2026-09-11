@@ -1,16 +1,20 @@
-import type { CensusRecord, CensusZone, Civic, Complex, Operator, Street } from "@/domain/census";
+import type { CensusRecord, CensusZone, Civic, Complex, Country, Municipality, Operator, Province, Region, Street } from "@/domain/census";
 
 export const operators: Operator[] = [
   { id: "op-1", name: "Elena Rossi" }, { id: "op-2", name: "Marco Bianchi" }, { id: "op-3", name: "Sara Conti" },
 ];
+export const countries: Country[] = [{ id: "country-it", code: "IT", name: "Italia" }];
+export const regions: Region[] = [{ id: "region-er", countryId: "country-it", name: "Emilia-Romagna" }];
+export const provinces: Province[] = [{ id: "province-bo", regionId: "region-er", code: "BO", name: "Bologna" }];
+export const municipalities: Municipality[] = [{ id: "municipality-bo", provinceId: "province-bo", name: "Bologna" }];
 export const streets: Street[] = [
-  { id: "st-1", name: "Via Roma", municipality: "Bologna" }, { id: "st-2", name: "Via San Vitale", municipality: "Bologna" },
-  { id: "st-3", name: "Via Marconi", municipality: "Bologna" }, { id: "st-4", name: "Via Indipendenza", municipality: "Bologna" },
-  { id: "st-5", name: "Via Rizzoli", municipality: "Bologna" },
+  { id: "st-1", municipalityId: "municipality-bo", name: "Via Roma", municipality: "Bologna" }, { id: "st-2", municipalityId: "municipality-bo", name: "Via San Vitale", municipality: "Bologna" },
+  { id: "st-3", municipalityId: "municipality-bo", name: "Via Marconi", municipality: "Bologna" }, { id: "st-4", municipalityId: "municipality-bo", name: "Via Indipendenza", municipality: "Bologna" },
+  { id: "st-5", municipalityId: "municipality-bo", name: "Via Rizzoli", municipality: "Bologna" },
 ];
 export const zones: CensusZone[] = [
-  { id: "zone-1", name: "Centro Storico", municipality: "Bologna", operator: operators[0], streetIds: ["st-1", "st-2", "st-5"] },
-  { id: "zone-2", name: "Porto–Saragozza", municipality: "Bologna", operator: operators[1], streetIds: ["st-3", "st-4"] },
+  { id: "zone-1", name: "Centro Storico", municipalityId: "municipality-bo", municipality: "Bologna", operator: operators[0], streetIds: ["st-1", "st-2", "st-5"] },
+  { id: "zone-2", name: "Porto–Saragozza", municipalityId: "municipality-bo", municipality: "Bologna", operator: operators[1], streetIds: ["st-3", "st-4"] },
 ];
 export const civics: Civic[] = Array.from({ length: 20 }, (_, index) => ({
   id: `cv-${index + 1}`, streetId: streets[index % streets.length].id, number: String(2 + index * 2),
@@ -35,8 +39,8 @@ export const records: CensusRecord[] = Array.from({ length: 36 }, (_, index) => 
     responsibleOperatorName: operators[index % operators.length].name, zoneId: zone.id, zoneName: zone.name,
     streetId: street.id, streetName: street.name, civicId: civic.id, civicNumber: civic.number, civicExtension: civic.extension,
     complexId: complex?.id, complexName: complex?.name, buildingScope: index % 6 === 0 ? "Intero edificio" : "Parte di edificio",
-    levels: index % 6 === 0 ? 5 : undefined, floorLabel: index % 6 === 0 ? "Intero edificio" : index % 4 === 0 ? "3° di 10" : `${(index % 5) + 1}°`,
-    rooms: 2 + (index % 6), surface: 48 + index * 3, occupancy: index % 3 === 0 ? "Occupato" : "Libero", elevator: index % 2 === 0,
+    levels: index % 6 === 0 ? 5 : undefined, floorCode: index % 6 === 0 ? undefined : index % 4 === 0 ? "3°" : `${(index % 5) + 1}°`, totalFloors: index % 4 === 0 && index % 6 !== 0 ? 10 : undefined, isTopFloor: index % 10 === 0 && index % 6 !== 0, floorLabel: index % 6 === 0 ? "Intero edificio" : index % 4 === 0 ? "3° di 10" : `${(index % 5) + 1}°`,
+    rooms: 2 + (index % 6), surface: 48 + index * 3, occupancy: index % 3 === 0 ? "Occupato dal proprietario" : "Libero", elevator: index % 2 === 0,
     sheet: index % 5 === 1 ? undefined : String(10 + (index % 5)), parcel: index % 5 === 1 ? undefined : String(80 + index),
     subaltern: index % 3 === 0 ? String(index + 1) : undefined, cadastralCategory: index % 2 ? "A/2" : "A/3",
     isAppraised: isNews && index % 8 === 7, probableAssignment: index % 5 === 0, createdAt: `2026-0${(index % 8) + 1}-12`,

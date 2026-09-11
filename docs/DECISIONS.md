@@ -9,5 +9,9 @@
 - **DEC-007** — GeoCensimento is deferred to the next milestone.
 - **DEC-008** — OpenLayers is planned for GIS but not introduced in Milestone 1.
 - **DEC-009** — A deterministic read-only demo adapter supports UI review when dedicated Supabase variables are absent. This is a LAB EXPERIMENT, not production behavior.
-- **DEC-010** — `floor_label` remains textual because observed values cannot be faithfully represented by one integer.
+- **DEC-010** — Floor semantics are structured: whole-building levels remain separate; partial buildings use controlled floor code, optional total floors and top-floor flag. Legacy `floor_label` is read-only compatibility data.
 - **DEC-011** — Database authorization uses two explicit layers: narrow SQL `GRANT` privileges followed by RLS policies requiring an authenticated Supabase identity. Reference data is application-read-only; only operational Censimento tables receive authenticated CRUD privileges.
+- **DEC-012** — Streets and civics are persistent territorial entities, explicitly created/associated before contact creation and protected by normalized municipality/street uniqueness.
+- **DEC-013** — Contact persistence uses authenticated security-invoker RPCs and reports success only after the database insert; significant duplicate detection is location/property-specific.
+- **DEC-014** — CensusRecord creation and CensusInterview creation are separate commands. “Never contacted” means no real interview child exists and is available through an RLS-aware derived projection.
+- **DEC-015** — Supabase is the primary mode whenever public environment variables are configured; otherwise the UI is an explicitly read-only demo.

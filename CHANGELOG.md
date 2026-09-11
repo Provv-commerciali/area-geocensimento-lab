@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.0] - 2026-09-11
+
+- Complete persistent Milestone 1 zone, street, civic and contact workflows on Supabase.
+- Add hierarchical territory selection, civic range/parity generation and normalized duplicate protection.
+- Add structured floor data and controlled qualification/occupancy vocabularies.
+- Separate record creation from explicit interview creation and derive “never contacted” from real interview absence.
+- Add incremental migrations, truthful database/demo mode indicators and workflow regression tests.
+
 ## [0.1.1] - 2026-09-11
 
 - Add explicit least-privilege grants required before Supabase RLS evaluation.

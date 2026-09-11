@@ -1,4 +1,4 @@
-import type { CensusRecord, CensusZone, Civic, Complex, Operator, Street } from "@/domain/census";
+import type { CensusRecord, CensusZone, Civic, Complex, Country, Municipality, Operator, Province, Region, Street } from "@/domain/census";
 
 export interface CensusRepository {
   listRecords(): Promise<CensusRecord[]>;
@@ -7,4 +7,8 @@ export interface CensusRepository {
   listCivics(): Promise<Civic[]>;
   listComplexes(): Promise<Complex[]>;
   listOperators(): Promise<Operator[]>;
+  listCountries(): Promise<Country[]>;
+  listRegions(): Promise<Region[]>;
+  listProvinces(): Promise<Province[]>;
+  listMunicipalities(): Promise<Municipality[]>;
 }

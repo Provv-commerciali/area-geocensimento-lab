@@ -1,5 +1,19 @@
 # Codex worklog
 
+## 2026-09-11 — Milestone 1 persistence completion
+
+**Obiettivo:** complete real Supabase territory/contact workflows and preserve the domain distinction between a new record and an actual interview.
+
+**Modifiche:** hierarchical zone creation; explicit street/civic management; civic range/parity generation; cascaded contact form; structured floors; controlled vocabularies; truthful persistence feedback; significant duplicate protection; explicit interview action; derived never-contacted filter; database/demo mode indicators.
+
+**Migration:** `202609110003_complete_milestone_one_workflows.sql`, followed by `202609110004_separate_record_creation_from_interviews.sql`.
+
+**Seed:** unchanged; existing fictional interview rows remain intentional history, while all newly-created records start with zero interviews.
+
+**Test:** ESLint passed; strict TypeScript passed; 56 Vitest tests passed across 11 files; 7 Playwright Chromium smoke tests passed; Next.js production build passed.
+
+**Problemi/TBD:** live Supabase verification remains a manual LAB action; future GeoCensimento remains out of scope.
+
 ## 2026-09-11 — Supabase authorization fix
 
 **Obiettivo:** resolve authenticated runtime `permission denied` errors without disabling RLS or exposing service-role credentials.

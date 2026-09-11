@@ -8,4 +8,4 @@ export function StatCard({ label, value, detail, tone = "cyan" }: { label: strin
 }
 export function EmptyState({ children }: { children: ReactNode }) { return <div className="empty-state"><ClipboardIcon/>{children}</div> }
 function ClipboardIcon() { return <span aria-hidden="true" className="empty-icon">◎</span> }
-export function DemoNotice() { return <div className="demo-notice"><strong>Modalità demo LAB</strong><span>Dati fittizi in sola lettura. Configura Supabase per abilitare autenticazione e persistenza.</span></div> }
+export function DataModeNotice({databaseMode}:{databaseMode:boolean}) { return databaseMode?<div className="database-notice"><strong>Database LAB</strong><span>Sessione autenticata e dati caricati dal progetto Supabase dedicato.</span></div>:<div className="demo-notice"><strong>Modalità demo LAB</strong><span>Fallback con dati fittizi in sola lettura; Supabase non è configurato.</span></div> }

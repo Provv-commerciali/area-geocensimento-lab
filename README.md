@@ -10,7 +10,7 @@ Next.js App Router, React, strict TypeScript, Supabase Auth/PostgreSQL, PostGIS 
 
 1. Install Node.js and run `npm ci`.
 2. Copy `.env.example` to `.env.local` and insert credentials from the **dedicated** Supabase project.
-3. Apply migrations in `supabase/migrations` with the Supabase CLI or SQL editor, in filename order.
+3. Apply migrations in `supabase/migrations` with the Supabase CLI or SQL editor, strictly in filename order (`001`, `002`, `003`, `004`).
 4. Optionally apply `supabase/seed.sql` to obtain controlled fictional LAB data.
 5. Run `npm run dev` and open `http://localhost:3000`.
 
@@ -27,6 +27,8 @@ Without Supabase variables, the application intentionally runs in a read-only lo
 ## Supabase and deployment
 
 Configure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` locally and in Vercel. Never use a service-role key in the browser. The Vercel project should keep its default Next.js build and repository root settings. Database changes must be migrations; dashboard-only schema changes are not reproducible and are prohibited.
+
+Migration `004` is required after `003`: it enforces that a newly-created CensusRecord has no synthetic interview, exposes an explicit authenticated interview command and provides an RLS-aware derived contact-status view.
 
 ## Documentation
 

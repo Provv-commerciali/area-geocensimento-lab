@@ -6,6 +6,7 @@ export interface CensusFilters {
   roomsFrom?: number; roomsTo?: number; surfaceFrom?: number; surfaceTo?: number; elevator?: string;
   sheet?: string; parcel?: string; subaltern?: string; cadastralCategory?: string; operatorId?: string;
   occupancy?: string; inherited?: string; appraised?: string; response?: string;
+  contactStatus?: "contacted" | "never";
 }
 
 const has = (value: string | undefined, needle: string | undefined) => !needle || (value ?? "").toLocaleLowerCase("it").includes(needle.toLocaleLowerCase("it"));
@@ -25,6 +26,7 @@ export function filterCensusRecords(records: CensusRecord[], f: CensusFilters): 
       && boolMatch(Boolean(r.elevator), f.elevator) && has(r.sheet, f.sheet) && has(r.parcel, f.parcel)
       && has(r.subaltern, f.subaltern) && has(r.cadastralCategory, f.cadastralCategory)
       && (!f.operatorId || r.responsibleOperatorId === f.operatorId) && has(r.occupancy, f.occupancy)
-      && boolMatch(r.inherited, f.inherited) && boolMatch(r.isAppraised, f.appraised) && has(latest?.response, f.response);
+      && boolMatch(r.inherited, f.inherited) && boolMatch(r.isAppraised, f.appraised) && has(latest?.response, f.response)
+      && (!f.contactStatus || (f.contactStatus === "never" ? r.interviews.length === 0 : r.interviews.length > 0));
   });
 }
