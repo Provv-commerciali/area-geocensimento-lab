@@ -3,3 +3,5 @@
 Vitest covers Zod validators, filter semantics, appraisal invariants, record helpers, interview derivation and repository contracts. React Testing Library covers critical conditional UI. Playwright smoke specifications cover login/demo entry, zone/street flow, contact creation/filtering, contextual street contacts and complex interiors.
 
 Tests never call external APIs. Repository integration tests use deterministic in-memory fixtures; live Supabase migration verification is a separate infrastructure action because credentials are not stored. CI runs lint, strict typecheck, unit/integration tests and production build. Playwright can be run locally once the browser runtime is installed.
+
+Database contract tests also inspect incremental authorization migrations to prevent regressions such as missing schema/table grants, anonymous access, disabled RLS, browser service-role use, or accidental write grants on reference tables. Live policy verification still requires an authenticated user against the dedicated Supabase LAB project.
