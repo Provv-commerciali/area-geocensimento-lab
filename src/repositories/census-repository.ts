@@ -20,5 +20,6 @@ export interface CensusRepository {
   listProvinces(): Promise<Province[]>;
   listMunicipalities(provinceId?: string): Promise<Municipality[]>;
   listSubjects(): Promise<Subject[]>;
+  searchSubjects(query: string): Promise<Subject[]>;
   getOperationalSettings(): Promise<CensusOperationalSettings>;
 }

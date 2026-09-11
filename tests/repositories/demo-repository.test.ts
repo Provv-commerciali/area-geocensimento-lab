@@ -11,4 +11,10 @@ describe("demo repository contract", () => {
     expect((await demoCensusRepository.listRecords({zoneId:"zone-1"})).every(record=>record.zoneId==="zone-1")).toBe(true);
     expect(await demoCensusRepository.listMunicipalities("missing-province")).toEqual([]);
   });
+  it("bounds on-demand subject searches",async()=>{
+    const first=(await demoCensusRepository.listSubjects())[0];
+    expect(first).toBeDefined();
+    expect(await demoCensusRepository.searchSubjects(first!.lastName??first!.companyName??"")).toContainEqual(first);
+    expect((await demoCensusRepository.searchSubjects("a")).length).toBeLessThanOrEqual(20);
+  });
 });

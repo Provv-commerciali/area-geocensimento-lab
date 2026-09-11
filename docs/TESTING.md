@@ -8,7 +8,7 @@ Tests never call external APIs. Repository integration tests use deterministic i
 
 Database contract tests also inspect incremental authorization/workflow migrations to prevent regressions such as missing grants, anonymous access, disabled RLS, browser service-role use, security-definer bypass, bundled synthetic interviews or accidental write grants on reference tables. Live policy and RPC verification still requires an authenticated user against the dedicated Supabase LAB project.
 
-Runtime performance contracts verify contextual repository filtering, incremental reverse-link/filter indexes and preservation of RLS. Browser tests retain the territorial cascade while Municipality rows are fetched only after Province selection.
+Runtime performance contracts verify contextual repository filtering, incremental reverse-link/filter/search indexes and preservation of RLS. Browser tests retain the territorial cascade while Municipality and Street rows are fetched only after their parent selection.
 
 Territory tests validate all 20 official Region codes, the known 2026 release counts, consistent Region → intermediate unit → Municipality relationships, multiple Regions, the Toscana → Lucca → Camaiore example, rejection of conflicting parentage and the database-backed cascade in Nuova zona. The importer dry-run against the official workbook is the release-time integration check; tests never download it from the network.
 

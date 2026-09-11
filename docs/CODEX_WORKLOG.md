@@ -4,13 +4,15 @@
 
 **Obiettivo:** remove the request amplification and unnecessary full-snapshot reads found by the application/database performance audit, without overlapping the separate cadastral-map correction.
 
-**Modifiche:** use-case-scoped data loader; PostgREST record constraints for Zone, Street and Complex pages; Municipality loading only after Province selection; runtime payload validation; linear link aggregation; bounded Contact table rendering; disabled speculative prefetch on authenticated heavy navigation; locally verifiable JWT claims in the Supabase proxy.
+**Modifiche:** use-case-scoped data loader; PostgREST record constraints for Zone, Street and Complex pages; Municipality/Street loading only after parent selection; bounded on-demand Subject lookup; runtime payload validation; linear link aggregation; bounded Contact table rendering; disabled speculative prefetch on authenticated heavy navigation; locally verifiable JWT claims in the Supabase proxy.
 
 **Migration:** `202609110010_runtime_performance_indexes.sql`; reverse many-to-many traversal, record-filter and Subject-order indexes only. No domain or geometry change.
 
+**Migration successiva:** `202609110011_subject_search_projection.sql`; generated, trigram-indexed Subject lookup projection used only for bounded search.
+
 **Esclusione esplicita:** cadastral WMS CRS behavior and map implementation files remain owned by the separate map task.
 
-**Quality gate integrato:** ESLint passed; strict TypeScript passed; 112 Vitest tests passed across 23 files; 15 Playwright Chromium tests passed; Next.js production build passed.
+**Quality gate integrato:** ESLint passed; strict TypeScript passed; 116 Vitest tests passed across 24 files; 15 Playwright Chromium tests passed; Next.js production build passed.
 
 ## 2026-09-11 — GeoCensimento production correction
 

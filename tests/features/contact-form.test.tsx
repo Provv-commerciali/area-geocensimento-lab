@@ -1,9 +1,10 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ContactForm } from "@/features/census/contact-form";
 
 describe("contact form", () => {
+  afterEach(()=>vi.unstubAllGlobals());
   it("reveals an unchecked manual appraisal only for Notizia", async () => {
     const user=userEvent.setup(); render(<ContactForm/>);
     expect(screen.queryByText("Perizia Immobiliare")).not.toBeInTheDocument();
@@ -60,6 +61,16 @@ describe("contact form", () => {
     expect(screen.getByText(/Questo soggetto è già presente/)).toBeInTheDocument();
     await user.click(screen.getByRole("button",{name:"Usa anagrafica esistente"}));
     expect(screen.getByLabelText("Contatto già presente *")).toHaveValue("subject-1");
+  });
+
+  it("searches the registry on demand in database mode",async()=>{
+    const user=userEvent.setup();vi.stubGlobal("fetch",vi.fn().mockResolvedValue(new Response(JSON.stringify({subjects:[{id:"subject-db",subjectType:"PRIVATO",firstName:"Ada",lastName:"Lovelace"}]}),{status:200})));
+    render(<ContactForm databaseMode subjects={[]}/>);
+    await user.click(screen.getByLabelText("Anagrafica già presente"));
+    await user.type(screen.getByLabelText("Cerca anagrafica"),"Lovelace");
+    await user.click(screen.getByRole("button",{name:"Cerca"}));
+    await waitFor(()=>expect(screen.getByLabelText("Contatto già presente *")).toHaveTextContent("Lovelace Ada"));
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   it("shows persistence errors instead of a false success", async () => {
