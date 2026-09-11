@@ -3,7 +3,7 @@ export type ContactType = (typeof contactTypes)[number];
 export type BuildingScope = "Intero edificio" | "Parte di edificio";
 export const occupancies = ["Libero", "Libero al rogito", "Occupato dal proprietario", "Occupato dall'inquilino", "Inagibile"] as const;
 export type Occupancy = (typeof occupancies)[number];
-export const qualifications = ["Proprietario", "Inquilino"] as const;
+export const qualifications = ["Proprietario", "Comproprietario", "Inquilino"] as const;
 export type Qualification = (typeof qualifications)[number];
 export type SubjectType = "PRIVATO" | "AZIENDA";
 export const floorCodes = ["Interrato", "Seminterrato", "Terra", "Rialzato", ...Array.from({ length: 60 }, (_, index) => `${index + 1}°`)] as const;
@@ -18,7 +18,7 @@ export interface Subject {
   id: string; subjectType: SubjectType; firstName?: string; lastName?: string; companyName?: string;
   taxCode?: string; vatNumber?: string; phone?: string; email?: string; birthDate?: string; notes?: string;
 }
-export interface CensusRecordSubject { subjectId: string; role: Qualification | "Non specificato"; isPrimary: boolean }
+export interface CensusRecordSubject { subjectId: string; role: Qualification | "Non specificato"; isPrimary: boolean; ownershipShare?: number }
 export interface CensusZone { id: string; name: string; municipalityId: string; municipality: string; operator: Operator; streetIds: string[] }
 export interface Street { id: string; municipalityId: string; name: string; municipality: string }
 export interface Civic { id: string; streetId: string; number: string; extension?: string }

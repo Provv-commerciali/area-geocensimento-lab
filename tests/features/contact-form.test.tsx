@@ -31,8 +31,9 @@ describe("contact form", () => {
 
   it("offers only controlled qualification and occupancy choices", () => {
     render(<ContactForm/>);
-    expect(screen.getByLabelText("Ruolo nella proprietà *")).toHaveTextContent("Proprietario");
-    expect(screen.getByLabelText("Ruolo nella proprietà *")).toHaveTextContent("Inquilino");
+    expect(screen.getByLabelText("Ruolo nel contesto *")).toHaveTextContent("Proprietario");
+    expect(screen.getByLabelText("Ruolo nel contesto *")).toHaveTextContent("Comproprietario");
+    expect(screen.getByLabelText("Ruolo nel contesto *")).toHaveTextContent("Inquilino");
     expect(screen.getByLabelText("Occupazione")).toHaveTextContent("Libero al rogito");
     expect(screen.getByLabelText("Occupazione")).not.toHaveTextContent(/^Occupato$/);
   });
@@ -49,16 +50,16 @@ describe("contact form", () => {
     await user.click(screen.getByLabelText("Azienda"));
     expect(screen.getByLabelText("Ragione sociale *")).toBeInTheDocument();
     expect(screen.getByLabelText("Partita IVA")).toBeInTheDocument();
-    await user.click(screen.getByLabelText("Soggetto esistente"));
-    expect(screen.getByLabelText("Soggetto *")).toBeInTheDocument();
+    await user.click(screen.getByLabelText("Anagrafica già presente"));
+    expect(screen.getByLabelText("Contatto già presente *")).toBeInTheDocument();
   });
 
   it("suggests linking an existing subject only from a strong identifier",async()=>{
     const user=userEvent.setup();render(<ContactForm/>);
     await user.type(screen.getByLabelText("Codice fiscale"),"FRRNNA80A41A944X");
-    expect(screen.getByText(/Identificativo già presente/)).toBeInTheDocument();
-    await user.click(screen.getByRole("button",{name:"Collega questo soggetto"}));
-    expect(screen.getByLabelText("Soggetto *")).toHaveValue("subject-1");
+    expect(screen.getByText(/Questo soggetto è già presente/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button",{name:"Usa anagrafica esistente"}));
+    expect(screen.getByLabelText("Contatto già presente *")).toHaveValue("subject-1");
   });
 
   it("shows persistence errors instead of a false success", async () => {
@@ -68,8 +69,8 @@ describe("contact form", () => {
     await user.selectOptions(screen.getByLabelText("Via *"),"st-1");
     await user.selectOptions(screen.getByLabelText("Civico *"),"cv-1");
     await user.type(screen.getByLabelText("Cognome *"),"Ferri");
-    await user.selectOptions(screen.getByLabelText("Ruolo nella proprietà *"),"Proprietario");
-    await user.click(screen.getByRole("button",{name:"Salva proprietà"}));
+    await user.selectOptions(screen.getByLabelText("Ruolo nel contesto *"),"Proprietario");
+    await user.click(screen.getByRole("button",{name:"Salva contatto"}));
     await waitFor(()=>expect(screen.getByRole("alert")).toHaveTextContent("Database non disponibile"));
   });
 });

@@ -11,5 +11,5 @@ export async function linkSubjectAction(_state:SubjectLinkActionState,data:FormD
   const recordId=value(data,"recordId"),subjectId=value(data,"subjectId"),role=value(data,"role");
   if(!recordId||!subjectId||!qualifications.some(candidate=>candidate===role))return{error:"Seleziona soggetto e ruolo."};
   const db=await createClient();const {error}=await db.rpc("link_subject_to_census_record_lab",{p_record_id:recordId,p_subject_id:subjectId,p_role:role});
-  if(error)return{error:error.message};revalidatePath(`/censimento/contatti/${recordId}`);revalidatePath(`/censimento/soggetti/${subjectId}`);return{success:"Soggetto collegato alla proprietà."};
+  if(error)return{error:error.message};revalidatePath(`/censimento/contatti/${recordId}`);return{success:"Anagrafica collegata al contatto."};
 }

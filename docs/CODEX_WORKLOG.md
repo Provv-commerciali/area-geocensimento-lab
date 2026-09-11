@@ -1,5 +1,15 @@
 # Codex worklog
 
+## 2026-09-11 — Contact UX correction
+
+**Obiettivo:** restore the A.R.E.A. Censimento operating model after the registry normalization was exposed too prominently.
+
+**Modifiche:** restored Dashboard/Contatti/Nuovo contatto/Zone/Complessi navigation; removed the autonomous Subjects UI; retained the internal normalized registry and N:N links; added Comproprietario; exposed same-registry contexts inside the Contact sheet; preserved context-specific interview history and zero-interview creation.
+
+**Migration:** `202609110006_restore_contact_ux_and_coownership.sql` after migration `005`; no migrated registry data is removed.
+
+**Test:** contact navigation, private/company form, strong-identifier reuse, comproprietà, cross-context links, interview isolation and migration contract.
+
 ## 2026-09-11 — Subject/property normalization
 
 **Obiettivo:** separate unique personal/company registry data from reusable property census contexts.

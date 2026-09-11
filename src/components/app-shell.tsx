@@ -8,9 +8,8 @@ import { isSupabaseConfigured } from "@/lib/supabase/client";
 
 const items = [
   { href: "/", label: "Dashboard LAB", icon: LayoutDashboard },
-  { href: "/censimento/contatti", label: "Proprietà", icon: Building2 },
-  { href: "/censimento/contatti/nuovo", label: "Nuova proprietà", icon: Plus },
-  { href: "/censimento/soggetti", label: "Soggetti", icon: Contact },
+  { href: "/censimento/contatti", label: "Contatti", icon: Contact },
+  { href: "/censimento/contatti/nuovo", label: "Nuovo contatto", icon: Plus },
   { href: "/censimento/zone", label: "Zone", icon: MapPinned },
   { href: "/censimento/complessi", label: "Complessi", icon: Building2 },
 ];

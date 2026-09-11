@@ -16,6 +16,7 @@
 - **DEC-014** — CensusRecord creation and CensusInterview creation are separate commands. “Never contacted” means no real interview child exists and is available through an RLS-aware derived projection.
 - **DEC-015** — Supabase is the primary mode whenever public environment variables are configured; otherwise the UI is an explicitly read-only demo.
 - **DEC-016** — `Subject` is the authoritative unique registry entity, with explicit `PRIVATO` and `AZIENDA` shapes. `CensusRecord` represents the property/census context rather than the person.
-- **DEC-017** — Subject ↔ CensusRecord is many-to-many through `census_record_subjects`; the relationship owns the Proprietario/Inquilino role. `Non specificato` exists only for lossless legacy backfill.
+- **DEC-017** — Subject ↔ CensusRecord is many-to-many through `census_record_subjects`; the relationship owns the Proprietario/Comproprietario/Inquilino role. `Non specificato` exists only for lossless legacy backfill.
 - **DEC-018** — Normalized CF and P.IVA are strong uniqueness signals. Matching names or company names never cause automatic merge; records without strong identifiers backfill as distinct subjects.
 - **DEC-019** — Interviews remain children of CensusRecord. Subject-level history is an aggregate projection across linked property contexts, preserving the original context.
+- **DEC-020** — The normalized Subject is an internal support entity, not a Milestone 1 navigation paradigm. Dashboard, Contatti, Nuovo contatto, Zone and Complessi remain the primary UX; cross-context registry links appear inside the Contact sheet.

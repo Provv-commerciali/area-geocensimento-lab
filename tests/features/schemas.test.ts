@@ -6,6 +6,7 @@ describe("runtime validators", () => {
   it("accepts a valid structured partial-building record", () => expect(censusRecordSchema.safeParse({...base,buildingScope:"Parte di edificio",floorCode:"3°",totalFloors:10,contactType:"Notizia",occupancy:"Libero al rogito"}).success).toBe(true));
   it("rejects a missing private surname", () => expect(censusRecordSchema.safeParse({...base,lastName:""}).success).toBe(false));
   it("accepts an existing subject link without repeating its identity",()=>expect(censusRecordSchema.safeParse({...base,subjectMode:"existing",existingSubjectId:"subject-1",lastName:""}).success).toBe(true));
+  it("accepts comproprietario as a census relationship",()=>expect(censusRecordSchema.safeParse({...base,relationshipRole:"Comproprietario"}).success).toBe(true));
   it("requires company name for an Azienda",()=>expect(censusRecordSchema.safeParse({...base,subjectType:"AZIENDA",lastName:"",companyName:""}).success).toBe(false));
   it("requires a structured floor for a partial building", () => expect(censusRecordSchema.safeParse({...base,buildingScope:"Parte di edificio"}).success).toBe(false));
   it("rejects uncontrolled role and occupancy values", () => expect(censusRecordSchema.safeParse({...base,relationshipRole:"Altro",occupancy:"Occupato"}).success).toBe(false));

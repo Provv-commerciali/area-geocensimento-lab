@@ -12,4 +12,6 @@ Migration `202609110004_separate_record_creation_from_interviews.sql` replaces r
 
 Migration `202609110005_normalize_subjects_and_property_links.sql` introduces `subjects` and the many-to-many `census_record_subjects` table. It backfills one private subject per legacy record unless a normalized tax code provides a strong match, preserves legacy columns as snapshots, adds partial unique indexes for CF/P.IVA and replaces record creation with an atomic subject resolution/link workflow. New tables retain RLS and explicit authenticated-only grants.
 
+Migration `202609110006_restore_contact_ux_and_coownership.sql` preserves the normalized registry and all migrated links, adds `Comproprietario` to the relationship roles and updates the authenticated security-invoker workflows. It does not alter interview ownership or create synthetic events.
+
 `supabase/seed.sql` inserts a deterministic fictional dataset. It is idempotent by stable UUID/key usage and must only be applied to the dedicated Lab project.

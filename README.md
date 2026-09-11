@@ -10,7 +10,7 @@ Next.js App Router, React, strict TypeScript, Supabase Auth/PostgreSQL, PostGIS 
 
 1. Install Node.js and run `npm ci`.
 2. Copy `.env.example` to `.env.local` and insert credentials from the **dedicated** Supabase project.
-3. Apply migrations in `supabase/migrations` with the Supabase CLI or SQL editor, strictly in filename order (`001` through `005`).
+3. Apply migrations in `supabase/migrations` with the Supabase CLI or SQL editor, strictly in filename order (`001` through `006`).
 4. Optionally apply `supabase/seed.sql` to obtain controlled fictional LAB data.
 5. Run `npm run dev` and open `http://localhost:3000`.
 

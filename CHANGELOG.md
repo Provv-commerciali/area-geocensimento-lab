@@ -1,11 +1,18 @@
 # Changelog
 
+## [0.3.1] - 2026-09-11
+
+- Restore Contacts and New Contact as the primary Milestone 1 workflow and navigation.
+- Keep the normalized subject registry internal to census operations.
+- Add Comproprietario to context relationship roles.
+- Show other contexts linked to the same registry identity inside the Contact sheet.
+
 ## [0.3.0] - 2026-09-11
 
 - Separate unique private/company subjects from property census contexts.
 - Add many-to-many subject/property roles and lossless legacy backfill.
 - Detect strong CF/P.IVA matches without merging names automatically.
-- Add subject and property relationship views while keeping interviews context-specific.
+- Add internal subject/property relationships while keeping interviews context-specific.
 
 ## [0.2.0] - 2026-09-11
 
