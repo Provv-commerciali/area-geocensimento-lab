@@ -10,3 +10,6 @@
 - **TBD-MAP-003** — Authoritative geometry model for a Complex spanning several civics/extensions. Milestone 2 indicates a Complex through its associated civic features.
 - **TBD-MAP-004** — Reliable official WFS availability. The endpoint tested on 2026-09-11 returned Access Denied, so no WFS capability is claimed.
 - **TBD-MAP-006** — Whether a future paid provider supplies stable parcel geometry/identity and which licensed fields it may enrich. It must extend the confirmed association and cannot infer ownership.
+- **TBD-OCR-001** — Final location, capacity, synchronous/queued mode, retry lease and service-level requirements for the separate free/self-hosted PaddleOCR service.
+- **TBD-OCR-002** — Final privacy retention duration for photos, raw text and detections. Until approved, deletion is operator-driven; provenance metadata remains while the blob is removed.
+- **TBD-OCR-003** — Whether Scala/Interno later normalize into an approved property-unit model. Milestone 3 keeps optional CensusRecord labels and infers no unit identity.

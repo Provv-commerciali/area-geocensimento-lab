@@ -22,6 +22,16 @@ Deleting a Contact deletes the selected `CensusRecord` context after explicit op
 
 `Complex ↔ Civic` is many-to-many through `complex_civics`; creation may attach the first selected civic but does not designate a “primary” civic.
 
+`CensusRecord.staircase` and `CensusRecord.unitIdentifier` are optional operator-entered Scala and Interno labels inside the existing property/civic context. They do not create a `PropertyUnit`, are not ownership evidence and are not globally unique. Several Subjects may intentionally have separate CensusRecords carrying the same Scala/Interno/Piano context.
+
+## Complex photos and doorbell acquisition
+
+`ComplexPhoto` belongs to one Complex and is either `COMPLEX` or `DOORBELL`. The private Storage object has metadata, an opaque path and upload audit. A building photo is documentation only and never triggers OCR. A doorbell photo may join an `AcquisitionSession`, have explicit processing attempts and produce immutable detections. `UPLOADED`, `PROCESSING`, `PROCESSED`, `NEEDS_REVIEW` and `FAILED` are technical photo states, not contact states.
+
+`DoorbellContactProposal` is editable staging linked through `DoorbellProposalSource` to one or more OCR detections. Merge and split operate only on proposals and preserve sources. `PERSON`, `COMPANY` and `UNKNOWN` are recognition proposals; only operator-confirmed `PRIVATO` or `AZIENDA` enters the existing Subject domain. A name alone is only a possible match and never causes an automatic Subject merge.
+
+Photo ≠ proposal ≠ Contact. Final confirmation atomically calls the normal `create_census_record_lab` workflow for every selected proposal and records the resulting `census_record_id`. No `CensusInterview` is created; each result remains `MAI_CONTATTATO` until a real interview. A doorbell name never implies Proprietario: the operator chooses the existing Qualifica, including Inquilino when appropriate.
+
 ## GeoCensimento civic location
 
 `Civic` optionally owns one cached `geography(Point, 4326)` plus source, method, timestamp, optional 0–1 quality and the explicit state `NOT_GEOLOCATED`, `AUTO_GEOLOCATED` or `VERIFIED`. `GEOCODER` may only produce an automatic candidate; only an explicit operator confirmation with `MANUAL_MAP` or `CADASTRAL` may produce `VERIFIED`. Contacts and Subjects never store duplicate coordinates. Several contacts at one civic reuse the same point and become one civic feature; automatic features remain visibly uncertain and verified features have priority.
@@ -54,6 +64,8 @@ A recall is overdue when its date is before today and there is no different inte
 - Record duplicate protection prevents the same subject from being linked twice to the same location, building scope, floor and subaltern; subject uniqueness remains governed separately by strong identifiers.
 - A cadastral WMS feature is external cartography and never creates a CensusRecord, property, subject or ownership link.
 - A map click is an external preview. Only the separate confirmation command creates or corrects a CadastralAssociation.
+- Complex/doorbell images are private personal-data-bearing artifacts; neither image nor OCR text becomes authoritative Subject data without operator confirmation.
+- OCR confidence may guide review but never blocks correction or creates/merges a Contact automatically.
 
 ## Future boundary (documentation only)
 

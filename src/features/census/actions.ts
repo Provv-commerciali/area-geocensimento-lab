@@ -19,7 +19,7 @@ export async function createCensusRecordAction(
   const buildingScope = value(data, "buildingScope");
   const record = {
     zoneId: value(data, "zoneId"), streetId: value(data, "streetId"), civicId: value(data, "civicId"), complexId: value(data, "complexId"),
-    buildingScope, levels: optionalNumber(data, "levels"),
+    buildingScope, levels: optionalNumber(data, "levels"), staircase: value(data, "staircase"), unitIdentifier: value(data, "unitIdentifier"),
     floorCode: buildingScope === "Parte di edificio" ? value(data, "floorCode") : "",
     totalFloors: buildingScope === "Parte di edificio" ? optionalNumber(data, "totalFloors") : undefined,
     isTopFloor: buildingScope === "Parte di edificio" && data.get("isTopFloor") === "on",
@@ -37,6 +37,8 @@ export async function createCensusRecordAction(
       const { data: id, error } = await db.rpc("create_census_record_lab", { p_record: {...payload,subject:{subjectType:payload.subjectType,firstName:payload.firstName,lastName:payload.lastName,companyName:payload.companyName,vatNumber:payload.vatNumber,phone:payload.phone,email:payload.email,taxCode:payload.taxCode,birthDate:payload.birthDate,notes:payload.notes}}, p_interview: null });
       if (error) throw new Error(error.message);
       if (typeof id !== "string") throw new Error("Supabase non ha restituito l'identificativo del record.");
+      const location = await db.from("census_records").update({ staircase: payload.staircase || null, unit_identifier: payload.unitIdentifier || null }).eq("id", id);
+      if (location.error) throw new Error(location.error.message);
       return id;
     },
   };

@@ -28,3 +28,17 @@ The browser receives serializable domain data and never a Supabase service-role 
 The GeoCensimento page loads its bounded application projection once per navigation and filters it locally; it does not reload the database or geocode on pan. Contact detail reads are constrained by record and Subject context. The GiST index and provider boundary prepare viewport queries for larger volumes.
 
 Explicit geography commands cross a validated server-action boundary. Civic location is written once on `Civic`; an automatic geocoder candidate remains `AUTO_GEOLOCATED`, while marker movement/click plus operator confirmation writes `VERIFIED`. The separate cadastral picker uses the existing WMS proxy and validated `GetFeatureInfo` parser, previews only returned fields, and writes a `CadastralAssociation` only after confirmation.
+
+Milestone 3 adds a bounded Complex-photo feature without changing the main navigation. Authenticated browsers upload JPG/PNG/WebP directly to the private Supabase Storage bucket `complex-photos`; validated server actions write metadata, short-lived signed URLs support display and deletion removes the blob while retaining soft-deleted audit metadata.
+
+```text
+Complex → private photo → explicit Analyze → DoorbellTextRecognitionProvider
+                                      ↓
+                         OCR detection → editable proposal
+                                      ↓ operator confirmation
+                         create_census_record_lab → normal CensusRecord
+```
+
+`DoorbellTextRecognitionProvider` is server-only and storage-agnostic. Its HTTP adapter sends bytes to a separately operated PaddleOCR/PP-OCRv6 service, validates a versioned response with Zod and persists only safe errors. No application logic imports PaddleOCR types. The endpoint/token are server-only. Without an endpoint, no fake OCR result is produced and manual proposals remain available.
+
+The OCR stack is not embedded in the current Vercel Next.js function. Official PaddleOCR requires a Python inference stack and model assets; while Vercel Fluid compute now permits larger/longer functions, large functions remain beta and this project has no measured or approved Python deployment. A separate local/self-hosted HTTP service is the milestone boundary; its final hosting, sync/queued execution and capacity remain operational TBDs.

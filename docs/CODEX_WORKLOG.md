@@ -1,5 +1,17 @@
 # Codex worklog
 
+## 2026-09-11 — Milestone 3 Complex photos and assisted doorbell acquisition
+
+**Obiettivo:** add private Complex documentation and operator-assisted Doorbell text acquisition without a parallel contact/property domain.
+
+**Modifiche:** private Supabase Storage metadata; sessions; provider-neutral OCR runs/detections; editable source-preserving proposals; mass review with manual correction, bulk context, weak-match review, duplicate warning, merge/split and manual fallback; optional Scala/Interno labels on the existing CensusRecord.
+
+**OCR boundary:** PP-OCRv6 stays behind a server-only HTTP adapter to a separately operated local/self-hosted service. No commercial OCR, embedded Python Vercel runtime or cost was introduced. Without configuration, uploads and manual proposals remain available.
+
+**Invariants:** photo/proposal are not Contacts; names do not imply ownership; confirmation calls the canonical Contact RPC with no interview; resulting records derive Mai contattato from zero interviews.
+
+**Migration:** `202609130001_complex_photos_and_doorbell_acquisition.sql`, after the existing Milestone 2/Contact migrations. Live Supabase Storage/policy verification remains an infrastructure step.
+
 ## 2026-09-11 — GeoCensimento layout, persisted point and Contact correction
 
 **Obiettivo:** correct the four production regressions reported after the verified-location migration: narrow map/sidebar filters, an invisible persisted Via Francesca 59 point, missing Contact editing and incomplete cadastral click detail.

@@ -42,7 +42,7 @@ export interface CensusRecord {
   birthDate?: string; responsibleOperatorId?: string; responsibleOperatorName?: string; notes?: string;
   zoneId: string; zoneName: string; streetId: string; streetName: string; civicId: string;
   civicNumber: string; civicExtension?: string; complexId?: string; complexName?: string;
-  buildingScope: BuildingScope; levels?: number; floorCode?: string; totalFloors?: number; isTopFloor: boolean; floorLabel?: string; rooms?: number; surface?: number;
+  buildingScope: BuildingScope; levels?: number; staircase?: string; unitIdentifier?: string; floorCode?: string; totalFloors?: number; isTopFloor: boolean; floorLabel?: string; rooms?: number; surface?: number;
   occupancy?: Occupancy; elevator?: boolean; sheet?: string; parcel?: string; subaltern?: string;
   cadastralCategory?: string; isAppraised: boolean; probableAssignment?: boolean;
   engagementType?: string; createdAt: string; interviews: CensusInterview[];
