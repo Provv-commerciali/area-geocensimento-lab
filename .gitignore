@@ -13,3 +13,6 @@ test-results/
 *.tsbuildinfo
 npm-debug.log*
 debug.log
+__pycache__/
+*.py[cod]
+tools/doorbell-ocr-service/server.*.log

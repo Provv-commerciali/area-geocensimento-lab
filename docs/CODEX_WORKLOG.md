@@ -1,5 +1,9 @@
 # Codex worklog
 
+## 2026-09-13 — Local PP-OCRv6 reference service
+
+Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service`, installed PaddlePaddle 3.2/PaddleOCR 3.7 in the isolated local environment and connected `.env.local` to port 8091 because port 8090 was occupied by unrelated software. Health and a real-image PP-OCRv6 inference completed successfully; online hosting remains `TBD-OCR-001`.
+
 ## 2026-09-11 — Milestone 3 Complex photos and assisted doorbell acquisition
 
 **Obiettivo:** add private Complex documentation and operator-assisted Doorbell text acquisition without a parallel contact/property domain.
@@ -167,3 +171,9 @@
 **Problema:** `GetFeatureInfo` restava operativo ma il caricamento iniziale `GetMap` poteva ricevere un redirect di sessione, una risposta WMS non-PNG con stato 200 o superare il limite dimensionale su schermi HiDPI.
 
 **Correzione:** proxy cartografico indipendente dall’autenticazione, validazione PNG con singolo retry, errori non memorizzabili, richieste non-HiDPI e comando manuale “Riprova”.
+
+## 2026-09-13 — Causa riprodotta: dimensioni dopo riproiezione
+
+**Evidenza:** il GetMap generato realmente da OpenLayers per 1530×610 pixel in Toscana richiede WIDTH=2122 e riceve HTTP 400 dal proxy online. Anche AdE dichiara MaxWidth/MaxHeight=2048. La precedente verifica con una URL costruita a mano non copriva questa richiesta e non dimostrava il rendering; l’ipotesi del refresh di sessione non era una causa dimostrata del guasto autenticato.
+
+**Correzione:** loader condiviso che ridimensiona la richiesta finale mantenendo BBOX e aggiornando la risoluzione usata per riproiettare. Applicato a mappa principale e selettore catastale. Test sulle richieste reali a dimensioni desktop, ultrawide e portrait/HiDPI; verifica browser con immagini AdE e OSM reali e screenshot dei fabbricati arancioni sovrapposti.

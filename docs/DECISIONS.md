@@ -1,5 +1,7 @@
 # Decisions
 
+- **DEC-038** — Bound cadastral images after OpenLayers reprojection, preserving geographic BBOX and updating the image resolution. AdE GetCapabilities advertises 2048×2048; a 1530px Tuscany viewport generates a 2122px source image even without HiDPI. Main map and cadastral picker share this loader. Proxy limits remain unchanged.
+
 - **DEC-001** — Next.js App Router + strict TypeScript is the application stack.
 - **DEC-002** — Supabase/PostgreSQL is the persistence and authentication platform.
 - **DEC-003** — PostGIS is enabled from the initial migration, without geometry tables yet.
@@ -38,3 +40,4 @@
 - **DEC-037** — Scala and Interno are optional text labels on the existing CensusRecord context. They introduce neither a parallel property unit nor cadastral identity.
 - **DEC-032** — Contact editing is one authenticated security-invoker command spanning the selected CensusRecord, its primary Subject and primary relationship. Shared Subject identity remains authoritative; property context and interviews remain record-scoped, and edits never synthesize interview history.
 - **DEC-033** — Contact deletion removes one CensusRecord context only after explicit confirmation and retains the normalized Subject. Cadastral popup territory is resolved exclusively through the provider municipality code and persisted Municipality cadastral codes; loaded-record order is never geographic evidence.
+- **DEC-038** — The repository includes a loopback-only PP-OCRv6 CPU reference service as a LAB EXPERIMENT. It validates the provider contract locally without making localhost a Vercel deployment strategy; externally reachable hosting and service level remain TBD.
