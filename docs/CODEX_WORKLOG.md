@@ -161,3 +161,9 @@
 **Correzione:** exact cadastral-code territory matching, explicit overlay status, structured popup, coordinate picker restored in editing and confirmed record-scoped deletion. Migration `202609110015_contact_deletion.sql` adds the authenticated deletion command.
 
 **Verifica:** typecheck, lint, build, 154 tests and 16 Playwright scenarios pass.
+
+## 2026-09-13 — Resilienza sovrapposizione catastale
+
+**Problema:** `GetFeatureInfo` restava operativo ma il caricamento iniziale `GetMap` poteva ricevere un redirect di sessione, una risposta WMS non-PNG con stato 200 o superare il limite dimensionale su schermi HiDPI.
+
+**Correzione:** proxy cartografico indipendente dall’autenticazione, validazione PNG con singolo retry, errori non memorizzabili, richieste non-HiDPI e comando manuale “Riprova”.

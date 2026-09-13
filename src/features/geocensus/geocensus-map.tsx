@@ -27,7 +27,7 @@ type Props = { records: CensusRecord[]; civics: Civic[]; zones: CensusZone[]; st
 type GeocodingResponse = { results?: Array<{ label: string; longitude: number; latitude: number }>; error?: string };
 
 export function GeoCensusMap({ records, civics, zones, streets, complexes, operators, settings, today, initialFilters }: Props) {
-  const targetRef = useRef<HTMLDivElement>(null); const mapRef = useRef<Map | null>(null); const sourceRef = useRef(new VectorSource());
+  const targetRef = useRef<HTMLDivElement>(null); const mapRef = useRef<Map | null>(null); const sourceRef = useRef(new VectorSource()); const cadastralSourceRef=useRef<ImageWMS|null>(null);
   const [filters, setFilters] = useState(initialFilters); const [filtersOpen, setFiltersOpen] = useState(true); const [cadastralVisible, setCadastralVisible] = useState(true);
   const [selected, setSelected] = useState<CivicMapFeature[]>([]); const [cadastralInfo, setCadastralInfo] = useState<CadastralFeatureInfo | "loading" | "empty" | "error" | null>(null); const [cadastralState, setCadastralState] = useState<"loading" | "ready" | "error">("loading");
   const [search, setSearch] = useState(initialFilters.query ?? ""); const [searchMessage, setSearchMessage] = useState("");
@@ -37,8 +37,8 @@ export function GeoCensusMap({ records, civics, zones, streets, complexes, opera
   useEffect(() => {
     if (!targetRef.current || mapRef.current) return;
     ensureEtrs89Projection();
-    const cadastral = new ImageWMS({ url: italianRevenueCadastralProvider.proxyUrl, projection: ETRS89_CODE, params: { LAYERS: italianRevenueCadastralProvider.layer }, serverType: "mapserver", attributions: italianRevenueCadastralProvider.attribution, ratio: 1 });
-    const parcelInfo = new ImageWMS({ url: italianRevenueCadastralProvider.proxyUrl, projection: ETRS89_CODE, params: { LAYERS: italianRevenueCadastralProvider.queryLayer }, serverType: "mapserver", ratio: 1 });
+    const cadastral = new ImageWMS({ url: italianRevenueCadastralProvider.proxyUrl, projection: ETRS89_CODE, params: { LAYERS: italianRevenueCadastralProvider.layer }, hidpi:false, attributions: italianRevenueCadastralProvider.attribution, ratio: 1 });
+    const parcelInfo = new ImageWMS({ url: italianRevenueCadastralProvider.proxyUrl, projection: ETRS89_CODE, params: { LAYERS: italianRevenueCadastralProvider.queryLayer }, hidpi:false, ratio: 1 });cadastralSourceRef.current=cadastral;
     cadastral.on("imageloadstart", () => setCadastralState("loading")); cadastral.on("imageloadend", () => setCadastralState("ready")); cadastral.on("imageloaderror", () => setCadastralState("error"));
     const cluster = new Cluster({ distance: 48, minDistance: 18, source: sourceRef.current });
     const vector = new VectorLayer({ source: cluster, style: (feature) => {
@@ -60,7 +60,7 @@ export function GeoCensusMap({ records, civics, zones, streets, complexes, opera
       try { const response = await fetch(url); const body = await response.json() as { feature: CadastralFeatureInfo | null }; setCadastralInfo(response.ok && body.feature ? body.feature : "empty"); }
       catch { setCadastralInfo("error"); }
     });
-    mapRef.current = map; return () => { map.setTarget(undefined); mapRef.current = null; };
+    mapRef.current = map; return () => { map.setTarget(undefined); mapRef.current = null;cadastralSourceRef.current=null; };
   }, []);
 
   useEffect(() => {
@@ -116,7 +116,7 @@ export function GeoCensusMap({ records, civics, zones, streets, complexes, opera
       <button className="text-button" onClick={() => { setSelected([]); setContextState("idle"); setFilters({}); }}>Reimposta filtri</button>
     </>}</aside>
     <section className="map-workspace">
-      <div className="map-toolbar"><strong>{projection.visibleRecordCount} contatti · {projection.verifiedCivicCount} civici verificati</strong><span>{projection.autoGeolocatedCivicCount} da verificare · {projection.notGeolocatedCivicCount} non localizzati</span><label><input type="checkbox" checked={cadastralVisible} onChange={(event) => setCadastralVisible(event.target.checked)}/> Cartografia catastale</label><small className={`service-state ${cadastralState}`}>{cadastralState === "ready" ? "Cartografia catastale disponibile" : cadastralState === "error" ? "Sovrapposizione catastale temporaneamente non disponibile" : "Caricamento cartografia catastale"}</small></div>
+      <div className="map-toolbar"><strong>{projection.visibleRecordCount} contatti · {projection.verifiedCivicCount} civici verificati</strong><span>{projection.autoGeolocatedCivicCount} da verificare · {projection.notGeolocatedCivicCount} non localizzati</span><label><input type="checkbox" checked={cadastralVisible} onChange={(event) => setCadastralVisible(event.target.checked)}/> Cartografia catastale</label><small className={`service-state ${cadastralState}`}>{cadastralState === "ready" ? "Cartografia catastale disponibile" : cadastralState === "error" ? "Cartografia non caricata" : "Caricamento cartografia catastale"}</small>{cadastralState==="error"&&<button type="button" className="text-button" onClick={()=>{setCadastralState("loading");cadastralSourceRef.current?.refresh()}}>Riprova</button>}</div>
       <div ref={targetRef} className="geocensus-map" aria-label="Mappa GeoCensimento"/>
       {projection.visibleRecordCount > 0 && projection.features.length === 0 && <div className="map-empty-notice"><strong>{filters.zoneId ? "Filtro applicato" : "Risultati caricati"}: i civici non hanno ancora coordinate persistenti.</strong><span>{contextState === "locating" ? "Centro la vista sul primo indirizzo…" : contextState === "centered" ? "Vista centrata sull’indirizzo. I fabbricati catastali ufficiali sono evidenziati in arancione; il civico resta da verificare e salvare." : contextState === "error" ? "Non è stato possibile centrare automaticamente il contesto." : "I record restano conteggiati e non vengono nascosti."}</span></div>}
       <div className="map-legend"><strong>Legenda</strong>{Object.entries(CENSUS_OPERATIONAL_STATUS_VISUALS).map(([status, visual]) => <span key={status}><i style={{ background: visual.markerColor }}/>{visual.label}</span>)}<span><i className="automatic-ring"/> Posizione da verificare</span><span><i className="complex-ring"/> Complesso</span></div>

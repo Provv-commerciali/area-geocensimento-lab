@@ -5,7 +5,7 @@ GeoCensimento is the map projection of existing Censimento contacts. The page lo
 ## Layers and interaction
 
 1. Replaceable OSM LAB basemap with required attribution.
-2. Toggleable official AdE `fabbricati` WMS through a same-origin proxy. At cadastral zoom it renders the orange building footprints over the basemap; the queryable parcel layer is used for point information. Failure leaves the app usable and is displayed.
+2. Toggleable official AdE `fabbricati` WMS through a public, same-origin, strictly allowlisted proxy. The route is independent from LAB session refresh, accepts only real PNG map responses, retries one invalid provider response and never caches errors. OpenLayers requests one non-HiDPI image per view so the proxy limit remains deterministic. At cadastral zoom it renders the orange building footprints over the basemap; the queryable parcel layer is used for point information. Failure leaves the app usable and exposes an explicit retry.
 3. One vector feature per geolocated civic. It contains references to all matching CensusRecords and any associated Complex names.
 4. OpenLayers density clustering at 48 px. A cluster count is the number of contacts, not merely civic features. Click zooms into a multi-feature cluster; at detail scale it lists individual contacts.
 
