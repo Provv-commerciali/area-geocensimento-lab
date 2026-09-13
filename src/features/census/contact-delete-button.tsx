@@ -1,0 +1,4 @@
+"use client";
+
+import{useActionState}from"react";import{Trash2}from"lucide-react";import{deleteContactAction}from"./contact-delete-actions";
+export function ContactDeleteButton({recordId,databaseMode}:{recordId:string;databaseMode:boolean}){const[state,action,pending]=useActionState(deleteContactAction,{});return <form action={action} onSubmit={event=>{if(!window.confirm("Eliminare definitivamente questo contatto e il suo storico interviste? L’anagrafica condivisa con altri contatti non verrà eliminata."))event.preventDefault()}}><input type="hidden" name="recordId" value={recordId}/><button type="submit" className="button danger" disabled={pending||!databaseMode}><Trash2 size={16}/>{pending?"Eliminazione…":"Elimina contatto"}</button>{state.error&&<small className="form-error" role="alert">{state.error}</small>}</form>}

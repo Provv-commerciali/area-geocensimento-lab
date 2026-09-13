@@ -13,8 +13,8 @@ export const streets: Street[] = [
   { id: "st-5", municipalityId: "municipality-bo", name: "Via Rizzoli", municipality: "Bologna" },
 ];
 export const zones: CensusZone[] = [
-  { id: "zone-1", name: "Centro Storico", municipalityId: "municipality-bo", municipality: "Bologna", province: "Bologna", provinceCode: "BO", operator: operators[0], streetIds: ["st-1", "st-2", "st-5"] },
-  { id: "zone-2", name: "Porto–Saragozza", municipalityId: "municipality-bo", municipality: "Bologna", province: "Bologna", provinceCode: "BO", operator: operators[1], streetIds: ["st-3", "st-4"] },
+  { id: "zone-1", name: "Centro Storico", municipalityId: "municipality-bo", municipality: "Bologna", municipalityCadastralCode: "A944", province: "Bologna", provinceCode: "BO", operator: operators[0], streetIds: ["st-1", "st-2", "st-5"] },
+  { id: "zone-2", name: "Porto–Saragozza", municipalityId: "municipality-bo", municipality: "Bologna", municipalityCadastralCode: "A944", province: "Bologna", provinceCode: "BO", operator: operators[1], streetIds: ["st-3", "st-4"] },
 ];
 export const civics: Civic[] = Array.from({ length: 20 }, (_, index) => ({
   id: `cv-${index + 1}`, streetId: streets[index % streets.length].id, number: String(2 + index * 2),

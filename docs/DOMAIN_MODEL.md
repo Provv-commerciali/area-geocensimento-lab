@@ -18,6 +18,8 @@ Legacy person columns remain on `census_records` only to preserve already-loaded
 
 Editing a Contact is one atomic command over its primary `Subject`, `CensusRecord` and primary `CensusRecordSubject` relationship. Subject identity changes therefore remain shared registry changes, while address/property/operational changes remain scoped to the selected record. The command does not create, alter or synthesize interviews.
 
+Deleting a Contact deletes the selected `CensusRecord` context after explicit operator confirmation. FK-owned interview, subject-link and cadastral-association children follow their declared lifecycle; the normalized `Subject` is intentionally retained because it may be shared by other contexts and remains a distinct registry entity.
+
 `Complex ↔ Civic` is many-to-many through `complex_civics`; creation may attach the first selected civic but does not designate a “primary” civic.
 
 ## GeoCensimento civic location

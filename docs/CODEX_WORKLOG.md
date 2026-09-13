@@ -141,3 +141,11 @@
 **Problemi/TBD:** see `OPEN_QUESTIONS.md`; real Supabase credentials unavailable in repository by design.
 
 **Commit:** semantic commits on `main`; final SHAs are recorded in Git history and delivery report.
+
+## 2026-09-13 — Territory-safe cadastral detail and Contact lifecycle
+
+**Problema:** an unfiltered cadastral click displayed Bologna for AdE code F035; Contact editing omitted coordinate management; deletion was unavailable; the cadastral popup lacked hierarchy.
+
+**Correzione:** exact cadastral-code territory matching, explicit overlay status, structured popup, coordinate picker restored in editing and confirmed record-scoped deletion. Migration `202609110015_contact_deletion.sql` adds the authenticated deletion command.
+
+**Verifica:** typecheck, lint, build, 154 tests and 16 Playwright scenarios pass.

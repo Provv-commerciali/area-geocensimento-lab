@@ -13,6 +13,8 @@ export type CadastralFeatureInfo = {
   municipalityCode: string; municipalityName?: string; section?: string; sheet: string; parcel: string; featureType?: string;
 };
 
+export function resolveCadastralTerritory<T extends {municipalityCadastralCode?:string}>(zones:T[],municipalityCode:string):T|undefined{return zones.find(zone=>zone.municipalityCadastralCode?.trim().toUpperCase()===municipalityCode.trim().toUpperCase())}
+
 function findJsonObject(body: string): unknown {
   const start = body.indexOf("{"); const end = body.lastIndexOf("}");
   if (start < 0 || end <= start) throw new Error("Risposta catastale priva di attributi strutturati");

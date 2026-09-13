@@ -19,7 +19,7 @@ export interface Subject {
   taxCode?: string; vatNumber?: string; phone?: string; email?: string; birthDate?: string; notes?: string;
 }
 export interface CensusRecordSubject { subjectId: string; role: Qualification | "Non specificato"; isPrimary: boolean; ownershipShare?: number }
-export interface CensusZone { id: string; name: string; municipalityId: string; municipality: string; province?: string; provinceCode?: string; operator: Operator; streetIds: string[] }
+export interface CensusZone { id: string; name: string; municipalityId: string; municipality: string; municipalityCadastralCode?: string; province?: string; provinceCode?: string; operator: Operator; streetIds: string[] }
 export interface Street { id: string; municipalityId: string; name: string; municipality: string }
 export type GeocodingStatus = "NOT_GEOLOCATED" | "AUTO_GEOLOCATED" | "VERIFIED";
 export type GeocodingMethod = "GEOCODER" | "MANUAL_MAP" | "CADASTRAL";

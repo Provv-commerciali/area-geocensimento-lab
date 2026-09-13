@@ -9,7 +9,7 @@ GeoCensimento is the map projection of existing Censimento contacts. The page lo
 3. One vector feature per geolocated civic. It contains references to all matching CensusRecords and any associated Complex names.
 4. OpenLayers density clustering at 48 px. A cluster count is the number of contacts, not merely civic features. Click zooms into a multi-feature cluster; at detail scale it lists individual contacts.
 
-The primary marker/cluster color follows operational precedence. A purple ring indicates at least one Complex without replacing operational meaning. Every feature also carries `VERIFIED` or `AUTO_GEOLOCATED`; counters separate verified, to-verify and missing civics, and the detail never presents an automatic point as certain. The persistence adapter accepts PostGIS points returned as GeoJSON, serialized GeoJSON, WKT or EWKB. Cadastral clicks on the general map remain informative only and show Province, Comune, cadastral identifiers and provider feature type when available.
+The primary marker/cluster color follows operational precedence. A purple ring indicates at least one Complex without replacing operational meaning. Every feature also carries `VERIFIED` or `AUTO_GEOLOCATED`; counters separate verified, to-verify and missing civics, and the detail never presents an automatic point as certain. The persistence adapter accepts PostGIS points returned as GeoJSON, serialized GeoJSON, WKT or EWKB. Cadastral clicks on the general map remain informative only. The popup matches the provider’s cadastral municipality code with persisted Municipality data before displaying Province/Comune, preventing unrelated loaded zones from contaminating the result, and groups territory and parcel identifiers in a dedicated card.
 
 ## URL filters
 

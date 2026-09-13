@@ -28,4 +28,6 @@ Migration `202609110012_verified_locations_and_cadastral_associations.sql` repla
 
 Migration `202609110014_contact_updates.sql` adds the authenticated Subject update policy/column grant and the security-invoker `update_census_contact_lab` command. It validates primary-subject identity, zone/street/civic and complex membership plus the established duplicate property-context invariant, then atomically updates Subject identity, CensusRecord context/property data and the primary relationship role. It never updates interview rows.
 
+Migration `202609110015_contact_deletion.sql` adds the authenticated security-invoker `delete_census_contact_lab` command. It removes one CensusRecord context, lets existing cascade FKs remove its context-owned children, retains the normalized Subject and detaches any optional doorbell acquisition audit reference before deletion.
+
 `supabase/seed.sql` inserts a deterministic fictional application dataset. Its Bologna territorial anchors are not the national archive. `scripts/sync-istat-territories.ts` separately downloads, validates and transactionally synchronizes the official archive; see `docs/TERRITORIAL_IMPORT.md`.
