@@ -1,6 +1,6 @@
 # Decisions
 
-- **DEC-038** — Bound cadastral images after OpenLayers reprojection, preserving geographic BBOX and updating the image resolution. AdE GetCapabilities advertises 2048×2048; a 1530px Tuscany viewport generates a 2122px source image even without HiDPI. Main map and cadastral picker share this loader. Proxy limits remain unchanged.
+- **DEC-039** — Bound cadastral images after OpenLayers reprojection, preserving geographic BBOX and updating the image resolution. AdE GetCapabilities advertises 2048×2048; a 1530px Tuscany viewport generates a 2122px source image even without HiDPI. Main map and cadastral picker share this loader. Proxy limits remain unchanged.
 
 - **DEC-001** — Next.js App Router + strict TypeScript is the application stack.
 - **DEC-002** — Supabase/PostgreSQL is the persistence and authentication platform.

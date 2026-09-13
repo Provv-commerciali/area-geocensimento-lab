@@ -177,3 +177,5 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **Evidenza:** il GetMap generato realmente da OpenLayers per 1530×610 pixel in Toscana richiede WIDTH=2122 e riceve HTTP 400 dal proxy online. Anche AdE dichiara MaxWidth/MaxHeight=2048. La precedente verifica con una URL costruita a mano non copriva questa richiesta e non dimostrava il rendering; l’ipotesi del refresh di sessione non era una causa dimostrata del guasto autenticato.
 
 **Correzione:** loader condiviso che ridimensiona la richiesta finale mantenendo BBOX e aggiornando la risoluzione usata per riproiettare. Applicato a mappa principale e selettore catastale. Test sulle richieste reali a dimensioni desktop, ultrawide e portrait/HiDPI; verifica browser con immagini AdE e OSM reali e screenshot dei fabbricati arancioni sovrapposti.
+
+**Verifica:** lint, typecheck, 158 test e build superati. Nel browser a 1920px, Piano di Mommio mostra oltre 62.000 pixel arancioni; GetMap 2048×708 restituisce 200 e la sovrapposizione su OSM è stata ispezionata visivamente.

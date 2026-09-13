@@ -10,6 +10,7 @@ import ImageLayer from "ol/layer/Image.js";
 import TileLayer from "ol/layer/Tile.js";
 import VectorLayer from "ol/layer/Vector.js";
 import ImageWMS from "ol/source/ImageWMS.js";
+import { createCadastralImageSource } from "@/services/cadastral-image-source";
 import OSM from "ol/source/OSM.js";
 import VectorSource from "ol/source/Vector.js";
 import Cluster from "ol/source/Cluster.js";
@@ -37,7 +38,7 @@ export function GeoCensusMap({ records, civics, zones, streets, complexes, opera
   useEffect(() => {
     if (!targetRef.current || mapRef.current) return;
     ensureEtrs89Projection();
-    const cadastral = new ImageWMS({ url: italianRevenueCadastralProvider.proxyUrl, projection: ETRS89_CODE, params: { LAYERS: italianRevenueCadastralProvider.layer }, hidpi:false, attributions: italianRevenueCadastralProvider.attribution, ratio: 1 });
+    const cadastral = createCadastralImageSource();
     const parcelInfo = new ImageWMS({ url: italianRevenueCadastralProvider.proxyUrl, projection: ETRS89_CODE, params: { LAYERS: italianRevenueCadastralProvider.queryLayer }, hidpi:false, ratio: 1 });cadastralSourceRef.current=cadastral;
     cadastral.on("imageloadstart", () => setCadastralState("loading")); cadastral.on("imageloadend", () => setCadastralState("ready")); cadastral.on("imageloaderror", () => setCadastralState("error"));
     const cluster = new Cluster({ distance: 48, minDistance: 18, source: sourceRef.current });
