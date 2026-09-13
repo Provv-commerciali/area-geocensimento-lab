@@ -19,6 +19,13 @@ This repository is an isolated, disposable laboratory. Never inspect, use, query
 
 The primary agent owns integration, testing, documentation, commits and push. Subagents may handle independent reviews or analysis, never conflicting edits or definitive architecture decisions.
 
+## Protocollo Efficienza e Risparmio Token
+
+1. **Codice Conciso:** Prediligere sempre modifiche puntuali rispetto alla riscrittura totale dei sorgenti.
+2. **Output Essenziale:** Risposte dirette, niente testo introduttivo o conclusivo superfluo.
+3. **Gestione del Contesto:** Evitare l'inclusione di log o file non strettamente necessari alla risoluzione del task.
+4. **No Spiegazioni Non Richieste:** Spiegare il "perché" solo se richiesto dall'utente, altrimenti fornire solo il "come" (codice/fix).
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
