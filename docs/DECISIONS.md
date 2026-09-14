@@ -1,5 +1,8 @@
 # Decisions
 
+- **DEC-043** — Paid-service price visibility and spend controls are enforced at the database insertion boundary. An operator has a calendar-month budget and a per-request ceiling; a distinct manager permission may change those limits. The UI displays the configured expected price and an auditable request/document history, but it does not claim a provider invoice price unless `known_cost` is supplied. Existing authorized LAB operators become the initial managers only for this migration; newly authorized operators remain manager-denied.
+- **DEC-044** — GeoCensimento continues to aggregate markers by Civic. The click panel is an “Edificio / civico” workspace: it lists existing Contacts and compares provider-returned units using the exact sheet/parcel/subaltern identity. It offers open-existing or create-new actions but never materializes a parallel building/unit archive.
+
 - **DEC-042** — Paid Catasto documents remain explicit unit-led commands: property data/intestatari first, then ordinary visura or building elaborato planimetrico with confirmation and private PDF storage. OpenAPI Real Estate comparables are a separate server-only, cached provider using a distinct token and never modify Contact data.
 
 - **DEC-041** — The existing CensusRecord remains the LAB’s editable unit context. OpenAPI attributes extend that existing block only after explicit import and retain request provenance; Sandbox results are demonstrative and cannot be imported. Contact photos are private storage assets with an optional primary map projection.

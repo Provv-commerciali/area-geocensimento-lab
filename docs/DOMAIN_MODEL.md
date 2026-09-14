@@ -86,3 +86,7 @@ A future milestone may enrich the current minimal `CadastralAssociation` with pr
 `RealEstateComparableRequest` is an auditable, cached OpenAPI Real Estate search associated with one Contact and its civic coordinate. It stores only the explicit search parameters and returned market listings; it never overwrites Contact or cadastral data.
 
 An OpenAPI holder is not an interview and never creates one. An imported holder enters only through the canonical Contact workflow. Non-ownership rights such as usufruct are not falsely normalized into `Proprietario`; the original provider value remains authoritative for the enrichment.
+
+`Operator` owns paid-service governance in addition to its explicit access grant: a monthly budget, a per-request ceiling and a separate manager permission. `CadastralRequest.estimated_cost` is the configured price at creation; it is used to reserve the operator budget before the provider call. Completed, active requests count in the calendar-month total, while cached requests create no new spend. `known_cost`, when a provider contract exposes it, supersedes the estimate for reporting.
+
+One map marker remains one `Civic` projection. The marker's building panel lists every CensusRecord already associated with that civic; Catasto property units are matched only when sheet, parcel and subaltern all agree. A match opens the existing Contact; an unmatched Catasto unit can enter the normal New Contact workflow. No automatic CensusRecord or unit merge is introduced.

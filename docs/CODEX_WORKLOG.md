@@ -212,3 +212,9 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **Migration:** `202609140003_contact_cadastral_import_and_photos.sql` aggiunge la provenienza catastale e `contact-photos` con bucket privato/RLS.
 
 **Verifica:** lint, typecheck, 167 test Vitest e build production superati.
+
+## 2026-09-14 — Governance costi e pannello edificio
+
+**Modifiche:** costi previsti mostrati nel consenso; budget mensile e massimale per richiesta per operatore, verificati da trigger PostgreSQL prima di una nuova richiesta; storico richieste/documenti in Impostazioni operative e modifica limiti riservata al manager. Il popup mappa mantiene un marker per civico e mostra le unità/contatti censiti; le unità Catasto confrontano sheet/particella/subalterno per aprire il contatto già esistente oppure creare un nuovo contatto.
+
+**Migration:** `202609140005_paid_service_governance.sql`.
