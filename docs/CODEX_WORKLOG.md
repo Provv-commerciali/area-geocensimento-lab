@@ -1,5 +1,10 @@
 # Codex worklog
 
+## 2026-09-14 — Documenti catastali e comparabili
+
+- Added the explicit unit-led flow for property data, ordinary report and planimetric elaboration, with private document handling.
+- Added official cadastral-category selects, richer map Contact metadata and a separate OpenAPI Real Estate comparable-search boundary.
+
 ## 2026-09-14 — Revisione OCR interattiva e Storage RLS
 
 **Problema:** lo scarto di una proposta OCR incompleta applicava erroneamente i vincoli necessari alla creazione del Contatto; l'errore della Server Action veniva mascherato in produzione come React #441. La policy Storage iniziale bloccava inoltre l'upload autenticato nel LAB online.

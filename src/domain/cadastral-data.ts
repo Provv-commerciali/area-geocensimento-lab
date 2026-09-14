@@ -1,4 +1,4 @@
-export type CadastralOperationType = "ELENCO_IMMOBILI" | "PROSPETTO_CATASTALE" | "VISURA_ORDINARIA";
+export type CadastralOperationType = "ELENCO_IMMOBILI" | "PROSPETTO_CATASTALE" | "VISURA_ORDINARIA" | "ELABORATO_PLANIMETRICO";
 export type CadastralRequestStatus = "CREATED" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
 
 export interface CadastralContext {

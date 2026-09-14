@@ -19,6 +19,9 @@ export interface CadastralDataProvider{
   requestOrdinaryReport(providerPropertyId:string):Promise<ProviderRequestState>;
   getOrdinaryReport(providerRequestId:string):Promise<ProviderRequestState>;
   downloadOrdinaryReport(providerRequestId:string):Promise<Uint8Array>;
+  requestPlanimetricElaboration(context:CadastralContext):Promise<ProviderRequestState>;
+  getPlanimetricElaboration(providerRequestId:string):Promise<ProviderRequestState>;
+  downloadPlanimetricElaboration(providerRequestId:string):Promise<Uint8Array>;
 }
 
 export class CadastralProviderError extends Error{
@@ -53,5 +56,8 @@ export class OpenApiCatastoProvider implements CadastralDataProvider{
   getRequest(id:string){return this.json(`/richiesta/${encodeURIComponent(id)}`)}
   requestOrdinaryReport(providerPropertyId:string){return this.json("/visura_catastale",{method:"POST",body:JSON.stringify({entita:"immobile",id_immobile:providerPropertyId,tipo_visura:"ordinaria"})})}
   getOrdinaryReport(id:string){return this.json(`/visura_catastale/${encodeURIComponent(id)}`)}
+  requestPlanimetricElaboration(context:CadastralContext){return this.json("/elaborato_planimetrico",{method:"POST",body:JSON.stringify({tipo_catasto:"F",provincia:context.provinceCode,comune:context.municipality,sezione:context.section??"",foglio:context.sheet,particella:context.parcel})})}
+  getPlanimetricElaboration(id:string){return this.json(`/elaborato_planimetrico/${encodeURIComponent(id)}`)}
   async downloadOrdinaryReport(id:string){const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),this.timeoutMs);try{const response=await fetch(`${this.baseUrl}/visura_catastale/${encodeURIComponent(id)}/documento`,{headers:{authorization:`Bearer ${this.token}`,accept:"application/pdf"},signal:controller.signal,cache:"no-store"});if(!response.ok)throw new CadastralProviderError(response.status>=500?"UPSTREAM_UNAVAILABLE":"UPSTREAM_REJECTED","Documento catastale non disponibile.",response.status>=500);const type=response.headers.get("content-type")??"";if(!type.toLowerCase().includes("application/pdf"))throw new CadastralProviderError("INVALID_RESPONSE","Il provider non ha restituito un documento PDF valido.",false);const bytes=new Uint8Array(await response.arrayBuffer());if(!bytes.length||bytes.length>20*1024*1024)throw new CadastralProviderError("INVALID_RESPONSE","Dimensione del documento catastale non valida.",false);return bytes}finally{clearTimeout(timeout)}}
+  async downloadPlanimetricElaboration(id:string){const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),this.timeoutMs);try{const response=await fetch(`${this.baseUrl}/elaborato_planimetrico/${encodeURIComponent(id)}/documento`,{headers:{authorization:`Bearer ${this.token}`,accept:"application/pdf"},signal:controller.signal,cache:"no-store"});if(!response.ok)throw new CadastralProviderError(response.status>=500?"UPSTREAM_UNAVAILABLE":"UPSTREAM_REJECTED","Elaborato planimetrico non disponibile.",response.status>=500);const type=response.headers.get("content-type")??"";if(!type.toLowerCase().includes("application/pdf"))throw new CadastralProviderError("INVALID_RESPONSE","Il provider non ha restituito un documento PDF valido.",false);const bytes=new Uint8Array(await response.arrayBuffer());if(!bytes.length||bytes.length>20*1024*1024)throw new CadastralProviderError("INVALID_RESPONSE","Dimensione del documento catastale non valida.",false);return bytes}finally{clearTimeout(timeout)}}
 }

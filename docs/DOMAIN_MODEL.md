@@ -83,4 +83,6 @@ A future milestone may enrich the current minimal `CadastralAssociation` with pr
 
 `CensusRecordPhoto` is a private JPG/PNG/WebP photograph of a Contact context. It is optional, size-limited and stored in the private `contact-photos` bucket; a primary signed URL may be projected into GeoCensimento. Sandbox Catasto responses are demonstrative and are never importable into a Contact.
 
+`RealEstateComparableRequest` is an auditable, cached OpenAPI Real Estate search associated with one Contact and its civic coordinate. It stores only the explicit search parameters and returned market listings; it never overwrites Contact or cadastral data.
+
 An OpenAPI holder is not an interview and never creates one. An imported holder enters only through the canonical Contact workflow. Non-ownership rights such as usufruct are not falsely normalized into `Proprietario`; the original provider value remains authoritative for the enrichment.

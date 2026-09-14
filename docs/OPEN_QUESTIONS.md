@@ -5,7 +5,7 @@
 - **TBD-CENSUS-004** — Complete meaning of actions/icons in the historic contact table.
 - **TBD-CENSUS-005** — Complete semantics and validation rules for special civic extension values. It remains flexible text.
 - **TBD-CENSUS-006** — Authoritative value set and semantics for “Tipo di Incarico” and “Probabile Incarico”. Filters are structurally reserved without hard business rules.
-- **TBD-CENSUS-007** — Final response and cadastral-category vocabularies. Qualification and occupancy are now confirmed and controlled.
+- **TBD-CENSUS-007** — Final response vocabulary. Cadastral categories now use the official Catasto Fabbricati selection.
 - **TBD-MAP-001** — Production basemap capacity/provider and service-level requirements; OSM Standard is LAB-only.
 - **TBD-MAP-003** — Authoritative geometry model for a Complex spanning several civics/extensions. Milestone 2 indicates a Complex through its associated civic features.
 - **TBD-MAP-004** — Reliable official WFS availability. The endpoint tested on 2026-09-11 returned Access Denied, so no WFS capability is claimed.

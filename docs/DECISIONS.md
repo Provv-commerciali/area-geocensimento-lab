@@ -1,5 +1,7 @@
 # Decisions
 
+- **DEC-042** — Paid Catasto documents remain explicit unit-led commands: property data/intestatari first, then ordinary visura or building elaborato planimetrico with confirmation and private PDF storage. OpenAPI Real Estate comparables are a separate server-only, cached provider using a distinct token and never modify Contact data.
+
 - **DEC-041** — The existing CensusRecord remains the LAB’s editable unit context. OpenAPI attributes extend that existing block only after explicit import and retain request provenance; Sandbox results are demonstrative and cannot be imported. Contact photos are private storage assets with an optional primary map projection.
 - **DEC-040** — OpenAPI Catasto enriches the existing cadastral association through one shared `CadastralDataProvider`. Paid operations require an explicit default-denied operator permission and user confirmation. Canonical-parameter hashes provide persistent reuse; an active-operation unique index prevents double purchase. Polling uses six-second intervals and bounded attempts. Units, original holder rights/shares and ordinary private PDF reports are separate persisted projections. A Catasto holder enters Censimento only through the normal zero-interview Contact workflow.
 

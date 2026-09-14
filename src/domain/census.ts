@@ -5,6 +5,15 @@ export const occupancies = ["Libero", "Libero al rogito", "Occupato dal propriet
 export type Occupancy = (typeof occupancies)[number];
 export const qualifications = ["Proprietario", "Comproprietario", "Inquilino"] as const;
 export type Qualification = (typeof qualifications)[number];
+/** Quadro generale delle categorie del Catasto Fabbricati (Agenzia delle Entrate). */
+export const cadastralCategories = [
+  ["A/1","Abitazioni di tipo signorile"],["A/2","Abitazioni di tipo civile"],["A/3","Abitazioni di tipo economico"],["A/4","Abitazioni di tipo popolare"],["A/5","Abitazioni di tipo ultrapopolare"],["A/6","Abitazioni di tipo rurale"],["A/7","Abitazioni in villini"],["A/8","Abitazioni in ville"],["A/9","Castelli e palazzi di pregio"],["A/10","Uffici e studi privati"],["A/11","Abitazioni e alloggi tipici"],
+  ["B/1","Collegi, convitti e caserme"],["B/2","Case di cura e ospedali"],["B/3","Prigioni e riformatori"],["B/4","Uffici pubblici"],["B/5","Scuole e laboratori scientifici"],["B/6","Biblioteche, musei e gallerie"],["B/7","Cappelle e oratori"],["B/8","Magazzini sotterranei"],
+  ["C/1","Negozi e botteghe"],["C/2","Magazzini e locali di deposito"],["C/3","Laboratori per arti e mestieri"],["C/4","Fabbricati per esercizi sportivi"],["C/5","Stabilimenti balneari e termali"],["C/6","Stalle, scuderie e autorimesse"],["C/7","Tettoie chiuse o aperte"],
+  ["D/1","Opifici"],["D/2","Alberghi e pensioni"],["D/3","Teatri e cinematografi"],["D/4","Case di cura e ospedali"],["D/5","Istituti di credito"],["D/6","Impianti sportivi"],["D/7","Fabbricati industriali speciali"],["D/8","Fabbricati commerciali speciali"],["D/9","Edifici galleggianti e ponti"],["D/10","Fabbricati produttivi agricoli"],
+  ["E/1","Stazioni per servizi di trasporto"],["E/2","Ponti a pedaggio"],["E/3","Costruzioni per esigenze pubbliche"],["E/4","Recinti per esigenze pubbliche"],["E/5","Fortificazioni"],["E/6","Fari, semafori e torri"],["E/7","Fabbricati per culto"],["E/8","Cimiteri"],["E/9","Altre costruzioni particolari"],
+  ["F/1","Area urbana"],["F/2","Unità collabente"],["F/3","Unità in corso di costruzione"],["F/4","Unità in corso di definizione"],["F/5","Lastrico solare"],["F/6","Fabbricato in attesa di dichiarazione"],["F/7","Portici, porzioni e beni comuni non censibili"],["F/9","Unità provenienti dal catasto fondiario"],["F/10","Unità dichiarate o ritenute rurali"],["F/11","Unità in attesa di accatastamento"],
+] as const;
 export type SubjectType = "PRIVATO" | "AZIENDA";
 export const floorCodes = ["Interrato", "Seminterrato", "Terra", "Rialzato", ...Array.from({ length: 60 }, (_, index) => `${index + 1}°`)] as const;
 export type CivicParity = "all" | "even" | "odd";
