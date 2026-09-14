@@ -199,3 +199,11 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **Verifica:** lint, typecheck, 167 test Vitest, 18 scenari Playwright e build production superati; provider esterno sempre mockato nei test automatici.
 
 **TBD/manuale:** applicare la migration al Supabase LAB, abilitare gli operatori autorizzati, configurare token sandbox e verificare il contratto prezzi/freschezza. Nessun endpoint OpenAPI production è usato dai test.
+
+## 2026-09-14 — Estensione contatto/unità e foto privata
+
+**Modifiche:** i campi Catasto disponibili (classe, consistenza, rendita, zona, partita e indirizzo) estendono il blocco unità già presente nel Contatto. Una unità può precompilare un Nuovo Contatto; nel contatto esistente l’import è esplicito e bloccato in Sandbox. Nuovo/Modifica contatto accettano una foto privata JPG/PNG/WebP.
+
+**Migration:** `202609140003_contact_cadastral_import_and_photos.sql` aggiunge la provenienza catastale e `contact-photos` con bucket privato/RLS.
+
+**Verifica:** lint, typecheck, 167 test Vitest e build production superati.

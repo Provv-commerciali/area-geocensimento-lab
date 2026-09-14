@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient, hasSupabaseEnvironment } from "@/lib/supabase/server";
 import { saveCensusRecord, type CensusRecordGateway } from "./persistence";
+import { uploadContactPhoto } from "@/services/contact-photo-data";
 
 export interface FormActionState { error?: string }
 
@@ -37,8 +38,9 @@ export async function createCensusRecordAction(
       const { data: id, error } = await db.rpc("create_census_record_lab", { p_record: {...payload,subject:{subjectType:payload.subjectType,firstName:payload.firstName,lastName:payload.lastName,companyName:payload.companyName,vatNumber:payload.vatNumber,phone:payload.phone,email:payload.email,taxCode:payload.taxCode,birthDate:payload.birthDate,notes:payload.notes}}, p_interview: null });
       if (error) throw new Error(error.message);
       if (typeof id !== "string") throw new Error("Supabase non ha restituito l'identificativo del record.");
-      const location = await db.from("census_records").update({ staircase: payload.staircase || null, unit_identifier: payload.unitIdentifier || null }).eq("id", id);
+      const location = await db.from("census_records").update({ staircase: payload.staircase || null, unit_identifier: payload.unitIdentifier || null,cadastral_class:value(data,"cadastralClass")||null,cadastral_consistency:value(data,"cadastralConsistency")||null,cadastral_income:value(data,"cadastralIncome")||null,cadastral_census_zone:value(data,"cadastralCensusZone")||null,cadastral_registry_lot:value(data,"cadastralRegistryLot")||null,cadastral_address:value(data,"cadastralAddress")||null }).eq("id", id);
       if (location.error) throw new Error(location.error.message);
+      const photo=data.get("contactPhoto");if(photo instanceof File&&photo.size>0)await uploadContactPhoto(id,photo);
       return id;
     },
   };

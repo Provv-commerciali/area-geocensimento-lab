@@ -44,7 +44,7 @@ export interface CensusRecord {
   civicNumber: string; civicExtension?: string; complexId?: string; complexName?: string;
   buildingScope: BuildingScope; levels?: number; staircase?: string; unitIdentifier?: string; floorCode?: string; totalFloors?: number; isTopFloor: boolean; floorLabel?: string; rooms?: number; surface?: number;
   occupancy?: Occupancy; elevator?: boolean; sheet?: string; parcel?: string; subaltern?: string;
-  cadastralCategory?: string; isAppraised: boolean; probableAssignment?: boolean;
+  cadastralCategory?: string; cadastralClass?:string; cadastralConsistency?:string; cadastralIncome?:string; cadastralCensusZone?:string; cadastralRegistryLot?:string; cadastralAddress?:string; cadastralAcquiredAt?:string; cadastralSourceRequestId?:string; photoUrl?:string; isAppraised: boolean; probableAssignment?: boolean;
   engagementType?: string; createdAt: string; interviews: CensusInterview[];
   subjectLinks: CensusRecordSubject[]; cadastralAssociation?: CadastralAssociation;
 }

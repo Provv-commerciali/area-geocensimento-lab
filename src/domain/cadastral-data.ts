@@ -56,4 +56,4 @@ export interface CadastralOperationResult {
   error?: string;
 }
 
-export type CadastralContactPrefill={zoneId?:string;streetId?:string;civicId?:string;complexId?:string;subjectType:"PRIVATO"|"AZIENDA";firstName?:string;lastName?:string;companyName?:string;taxCode?:string;relationshipRole?:"Proprietario"|"Comproprietario";sheet:string;parcel:string;subaltern?:string;cadastralCategory?:string};
+export type CadastralContactPrefill={zoneId?:string;streetId?:string;civicId?:string;complexId?:string;subjectType:"PRIVATO"|"AZIENDA";firstName?:string;lastName?:string;companyName?:string;taxCode?:string;relationshipRole?:"Proprietario"|"Comproprietario";sheet:string;parcel:string;subaltern?:string;cadastralCategory?:string;cadastralClass?:string;cadastralConsistency?:string;cadastralIncome?:string;cadastralCensusZone?:string;cadastralRegistryLot?:string;cadastralAddress?:string};
