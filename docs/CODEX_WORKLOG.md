@@ -1,5 +1,13 @@
 # Codex worklog
 
+## 2026-09-14 — Revisione OCR interattiva e Storage RLS
+
+**Problema:** lo scarto di una proposta OCR incompleta applicava erroneamente i vincoli necessari alla creazione del Contatto; l'errore della Server Action veniva mascherato in produzione come React #441. La policy Storage iniziale bloccava inoltre l'upload autenticato nel LAB online.
+
+**Correzione:** lo stato `DISCARDED` non richiede campi anagrafici/immobiliari completi, gli errori di validazione tornano alla UI in forma leggibile e le proposte scartate escono dalla revisione dopo il salvataggio. La policy versionata `202609140001_fix_complex_photo_storage_rls.sql` consente l'accesso autenticato solo alle cartelle collegate a un Complesso LAB esistente tramite una verifica protetta dalla RLS ricorsiva.
+
+**Verifica:** test UI mirato su select, salvataggio, separazione e scarto; lint, typecheck e build.
+
 ## 2026-09-13 — Local PP-OCRv6 reference service
 
 Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service`, installed PaddlePaddle 3.2/PaddleOCR 3.7 in the isolated local environment and connected `.env.local` to port 8091 because port 8090 was occupied by unrelated software. Health and a real-image PP-OCRv6 inference completed successfully; online hosting remains `TBD-OCR-001`.
