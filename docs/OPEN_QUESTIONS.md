@@ -13,3 +13,6 @@
 - **TBD-OCR-001** — Final location, capacity, synchronous/queued mode, retry lease and service-level requirements for the separate free/self-hosted PaddleOCR service.
 - **TBD-OCR-002** — Final privacy retention duration for photos, raw text and detections. Until approved, deletion is operator-driven; provenance metadata remains while the blob is removed.
 - **TBD-OCR-003** — Whether Scala/Interno later normalize into an approved property-unit model. Milestone 3 keeps optional CensusRecord labels and infers no unit identity.
+- **TBD-CATASTO-001** — Contract-specific OpenAPI prices and whether they can be obtained from an authoritative account endpoint. Cost columns exist; the UI does not invent a tariff.
+- **TBD-CATASTO-002** — Business-approved freshness duration per paid operation. Until approved, completed equal data is reused indefinitely and only the explicit “Aggiorna dati” action creates a new request.
+- **TBD-CATASTO-003** — Final operational process for granting `can_use_paid_cadastral_services` to LAB operators. The database defaults to denied and no self-service role system is invented.

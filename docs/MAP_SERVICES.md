@@ -36,3 +36,15 @@ The probed endpoint `https://wfs.cartografia.agenziaentrate.gov.it/inspire/wfs/o
 `GeocodingProvider` separates external search from the domain. The LAB adapter uses Nominatim for explicit searches and at most one picker lookup for an unlocated civic. Requests are restricted to Italy and at most five results. It sends an identifying User-Agent, never runs on pan and does not perform bulk geocoding. A candidate is cached once as `AUTO_GEOLOCATED`; only explicit operator confirmation changes it to `VERIFIED`.
 
 A single identified live search probe returned HTTP 200 and one structured Italian result. This verifies limited on-demand search availability, not a production SLA or permission for batch use.
+
+## OpenAPI Catasto paid data
+
+Documentation verified 2026-09-14 against the official OpenAPI Catasto documentation and FAQ. Production is `https://catasto.openapi.it`; sandbox is `https://test.catasto.openapi.it`. The implementation defaults to sandbox and selects production only through `OPENAPI_CATASTO_ENV=production`.
+
+- `POST /richiesta/elenco_immobili/`: explicit unit search from building cadastre, province, municipality, sheet and parcel.
+- `POST /richiesta/prospetto_catastale/`: explicit selected-unit request including subaltern, returning unit detail and all available holders/right/share data.
+- `GET /richiesta/{id}`: controlled status/result polling for the two request operations.
+- `POST /visura_catastale`: explicit ordinary property report by provider property ID.
+- `GET /visura_catastale/{id}` and `/documento`: report status and authenticated PDF retrieval.
+
+No test calls these endpoints. The token is server-only and never appears in client props, logs or responses.

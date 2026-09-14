@@ -1,5 +1,7 @@
 # Decisions
 
+- **DEC-040** — OpenAPI Catasto enriches the existing cadastral association through one shared `CadastralDataProvider`. Paid operations require an explicit default-denied operator permission and user confirmation. Canonical-parameter hashes provide persistent reuse; an active-operation unique index prevents double purchase. Polling uses six-second intervals and bounded attempts. Units, original holder rights/shares and ordinary private PDF reports are separate persisted projections. A Catasto holder enters Censimento only through the normal zero-interview Contact workflow.
+
 - **DEC-039** — Bound cadastral images after OpenLayers reprojection, preserving geographic BBOX and updating the image resolution. AdE GetCapabilities advertises 2048×2048; a 1530px Tuscany viewport generates a 2122px source image even without HiDPI. Main map and cadastral picker share this loader. Proxy limits remain unchanged.
 
 - **DEC-001** — Next.js App Router + strict TypeScript is the application stack.

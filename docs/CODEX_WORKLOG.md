@@ -187,3 +187,15 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **Correzione:** loader condiviso che ridimensiona la richiesta finale mantenendo BBOX e aggiornando la risoluzione usata per riproiettare. Applicato a mappa principale e selettore catastale. Test sulle richieste reali a dimensioni desktop, ultrawide e portrait/HiDPI; verifica browser con immagini AdE e OSM reali e screenshot dei fabbricati arancioni sovrapposti.
 
 **Verifica:** lint, typecheck, 158 test e build superati. Nel browser a 1920px, Piano di Mommio mostra oltre 62.000 pixel arancioni; GetMap 2048×708 restituisce 200 e la sovrapposizione su OSM è stata ispezionata visivamente.
+
+## 2026-09-14 — OpenAPI Catasto enrichment
+
+**Obiettivo:** integrare unità immobiliari, intestatari/diritti/quote e visura ordinaria senza duplicare il dominio catastale e senza chiamate automatiche a consumo.
+
+**Modifiche:** provider condiviso server-side; sandbox/production configurabile; autorizzazione default-denied; cache/audit/idempotenza; polling asincrono; unità e diritti lossless; PDF privati; workflow mappa e Contatto; deduplica forte e normale Nuovo Contatto senza interviste; azione Modifica nell’elenco.
+
+**Migration:** `202609140002_openapi_cadastral_enrichment.sql`.
+
+**Verifica:** lint, typecheck, 167 test Vitest, 18 scenari Playwright e build production superati; provider esterno sempre mockato nei test automatici.
+
+**TBD/manuale:** applicare la migration al Supabase LAB, abilitare gli operatori autorizzati, configurare token sandbox e verificare il contratto prezzi/freschezza. Nessun endpoint OpenAPI production è usato dai test.

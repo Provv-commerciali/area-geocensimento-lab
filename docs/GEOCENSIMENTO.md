@@ -25,4 +25,4 @@ The Contact sheet provides the separate cadastral workflow. It centers on the ci
 
 ## Security and hard stops
 
-Supabase RLS and authenticated grants remain unchanged. The map receives no service-role credential. External inputs and responses are validated, WMS parameters/layers are allowlisted, and provider errors are bounded. OpenAPI Catasto, paid calls, visure, ownership, scraping and automatic parcel/property matching are not implemented.
+Supabase RLS and authenticated grants remain active. The map receives no service-role credential. External inputs and responses are validated, WMS parameters/layers are allowlisted, and provider errors are bounded. The free click displays the AdE identifiers first and never invokes OpenAPI. Only the separate “Trova unità immobiliari” confirmation calls the shared server-side paid service; subsequent holder and ordinary-report operations are also distinct and explicit.

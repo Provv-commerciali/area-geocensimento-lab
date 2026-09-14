@@ -8,6 +8,8 @@ Milestone 2 adds GeoCensimento as a geographic projection of this same domain. I
 
 Milestone 3 extends only Complex management with private building/doorbell photos and operator-assisted contact acquisition. OCR output is staging data, never a Contact. An authenticated operator must review identity, civic, Scala, Interno, Piano, Qualifica and other canonical fields before a normal zero-interview Census Contact is created.
 
+The approved OpenAPI Catasto milestone enriches the existing `CadastralAssociation`; it does not create a second cadastral domain. The free AdE map click remains unchanged and never triggers a paid call. An explicitly authorized operator may confirm distinct server-side operations for property units, holders or an ordinary report. Requests, provider IDs, states, canonical parameters, results and costs are audited and cached. The same application service is consumed by GeoCensimento and Contact detail.
+
 ## Confirmed flows
 
 - Unauthenticated users are directed to login; authenticated LAB users enter Censimento. In missing-env demo mode, reviewers can enter a clearly labeled read-only demonstration.

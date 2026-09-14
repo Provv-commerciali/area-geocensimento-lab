@@ -74,3 +74,11 @@ CENSIMENTO ↔ CADASTRAL IDENTITY ↔ CADASTRAL CARTOGRAPHY
 ```
 
 A future milestone may enrich the current minimal `CadastralAssociation` with provider-backed identity or geometry. Manual census data is not assumed to be the sole authoritative cadastral source, and a parcel is not assumed to represent one unit.
+
+## Paid cadastral enrichment
+
+`CadastralAssociation` remains the cadastral identity anchor. `CadastralRequest` is the cost/cache/audit aggregate: operation, canonical parameters and hash, provider request ID, requester, timestamps, status, structured result and optional estimated/known cost. One partial unique index admits at most one active equal provider operation. A completed equal request is reused until an operator explicitly chooses “Aggiorna dati”.
+
+`CadastralPropertyUnit` is a provider-backed unit returned for a parcel and stores only available subaltern, address, zone, category, class, consistency, income, registry lot and provider property ID. It may be related to a CensusRecord but does not replace it. `CadastralOwnershipRight` relates a unit to one returned holder and losslessly retains provider right/share strings, acquisition source/date and optional link to the existing Subject. Multiple rights per unit are expected. Strong CF/P.IVA can propose an existing Subject; no automatic merge occurs. `CadastralDocument` references an ordinary report in private Storage; it is never public.
+
+An OpenAPI holder is not an interview and never creates one. An imported holder enters only through the canonical Contact workflow. Non-ownership rights such as usufruct are not falsely normalized into `Proprietario`; the original provider value remains authoritative for the enrichment.
