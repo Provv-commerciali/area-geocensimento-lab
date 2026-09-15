@@ -4,7 +4,7 @@
 - **TBD-CENSUS-003** — Exact semantics of “In valutazione”, “Altre agenzie” and “Esclusive”. UI marks aggregates as demo/TBD.
 - **TBD-CENSUS-004** — Complete meaning of actions/icons in the historic contact table.
 - **TBD-CENSUS-005** — Complete semantics and validation rules for special civic extension values. It remains flexible text.
-- **TBD-CENSUS-006** — Exact semantics and lifecycle of “Probabile Incarico”. “Tipo di Incarico” is now controlled by DEC-045; historical attribution of acquisition transitions remains part of the dashboard milestone.
+- **TBD-CENSUS-006** — Exact semantics and lifecycle of “Probabile Incarico”. “Tipo di Incarico”, its required expiries and first acquisition attribution are now controlled by DEC-045/046.
 - **TBD-CENSUS-007** — Final response vocabulary. Cadastral categories now use the official Catasto Fabbricati selection.
 - **TBD-MAP-001** — Production basemap capacity/provider and service-level requirements; OSM Standard is LAB-only.
 - **TBD-MAP-003** — Authoritative geometry model for a Complex spanning several civics/extensions. Milestone 2 indicates a Complex through its associated civic features.

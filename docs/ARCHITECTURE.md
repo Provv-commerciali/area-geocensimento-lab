@@ -15,6 +15,8 @@ The demo adapter is a documented LAB EXPERIMENT: deterministic fictional records
 
 Runtime pages request only the repository resources they render. Contextual Zone, Street and Complex pages push their record constraints into PostgREST instead of downloading the national snapshot and filtering it afterward. Municipalities and Streets are loaded incrementally after their parent selection through authenticated, runtime-validated routes. Heavy navigation links do not prefetch complete authenticated data trees speculatively.
 
+The Censimento dashboard consumes the existing record projection and derives one deterministic snapshot for current operational workload, monthly event performance, zone composition and commercial deadlines. Current ownership and historical event attribution are deliberately separate. Database triggers capture the authenticated actor for creation, first Notizia, appraisal and first agency acquisition; no historical actor is inferred. UI filters operate on this already-loaded bounded LAB projection and never call external providers.
+
 GeoCensimento reuses these identifiers and relationships through a client-only OpenLayers boundary fed by server-loaded, authenticated Censimento data. External providers remain isolated behind adapters and server routes.
 
 ```text

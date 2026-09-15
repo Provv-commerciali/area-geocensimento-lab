@@ -6,6 +6,8 @@ Vitest covers Zod validators, civic generation/parity/deduplication, filter sema
 
 Operational-state unit tests fix an explicit civil date and cover: no interviews, exact day age, stale threshold and boundary, overdue recall, fulfilment by a later interview and precedence. Filter tests call the same derivation used by the UI. Migration contracts verify the typed singleton, RLS and column-level update privilege; the existing persistence and migration contracts continue to prove that contact creation cannot create an interview. Playwright checks the operational column/filter and the minimal settings route.
 
+Dashboard tests fix a civil date and prove the mutually exclusive Notizia partition, event/operator attribution, monthly windows, distinct property counts, exact `Libero` semantics and chronological engagement expiry ordering. Migration contracts verify that historical actors are not inferred, audit fields are trigger-owned and external/exclusive expiry is validated atomically.
+
 Tests never call external APIs. Repository integration tests use deterministic in-memory fixtures; live Supabase migration verification is a separate infrastructure action because credentials are not stored. CI runs lint, strict typecheck, unit/integration tests and production build. Playwright can be run locally once the browser runtime is installed.
 
 Database contract tests also inspect incremental authorization/workflow migrations to prevent regressions such as missing grants, anonymous access, disabled RLS, browser service-role use, security-definer bypass, bundled synthetic interviews or accidental write grants on reference tables. Live policy and RPC verification still requires an authenticated user against the dedicated Supabase LAB project.

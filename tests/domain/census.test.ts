@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { canShowAppraisal, civicLabel, hasBeenContacted, isAgencyEngagement, latestInterview, normalizeAppraisal, recordsForSubject, subjectsForRecord } from "@/domain/census";
-import { deriveCensusOperationalStatus, todayInTimeZone } from "@/domain/census-operational-status";
+import { deriveCensusOperationalStatus, deriveNewsManagementStatus, todayInTimeZone } from "@/domain/census-operational-status";
 import { records, subjects } from "@/lib/demo-data";
 
 describe("census domain rules", () => {
@@ -27,4 +27,5 @@ describe("census operational status",()=>{
   it("F: a later real interview fulfils the recall",()=>expect(derive("Generico",[interview("i1","2026-09-01","2026-09-10"),interview("i2","2026-09-11")])).toMatchObject({status:"ORDINARIO",isRecallOverdue:false,overdueRecallDays:null}));
   it("G: overdue recall takes precedence over stale Notizia",()=>expect(derive("Notizia",[interview("i1","2026-08-01","2026-09-10")])).toMatchObject({status:"RICONTATTO_SCADUTO",isRecallOverdue:true,isStaleNews:true}));
   it("uses the Europe/Rome civil date independently of UTC midnight",()=>expect(todayInTimeZone("Europe/Rome",new Date("2026-09-10T22:30:00Z"))).toBe("2026-09-11"));
+  it("classifies mutually exclusive News management windows",()=>{expect(deriveNewsManagementStatus([interview("i1","2026-09-01","2026-09-10")],"2026-09-11").status).toBe("SCADUTA");expect(deriveNewsManagementStatus([interview("i1","2026-09-01","2026-09-11")],"2026-09-11").status).toBe("IN_SCADENZA");expect(deriveNewsManagementStatus([interview("i1","2026-09-01","2026-09-18")],"2026-09-11").status).toBe("IN_SCADENZA");expect(deriveNewsManagementStatus([interview("i1","2026-09-01","2026-09-19")],"2026-09-11").status).toBe("GESTITA_CORRETTAMENTE");expect(deriveNewsManagementStatus([],"2026-09-11").status).toBe("SENZA_RICONTATTO")});
 });

@@ -34,6 +34,10 @@ Migration `202609110015_contact_deletion.sql` adds the authenticated security-in
 
 Migration `202609150001_controlled_engagement_type.sql` turns the existing free-text `census_records.engagement_type` into a required controlled value with default `Nessuno`, updates the authenticated create/edit commands and keeps contact classification independent from commercial outcome.
 
+Migration `202609150002_dashboard_event_attribution.sql` adds authenticated event actor/timestamp columns for Census creation, first Notizia, appraisal and first agency acquisition. A locked trigger derives the actor from `operators.auth_user_id`; existing rows remain unattributed rather than being falsely backfilled. Partial indexes support monthly operator aggregates.
+
+Migration `202609150003_engagement_expiry.sql` requires a date for `Incarico altre agenzie` and `In esclusiva`, forbids it for other engagement types and protects the invariant with a deferred constraint trigger. Authenticated invoker commands validate and persist engagement plus expiry atomically while retaining the caller's RLS boundary.
+
 Migration `202609140002_openapi_cadastral_enrichment.sql` adds the default-denied paid-service permission, auditable/cacheable `cadastral_requests`, provider property-unit projections, lossless ownership rights and private ordinary-report metadata/storage. RLS remains enabled, anonymous access is revoked, one partial unique index prevents duplicate active purchases and signed document access is restricted to the authenticated requester.
 
 `supabase/seed.sql` inserts a deterministic fictional application dataset. Its Bologna territorial anchors are not the national archive. `scripts/sync-istat-territories.ts` separately downloads, validates and transactionally synchronizes the official archive; see `docs/TERRITORIAL_IMPORT.md`.

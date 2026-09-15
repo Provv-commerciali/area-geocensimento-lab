@@ -12,7 +12,9 @@
 
 `CensusRecord` is exposed operationally as a Census Contact: one private person or company in one property/civic context, with its own contact classification and interview history. It references a zone, street, civic, optional complex and responsible operator. `CensusRecordSubject` implements the internal many-to-many registry relationship and carries the role `Proprietario`, `Comproprietario` or `Inquilino`; migrated legacy links may temporarily be `Non specificato` rather than inventing historical meaning. Therefore one registry subject may span different streets, zones and municipalities, and one context may have several related people or companies.
 
-`CensusRecord.engagementType` is a controlled commercial outcome distinct from contact classification: `Nessuno`, `Incarico altre agenzie`, `In esclusiva`, `Verbale` or `Non esclusivo`. The last three identify an assignment held by the LAB agency; `Incarico altre agenzie` identifies competition already assigned elsewhere. Changing this field does not rewrite the original `Generico`, `Informatore`, `Informazione` or `Notizia` classification.
+`CensusRecord.engagementType` is a controlled commercial outcome distinct from contact classification: `Nessuno`, `Incarico altre agenzie`, `In esclusiva`, `Verbale` or `Non esclusivo`. The last three identify an assignment held by the LAB agency; `Incarico altre agenzie` identifies competition already assigned elsewhere. Changing this field does not rewrite the original `Generico`, `Informatore`, `Informazione` or `Notizia` classification. `Incarico altre agenzie` and `In esclusiva` require `engagementExpiresOn`; every other value forbids it.
+
+Dashboard event attribution is explicit and immutable from ordinary UI intent: the authenticated Operator is captured when a CensusRecord is created, first becomes a Notizia, is marked appraised or first enters an agency-held engagement. Existing rows are not backfilled from their current responsible operator because that would invent history. Current overdue/expiry workload is attributed to `responsibleOperatorId`; monthly production uses the captured event actor and timestamp.
 
 Legacy person columns remain on `census_records` only to preserve already-loaded LAB data and are no longer authoritative for new writes. Whole-building levels are distinct from the partial-building `floor_code`, `total_floors` and `is_top_floor` fields; `floor_label` remains only as backward-compatible legacy display data.
 
@@ -49,6 +51,8 @@ Operational state is a projection of one `CensusRecord`, its real `CensusIntervi
 The precedence is `RICONTATTO_SCADUTO` → `NOTIZIA_NON_AGGIORNATA` → `MAI_CONTATTATO` → `ORDINARIO`. The booleans remain independent so that a stale Notizia with an overdue recall exposes both facts while presenting the recall as its primary state. “Mai contattato” means exactly zero real interview children. Days since last contact use the most recent interview date, never record timestamps or technical events.
 
 A recall is overdue when its date is before today and there is no different interview dated on or after that recall date. An interview on the scheduled date therefore fulfils it. When several recalls remain unfulfilled, the oldest controls overdue days. A Notizia is stale only when it has an interview and its age is strictly greater than the configured threshold. The LAB default is 30 days and is editable; it is not embedded in the derivation.
+
+Dashboard Notizia management is a separate mutually exclusive projection over the earliest unfulfilled recall: before today is `SCADUTA`; today through seven days inclusive is `IN_SCADENZA`; later than seven days is `GESTITA_CORRETTAMENTE`; no unfulfilled recall is `SENZA_RICONTATTO`.
 
 ## Important invariants
 

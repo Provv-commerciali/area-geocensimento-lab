@@ -224,3 +224,9 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **Modifiche:** il Tipo di incarico usa i cinque valori approvati ed è salvato nei workflow di creazione/modifica, mostrato in scheda/elenco e filtrabile. Qualifica e Occupazione sono ora filtri espliciti; Ereditato resta disponibile. Le future statistiche contano immobili distinti e considerano vuoto soltanto `Libero`.
 
 **Migration:** `202609150001_controlled_engagement_type.sql`.
+
+## 2026-09-15 — Dashboard performance e scadenze incarichi
+
+**Modifiche:** nuova dashboard filtrabile con KPI Notizie, stati ricontatto mutuamente esclusivi, andamento mensile, performance operatori, distribuzione zone, qualifiche, occupazione, immobili ereditati, funnel commerciale e code operative. Censimenti, prima Notizia, perizia e prima acquisizione sono attribuiti all'operatore autenticato; il backlog resta del responsabile corrente. Incarico altre agenzie e In esclusiva richiedono una data e alimentano la coda scadenze.
+
+**Migration:** `202609150002_dashboard_event_attribution.sql`, `202609150003_engagement_expiry.sql`.

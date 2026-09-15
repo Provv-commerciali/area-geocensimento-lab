@@ -25,6 +25,10 @@ export interface CensusOperationalStatusResult {
   isRecallOverdue: boolean;
 }
 
+export const newsManagementStatuses = ["SCADUTA", "IN_SCADENZA", "GESTITA_CORRETTAMENTE", "SENZA_RICONTATTO"] as const;
+export type NewsManagementStatus = (typeof newsManagementStatuses)[number];
+export interface NewsManagementStatusResult { status: NewsManagementStatus; recallDate: string | null; daysUntilRecall: number | null }
+
 export const CENSUS_OPERATIONAL_STATUS_VISUALS: Record<CensusOperationalStatus, {
   label: string;
   className: string;
@@ -66,11 +70,7 @@ export function deriveCensusOperationalStatus(input: {
   const interviews = [...input.interviews].sort((a, b) => b.interviewDate.localeCompare(a.interviewDate));
   const lastInterviewAt = interviews[0]?.interviewDate ?? null;
   const daysSinceLastInterview = lastInterviewAt === null ? null : Math.max(0, todayDay - civilDay(lastInterviewAt));
-  const overdueRecallDates = interviews.flatMap((scheduled) => {
-    if (!scheduled.recallDate || civilDay(scheduled.recallDate) >= todayDay) return [];
-    const fulfilled = interviews.some((candidate) => candidate.id !== scheduled.id && civilDay(candidate.interviewDate) >= civilDay(scheduled.recallDate!));
-    return fulfilled ? [] : [scheduled.recallDate];
-  }).sort();
+  const overdueRecallDates = unresolvedRecallDates(interviews).filter(date => civilDay(date) < todayDay);
   const overdueRecallDays = overdueRecallDates[0] ? todayDay - civilDay(overdueRecallDates[0]) : null;
   const isNeverContacted = interviews.length === 0;
   const isStaleNews = input.contactType === "Notizia" && daysSinceLastInterview !== null && daysSinceLastInterview > input.staleNewsDays;
@@ -85,16 +85,34 @@ export function deriveCensusOperationalStatus(input: {
   return { status, daysSinceLastInterview, overdueRecallDays, lastInterviewAt, isNeverContacted, isStaleNews, isRecallOverdue };
 }
 
+export function unresolvedRecallDates(
+  interviews: readonly Pick<CensusInterview, "id" | "interviewDate" | "recallDate">[],
+): string[] {
+  return interviews.flatMap((scheduled) => {
+    if (!scheduled.recallDate) return [];
+    const fulfilled = interviews.some((candidate) => candidate.id !== scheduled.id && civilDay(candidate.interviewDate) >= civilDay(scheduled.recallDate!));
+    return fulfilled ? [] : [scheduled.recallDate];
+  }).sort();
+}
+
+export function deriveNewsManagementStatus(
+  interviews: readonly Pick<CensusInterview, "id" | "interviewDate" | "recallDate">[],
+  today: string,
+): NewsManagementStatusResult {
+  const recallDate=unresolvedRecallDates(interviews)[0]??null;
+  if(!recallDate)return{status:"SENZA_RICONTATTO",recallDate:null,daysUntilRecall:null};
+  const daysUntilRecall=civilDay(recallDate)-civilDay(today);
+  if(daysUntilRecall<0)return{status:"SCADUTA",recallDate,daysUntilRecall};
+  if(daysUntilRecall<=7)return{status:"IN_SCADENZA",recallDate,daysUntilRecall};
+  return{status:"GESTITA_CORRETTAMENTE",recallDate,daysUntilRecall};
+}
+
 export function unresolvedRecallDate(
   interviews: readonly Pick<CensusInterview, "id" | "interviewDate" | "recallDate">[],
   today: string,
 ): string | null {
   const todayDay = civilDay(today);
-  return [...interviews]
-    .filter((scheduled) => scheduled.recallDate && civilDay(scheduled.recallDate) >= todayDay)
-    .filter((scheduled) => !interviews.some((candidate) => candidate.id !== scheduled.id && civilDay(candidate.interviewDate) >= civilDay(scheduled.recallDate!)))
-    .map((scheduled) => scheduled.recallDate!)
-    .sort()[0] ?? null;
+  return unresolvedRecallDates(interviews).find(date=>civilDay(date)>=todayDay)??null;
 }
 
 export function operationalStatusLabel(result: CensusOperationalStatusResult): string {

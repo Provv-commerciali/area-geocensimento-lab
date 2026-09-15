@@ -26,6 +26,7 @@ export const censusRecordSchema = z.object({
   taxCode: optionalText,
   contactType: z.enum(contactTypes),
   engagementType: z.enum(engagementTypes),
+  engagementExpiresOn: z.string().date().optional().or(z.literal("")),
   relationshipRole: z.enum(qualifications),
   inherited: z.boolean().default(false),
   birthDate: optionalText,
@@ -48,6 +49,9 @@ export const censusRecordSchema = z.object({
   if (record.buildingScope === "Intero edificio" && (record.floorCode || record.isTopFloor)) context.addIssue({ code: "custom", path: ["buildingScope"], message: "Il piano dell'unità è disponibile solo per Parte di edificio" });
   const numericFloor = record.floorCode?.match(/^(\d+)°$/)?.[1];
   if (numericFloor && typeof record.totalFloors === "number" && Number(numericFloor) > record.totalFloors) context.addIssue({ code: "custom", path: ["totalFloors"], message: "Il totale piani non può essere inferiore al piano dell'unità" });
+  const requiresExpiry=record.engagementType==="Incarico altre agenzie"||record.engagementType==="In esclusiva";
+  if(requiresExpiry&&!record.engagementExpiresOn)context.addIssue({code:"custom",path:["engagementExpiresOn"],message:"Indica la data di scadenza dell'incarico"});
+  if(!requiresExpiry&&record.engagementExpiresOn)context.addIssue({code:"custom",path:["engagementExpiresOn"],message:"La scadenza è prevista solo per incarichi di altre agenzie o in esclusiva"});
 });
 
 export const zoneSchema = z.object({
@@ -92,10 +96,13 @@ export const contactUpdateSchema=z.object({
   zoneId:z.string().min(1,"Seleziona una zona"),streetId:z.string().min(1,"Seleziona una via"),civicId:z.string().min(1,"Seleziona un civico"),complexId:optionalText,
   buildingScope:z.enum(["Intero edificio","Parte di edificio"]),levels:z.coerce.number().int().positive().optional().or(z.literal("")),staircase:optionalText,unitIdentifier:optionalText,floorCode:optionalText,totalFloors:z.coerce.number().int().positive().optional().or(z.literal("")),isTopFloor:z.boolean(),
   rooms:z.coerce.number().nonnegative().optional().or(z.literal("")),surface:z.coerce.number().nonnegative().optional().or(z.literal("")),occupancy:z.enum(occupancies).optional().or(z.literal("")),elevator:z.boolean(),
-  contactType:z.enum(contactTypes),engagementType:z.enum(engagementTypes),relationshipRole:z.enum(qualifications),responsibleOperatorId:optionalText,inherited:z.boolean(),isAppraised:z.boolean(),
+  contactType:z.enum(contactTypes),engagementType:z.enum(engagementTypes),engagementExpiresOn:z.string().date().optional().or(z.literal("")),relationshipRole:z.enum(qualifications),responsibleOperatorId:optionalText,inherited:z.boolean(),isAppraised:z.boolean(),
   sheet:optionalText,parcel:optionalText,subaltern:optionalText,cadastralCategory:optionalText,
 }).superRefine((value,context)=>{
   if(value.subjectType==="PRIVATO"&&!value.lastName)context.addIssue({code:"custom",path:["lastName"],message:"Il cognome è obbligatorio"});
   if(value.subjectType==="AZIENDA"&&!value.companyName)context.addIssue({code:"custom",path:["companyName"],message:"La ragione sociale è obbligatoria"});
   if(value.buildingScope==="Parte di edificio"&&!value.floorCode)context.addIssue({code:"custom",path:["floorCode"],message:"Seleziona il piano"});
+  const requiresExpiry=value.engagementType==="Incarico altre agenzie"||value.engagementType==="In esclusiva";
+  if(requiresExpiry&&!value.engagementExpiresOn)context.addIssue({code:"custom",path:["engagementExpiresOn"],message:"Indica la data di scadenza dell'incarico"});
+  if(!requiresExpiry&&value.engagementExpiresOn)context.addIssue({code:"custom",path:["engagementExpiresOn"],message:"La scadenza non è prevista per questo tipo di incarico"});
 });

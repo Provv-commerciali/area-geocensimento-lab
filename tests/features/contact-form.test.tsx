@@ -47,6 +47,8 @@ describe("contact form", () => {
     for(const value of ["Nessuno","Incarico altre agenzie","In esclusiva","Verbale","Non esclusivo"])expect(select).toHaveTextContent(value);
   });
 
+  it("requires a calendar date only for external and exclusive assignments",async()=>{const user=userEvent.setup();render(<ContactForm/>);expect(screen.queryByLabelText("Scadenza incarico *")).not.toBeInTheDocument();await user.selectOptions(screen.getByLabelText("Tipo di incarico"),"Incarico altre agenzie");expect(screen.getByLabelText("Scadenza incarico *")).toBeRequired();await user.selectOptions(screen.getByLabelText("Tipo di incarico"),"Verbale");expect(screen.queryByLabelText("Scadenza incarico *")).not.toBeInTheDocument()});
+
   it("does not expose interview fields during record creation", () => {
     render(<ContactForm/>);
     expect(screen.queryByText("Prima intervista")).not.toBeInTheDocument();
