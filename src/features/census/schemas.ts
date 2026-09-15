@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { contactTypes, occupancies, qualifications } from "@/domain/census";
+import { contactTypes, engagementTypes, occupancies, qualifications } from "@/domain/census";
 
 const optionalText = z.string().trim().optional().or(z.literal(""));
 export const censusRecordSchema = z.object({
@@ -25,6 +25,7 @@ export const censusRecordSchema = z.object({
   email: z.string().email("E-mail non valida").optional().or(z.literal("")),
   taxCode: optionalText,
   contactType: z.enum(contactTypes),
+  engagementType: z.enum(engagementTypes),
   relationshipRole: z.enum(qualifications),
   inherited: z.boolean().default(false),
   birthDate: optionalText,
@@ -91,7 +92,7 @@ export const contactUpdateSchema=z.object({
   zoneId:z.string().min(1,"Seleziona una zona"),streetId:z.string().min(1,"Seleziona una via"),civicId:z.string().min(1,"Seleziona un civico"),complexId:optionalText,
   buildingScope:z.enum(["Intero edificio","Parte di edificio"]),levels:z.coerce.number().int().positive().optional().or(z.literal("")),staircase:optionalText,unitIdentifier:optionalText,floorCode:optionalText,totalFloors:z.coerce.number().int().positive().optional().or(z.literal("")),isTopFloor:z.boolean(),
   rooms:z.coerce.number().nonnegative().optional().or(z.literal("")),surface:z.coerce.number().nonnegative().optional().or(z.literal("")),occupancy:z.enum(occupancies).optional().or(z.literal("")),elevator:z.boolean(),
-  contactType:z.enum(contactTypes),relationshipRole:z.enum(qualifications),responsibleOperatorId:optionalText,inherited:z.boolean(),isAppraised:z.boolean(),
+  contactType:z.enum(contactTypes),engagementType:z.enum(engagementTypes),relationshipRole:z.enum(qualifications),responsibleOperatorId:optionalText,inherited:z.boolean(),isAppraised:z.boolean(),
   sheet:optionalText,parcel:optionalText,subaltern:optionalText,cadastralCategory:optionalText,
 }).superRefine((value,context)=>{
   if(value.subjectType==="PRIVATO"&&!value.lastName)context.addIssue({code:"custom",path:["lastName"],message:"Il cognome è obbligatorio"});

@@ -1,5 +1,7 @@
 export const contactTypes = ["Generico", "Informatore", "Informazione", "Notizia"] as const;
 export type ContactType = (typeof contactTypes)[number];
+export const engagementTypes = ["Nessuno", "Incarico altre agenzie", "In esclusiva", "Verbale", "Non esclusivo"] as const;
+export type EngagementType = (typeof engagementTypes)[number];
 export type BuildingScope = "Intero edificio" | "Parte di edificio";
 export const occupancies = ["Libero", "Libero al rogito", "Occupato dal proprietario", "Occupato dall'inquilino", "Inagibile"] as const;
 export type Occupancy = (typeof occupancies)[number];
@@ -54,7 +56,7 @@ export interface CensusRecord {
   buildingScope: BuildingScope; levels?: number; staircase?: string; unitIdentifier?: string; floorCode?: string; totalFloors?: number; isTopFloor: boolean; floorLabel?: string; rooms?: number; surface?: number;
   occupancy?: Occupancy; elevator?: boolean; sheet?: string; parcel?: string; subaltern?: string;
   cadastralCategory?: string; cadastralClass?:string; cadastralConsistency?:string; cadastralIncome?:string; cadastralCensusZone?:string; cadastralRegistryLot?:string; cadastralAddress?:string; cadastralAcquiredAt?:string; cadastralSourceRequestId?:string; photoUrl?:string; isAppraised: boolean; probableAssignment?: boolean;
-  engagementType?: string; createdAt: string; interviews: CensusInterview[];
+  engagementType: EngagementType; createdAt: string; interviews: CensusInterview[];
   subjectLinks: CensusRecordSubject[]; cadastralAssociation?: CadastralAssociation;
 }
 
@@ -77,6 +79,7 @@ export function hasBeenContacted(record: Pick<CensusRecord, "interviews">): bool
 }
 
 export function canShowAppraisal(type: ContactType): boolean { return type === "Notizia"; }
+export function isAgencyEngagement(type: EngagementType): boolean { return type === "In esclusiva" || type === "Verbale" || type === "Non esclusivo"; }
 export function normalizeAppraisal(type: ContactType, manuallyChecked: boolean): boolean {
   return type === "Notizia" ? manuallyChecked : false;
 }

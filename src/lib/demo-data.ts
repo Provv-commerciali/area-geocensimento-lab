@@ -45,7 +45,8 @@ export const records: CensusRecord[] = Array.from({ length: 36 }, (_, index) => 
     rooms: 2 + (index % 6), surface: 48 + index * 3, occupancy: index % 3 === 0 ? "Occupato dal proprietario" : "Libero", elevator: index % 2 === 0,
     sheet: index % 5 === 1 ? undefined : String(10 + (index % 5)), parcel: index % 5 === 1 ? undefined : String(80 + index),
     subaltern: index % 3 === 0 ? String(index + 1) : undefined, cadastralCategory: index % 2 ? "A/2" : "A/3",
-    isAppraised: isNews && index % 8 === 7, probableAssignment: index % 5 === 0, createdAt: `2026-0${(index % 8) + 1}-12`,
+    isAppraised: isNews && index % 8 === 7, probableAssignment: index % 5 === 0,
+    engagementType: (["Nessuno", "Incarico altre agenzie", "In esclusiva", "Verbale", "Non esclusivo"] as const)[index % 5], createdAt: `2026-0${(index % 8) + 1}-12`,
     subjectLinks: [{ subjectId: `subject-${index + 1}`, role: index % 3 === 0 ? "Proprietario" : "Inquilino", isPrimary: true }],
     interviews: Array.from({ length: interviewCount }, (_, j) => ({
       id: `int-${index}-${j}`, recordId: `rec-${index + 1}`, operatorId: operators[(index + j) % operators.length].id,

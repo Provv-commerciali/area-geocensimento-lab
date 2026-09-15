@@ -6,7 +6,7 @@ export interface CensusFilters {
   zoneId?: string; streetId?: string; civicFrom?: number; civicTo?: number; complexId?: string; floor?: string;
   roomsFrom?: number; roomsTo?: number; surfaceFrom?: number; surfaceTo?: number; elevator?: string;
   sheet?: string; parcel?: string; subaltern?: string; cadastralCategory?: string; operatorId?: string;
-  occupancy?: string; inherited?: string; appraised?: string; response?: string;
+  qualification?: string; occupancy?: string; inherited?: string; appraised?: string; engagementType?: string; response?: string;
   contactStatus?: "contacted" | "never";
   operationalStatus?: "never" | "recallOverdue" | "staleNews" | "actionRequired";
 }
@@ -33,8 +33,10 @@ export function filterCensusRecords(records: CensusRecord[], f: CensusFilters, c
       && (!f.surfaceFrom || (r.surface ?? -1) >= f.surfaceFrom) && (!f.surfaceTo || (r.surface ?? Infinity) <= f.surfaceTo)
       && boolMatch(Boolean(r.elevator), f.elevator) && has(r.sheet, f.sheet) && has(r.parcel, f.parcel)
       && has(r.subaltern, f.subaltern) && has(r.cadastralCategory, f.cadastralCategory)
-      && (!f.operatorId || r.responsibleOperatorId === f.operatorId) && has(r.occupancy, f.occupancy)
-      && boolMatch(r.inherited, f.inherited) && boolMatch(r.isAppraised, f.appraised) && has(latest?.response, f.response)
+      && (!f.operatorId || r.responsibleOperatorId === f.operatorId)
+      && (!f.qualification || r.subjectLinks.some(link => link.role === f.qualification)) && has(r.occupancy, f.occupancy)
+      && boolMatch(r.inherited, f.inherited) && boolMatch(r.isAppraised, f.appraised)
+      && (!f.engagementType || r.engagementType === f.engagementType) && has(latest?.response, f.response)
       && (!f.contactStatus || (f.contactStatus === "never" ? operational.isNeverContacted : !operational.isNeverContacted))
       && operationalMatch;
   });

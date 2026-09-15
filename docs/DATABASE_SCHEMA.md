@@ -32,6 +32,8 @@ Migration `202609110014_contact_updates.sql` adds the authenticated Subject upda
 
 Migration `202609110015_contact_deletion.sql` adds the authenticated security-invoker `delete_census_contact_lab` command. It removes one CensusRecord context, lets existing cascade FKs remove its context-owned children, retains the normalized Subject and detaches any optional doorbell acquisition audit reference before deletion.
 
+Migration `202609150001_controlled_engagement_type.sql` turns the existing free-text `census_records.engagement_type` into a required controlled value with default `Nessuno`, updates the authenticated create/edit commands and keeps contact classification independent from commercial outcome.
+
 Migration `202609140002_openapi_cadastral_enrichment.sql` adds the default-denied paid-service permission, auditable/cacheable `cadastral_requests`, provider property-unit projections, lossless ownership rights and private ordinary-report metadata/storage. RLS remains enabled, anonymous access is revoked, one partial unique index prevents duplicate active purchases and signed document access is restricted to the authenticated requester.
 
 `supabase/seed.sql` inserts a deterministic fictional application dataset. Its Bologna territorial anchors are not the national archive. `scripts/sync-istat-territories.ts` separately downloads, validates and transactionally synchronizes the official archive; see `docs/TERRITORIAL_IMPORT.md`.

@@ -218,3 +218,9 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **Modifiche:** costi previsti mostrati nel consenso; budget mensile e massimale per richiesta per operatore, verificati da trigger PostgreSQL prima di una nuova richiesta; storico richieste/documenti in Impostazioni operative e modifica limiti riservata al manager. Il popup mappa mantiene un marker per civico e mostra le unità/contatti censiti; le unità Catasto confrontano sheet/particella/subalterno per aprire il contatto già esistente oppure creare un nuovo contatto.
 
 **Migration:** `202609140005_paid_service_governance.sql`.
+
+## 2026-09-15 — Tipo di incarico e dimensioni statistiche
+
+**Modifiche:** il Tipo di incarico usa i cinque valori approvati ed è salvato nei workflow di creazione/modifica, mostrato in scheda/elenco e filtrabile. Qualifica e Occupazione sono ora filtri espliciti; Ereditato resta disponibile. Le future statistiche contano immobili distinti e considerano vuoto soltanto `Libero`.
+
+**Migration:** `202609150001_controlled_engagement_type.sql`.

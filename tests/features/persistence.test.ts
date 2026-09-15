@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { saveCensusRecord, type CensusRecordGateway } from "@/features/census/persistence";
 
-const validRecord={zoneId:"z",streetId:"s",civicId:"c",buildingScope:"Parte di edificio",floorCode:"3°",totalFloors:10,isTopFloor:false,subjectMode:"new",subjectType:"PRIVATO",lastName:"Ferri",relationshipRole:"Proprietario",contactType:"Notizia",occupancy:"Libero",inherited:false,isAppraised:false};
+const validRecord={zoneId:"z",streetId:"s",civicId:"c",buildingScope:"Parte di edificio",floorCode:"3°",totalFloors:10,isTopFloor:false,subjectMode:"new",subjectType:"PRIVATO",lastName:"Ferri",relationshipRole:"Proprietario",contactType:"Notizia",engagementType:"Nessuno",occupancy:"Libero",inherited:false,isAppraised:false};
 
 describe("record persistence", () => {
   it("reports success only after the gateway insert resolves", async () => { const gateway:CensusRecordGateway={createRecord:vi.fn().mockResolvedValue("record-1")}; await expect(saveCensusRecord(gateway,validRecord)).resolves.toEqual({ok:true,id:"record-1"}); expect(gateway.createRecord).toHaveBeenCalledOnce() });

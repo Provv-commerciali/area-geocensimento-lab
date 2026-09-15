@@ -26,7 +26,7 @@ export async function createCensusRecordAction(
     isTopFloor: buildingScope === "Parte di edificio" && data.get("isTopFloor") === "on",
     subjectMode:value(data,"subjectMode"),existingSubjectId:value(data,"existingSubjectId"),subjectType:value(data,"subjectType"),
     firstName: value(data, "firstName"), lastName: value(data, "lastName"), companyName:value(data,"companyName"),vatNumber:value(data,"vatNumber"),phone: value(data, "phone"), email: value(data, "email"), taxCode: value(data, "taxCode"),
-    contactType: value(data, "contactType"), relationshipRole: value(data, "relationshipRole"), inherited: data.get("inherited") === "on",
+    contactType: value(data, "contactType"), engagementType: value(data, "engagementType"), relationshipRole: value(data, "relationshipRole"), inherited: data.get("inherited") === "on",
     birthDate: value(data, "birthDate"), responsibleOperatorId: value(data, "responsibleOperatorId"), notes: value(data, "notes"),
     rooms: optionalNumber(data, "rooms"), surface: optionalNumber(data, "surface"), occupancy: value(data, "occupancy"), elevator: data.get("elevator") === "on",
     sheet: value(data, "sheet"), parcel: value(data, "parcel"), subaltern: value(data, "subaltern"), cadastralCategory: value(data, "cadastralCategory"),

@@ -42,6 +42,11 @@ describe("contact form", () => {
     expect(screen.getByLabelText("Occupazione")).not.toHaveTextContent(/^Occupato$/);
   });
 
+  it("offers the controlled engagement choices from the approved reference",()=>{
+    render(<ContactForm/>);const select=screen.getByLabelText("Tipo di incarico");
+    for(const value of ["Nessuno","Incarico altre agenzie","In esclusiva","Verbale","Non esclusivo"])expect(select).toHaveTextContent(value);
+  });
+
   it("does not expose interview fields during record creation", () => {
     render(<ContactForm/>);
     expect(screen.queryByText("Prima intervista")).not.toBeInTheDocument();

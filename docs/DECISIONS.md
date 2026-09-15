@@ -1,5 +1,7 @@
 # Decisions
 
+- **DEC-045** — Contact classification remains the origin/type of the census relationship. The separate controlled `engagementType` records the current commercial outcome: Nessuno, Incarico altre agenzie, In esclusiva, Verbale or Non esclusivo. The latter three are agency-held assignments. Qualification, inherited state and occupancy remain independent dimensions; property statistics count distinct CensusRecords and treat only exact `Libero` as vacant.
+
 - **DEC-043** — Paid-service price visibility and spend controls are enforced at the database insertion boundary. An operator has a calendar-month budget and a per-request ceiling; a distinct manager permission may change those limits. The UI displays the configured expected price and an auditable request/document history, but it does not claim a provider invoice price unless `known_cost` is supplied. Existing authorized LAB operators become the initial managers only for this migration; newly authorized operators remain manager-denied.
 - **DEC-044** — GeoCensimento continues to aggregate markers by Civic. The click panel is an “Edificio / civico” workspace: it lists existing Contacts and compares provider-returned units using the exact sheet/parcel/subaltern identity. It offers open-existing or create-new actions but never materializes a parallel building/unit archive.
 

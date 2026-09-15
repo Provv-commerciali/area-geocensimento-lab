@@ -12,6 +12,8 @@
 
 `CensusRecord` is exposed operationally as a Census Contact: one private person or company in one property/civic context, with its own contact classification and interview history. It references a zone, street, civic, optional complex and responsible operator. `CensusRecordSubject` implements the internal many-to-many registry relationship and carries the role `Proprietario`, `Comproprietario` or `Inquilino`; migrated legacy links may temporarily be `Non specificato` rather than inventing historical meaning. Therefore one registry subject may span different streets, zones and municipalities, and one context may have several related people or companies.
 
+`CensusRecord.engagementType` is a controlled commercial outcome distinct from contact classification: `Nessuno`, `Incarico altre agenzie`, `In esclusiva`, `Verbale` or `Non esclusivo`. The last three identify an assignment held by the LAB agency; `Incarico altre agenzie` identifies competition already assigned elsewhere. Changing this field does not rewrite the original `Generico`, `Informatore`, `Informazione` or `Notizia` classification.
+
 Legacy person columns remain on `census_records` only to preserve already-loaded LAB data and are no longer authoritative for new writes. Whole-building levels are distinct from the partial-building `floor_code`, `total_floors` and `is_top_floor` fields; `floor_label` remains only as backward-compatible legacy display data.
 
 `Subject N ↔ N CensusRecord` is traversed internally in both directions. In the UX this appears inside the Contact sheet as “Altri immobili / contesti collegati”; there is no autonomous Subjects macro-area in Milestone 1. `CensusRecord 1 → N CensusInterview` preserves context-specific history: interviews never move to or become shared through the registry subject. A record starts with zero interviews; latest interview, next recall and “Non ancora contattato” remain derived from actual children.
@@ -58,6 +60,7 @@ A recall is overdue when its date is before today and there is no different inte
 - A subject is not a census record and is never merged by name alone.
 - Strong CF/P.IVA matches prompt reuse of the existing subject.
 - One subject can link to many property contexts and one context to many subjects.
+- Qualification statistics count distinct CensusRecords matching at least one relationship role, so co-ownership never duplicates the property count. `Libero` is the exact occupancy value used for vacant-property statistics; `Libero al rogito` remains separate.
 - A CensusRecord creation cannot create a CensusInterview.
 - Operational flags and day counts are derived, never persisted on `census_records`.
 - Streets are unique by municipality plus normalized name; civics by street plus normalized number/extension.
