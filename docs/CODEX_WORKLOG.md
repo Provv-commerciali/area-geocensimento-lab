@@ -230,3 +230,5 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **Modifiche:** nuova dashboard filtrabile con KPI Notizie, stati ricontatto mutuamente esclusivi, andamento mensile, performance operatori, distribuzione zone, qualifiche, occupazione, immobili ereditati, funnel commerciale e code operative. Censimenti, prima Notizia, perizia e prima acquisizione sono attribuiti all'operatore autenticato; il backlog resta del responsabile corrente. Incarico altre agenzie e In esclusiva richiedono una data e alimentano la coda scadenze.
 
 **Migration:** `202609150002_dashboard_event_attribution.sql`, `202609150003_engagement_expiry.sql`.
+
+**Correzione deploy:** dopo l'aggiunta delle relazioni di attribuzione, l'embed PostgREST dell'operatore responsabile è stato qualificato tramite la FK esplicita per evitare l'ambiguità tra le cinque relazioni `census_records → operators`.
