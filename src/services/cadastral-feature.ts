@@ -30,10 +30,11 @@ function htmlValue(body:string,label:string):string|undefined{
 function parseOfficialHtml(body:string):CadastralFeatureInfo{
   const reference=htmlValue(body,"NationalCadastralReference");const label=htmlValue(body,"Label");
   if(!reference||!label)throw new Error("Risposta catastale priva del riferimento nazionale");
-  const match=reference.match(/^([A-Z0-9]{4})_([0-9]{4})([0-9]{2})\.(.+)$/i);
+  const match=reference.match(/^([A-Z0-9]{4})([_A-Z0-9])([0-9]{4})([0-9]{2})\.(.+)$/i);
   if(!match)throw new Error("Riferimento catastale nazionale non riconosciuto");
-  const sheet=String(Number(match[2]));if(!sheet||sheet==="NaN")throw new Error("Foglio catastale non riconosciuto");
-  return{municipalityCode:match[1].toUpperCase(),sheet,parcel:label,featureType:/CadastralParcel|Particelle/i.test(body)?"PARTICELLA":undefined};
+  const sheet=String(Number(match[3]));if(!sheet||sheet==="NaN")throw new Error("Foglio catastale non riconosciuto");
+  const section=match[2]==="_"?undefined:match[2].toUpperCase();
+  return{municipalityCode:match[1].toUpperCase(),...(section?{section}:{}),sheet,parcel:label,featureType:/CadastralParcel|Particelle/i.test(body)?"PARTICELLA":undefined};
 }
 
 export function parseCadastralFeatureInfo(body: string): CadastralFeatureInfo {

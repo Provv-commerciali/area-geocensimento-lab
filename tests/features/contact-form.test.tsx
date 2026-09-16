@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ContactForm } from "@/features/census/contact-form";
 
+vi.mock("@/features/census/cadastral-picker",()=>({CadastralPicker:({onSaved}:{onSaved:(feature:{municipalityCode:string;municipalityName:string;sheet:string;parcel:string})=>void})=><button type="button" onClick={()=>onSaved({municipalityCode:"A944",municipalityName:"Bologna",sheet:"12",parcel:"88"})}>Conferma particella test</button>}));
+
 describe("contact form", () => {
   afterEach(()=>vi.unstubAllGlobals());
   it("reveals an unchecked manual appraisal only for Notizia", async () => {
@@ -48,6 +50,10 @@ describe("contact form", () => {
   });
 
   it("requires a calendar date only for external and exclusive assignments",async()=>{const user=userEvent.setup();render(<ContactForm/>);expect(screen.queryByLabelText("Scadenza incarico *")).not.toBeInTheDocument();await user.selectOptions(screen.getByLabelText("Tipo di incarico"),"Incarico altre agenzie");expect(screen.getByLabelText("Scadenza incarico *")).toBeRequired();await user.selectOptions(screen.getByLabelText("Tipo di incarico"),"Verbale");expect(screen.queryByLabelText("Scadenza incarico *")).not.toBeInTheDocument()});
+
+  it("offers the free GeoCensimento import only after selecting a civic",async()=>{const user=userEvent.setup();render(<ContactForm/>);const open=screen.getByRole("button",{name:"Apri GeoCensimento"});expect(open).toBeDisabled();await user.selectOptions(screen.getByLabelText("Zona di censimento *"),"zone-1");await user.selectOptions(screen.getByLabelText("Via *"),"st-1");await user.selectOptions(screen.getByLabelText("Civico *"),"cv-1");expect(open).toBeEnabled()});
+
+  it("copies only the confirmed free sheet and parcel into the draft",async()=>{const user=userEvent.setup();render(<ContactForm/>);await user.selectOptions(screen.getByLabelText("Zona di censimento *"),"zone-1");await user.selectOptions(screen.getByLabelText("Via *"),"st-1");await user.selectOptions(screen.getByLabelText("Civico *"),"cv-1");await user.click(screen.getByRole("button",{name:"Apri GeoCensimento"}));await user.click(screen.getByRole("button",{name:"Conferma particella test"}));expect(screen.getByLabelText("Foglio")).toHaveValue("12");expect(screen.getByLabelText("Particella")).toHaveValue("88");expect(screen.getByLabelText("Subalterno")).toHaveValue("")});
 
   it("does not expose interview fields during record creation", () => {
     render(<ContactForm/>);

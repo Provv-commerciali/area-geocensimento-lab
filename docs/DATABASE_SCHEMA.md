@@ -38,6 +38,10 @@ Migration `202609150002_dashboard_event_attribution.sql` adds authenticated even
 
 Migration `202609150003_engagement_expiry.sql` requires a date for `Incarico altre agenzie` and `In esclusiva`, forbids it for other engagement types and protects the invariant with a deferred constraint trigger. Authenticated invoker commands validate and persist engagement plus expiry atomically while retaining the caller's RLS boundary.
 
+Migration `202609150004_dashboard_operator_audit_permission.sql` makes only the dashboard attribution trigger privileged so it can map `auth.uid()` to the internal Operator. Direct execution remains revoked and browser roles receive no access to `operators.auth_user_id`.
+
+Migration `202609160001_controlled_interview_response.sql` adds a non-retroactive check for new interview responses: null, `Risposto` or `Nessuna risposta`. It remains `NOT VALID` so historical LAB wording is retained without invented remapping.
+
 Migration `202609140002_openapi_cadastral_enrichment.sql` adds the default-denied paid-service permission, auditable/cacheable `cadastral_requests`, provider property-unit projections, lossless ownership rights and private ordinary-report metadata/storage. RLS remains enabled, anonymous access is revoked, one partial unique index prevents duplicate active purchases and signed document access is restricted to the authenticated requester.
 
 `supabase/seed.sql` inserts a deterministic fictional application dataset. Its Bologna territorial anchors are not the national archive. `scripts/sync-istat-territories.ts` separately downloads, validates and transactionally synchronizes the official archive; see `docs/TERRITORIAL_IMPORT.md`.

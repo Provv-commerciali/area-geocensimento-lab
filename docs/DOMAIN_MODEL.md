@@ -14,11 +14,15 @@
 
 `CensusRecord.engagementType` is a controlled commercial outcome distinct from contact classification: `Nessuno`, `Incarico altre agenzie`, `In esclusiva`, `Verbale` or `Non esclusivo`. The last three identify an assignment held by the LAB agency; `Incarico altre agenzie` identifies competition already assigned elsewhere. Changing this field does not rewrite the original `Generico`, `Informatore`, `Informazione` or `Notizia` classification. `Incarico altre agenzie` and `In esclusiva` require `engagementExpiresOn`; every other value forbids it.
 
+The creation-form cadastral selection remains draft input, not a new entity: the free WMS/GetFeatureInfo result may populate only `sheet` and `parcel`. A persistent `CadastralAssociation` still requires an existing CensusRecord and explicit confirmation.
+
 Dashboard event attribution is explicit and immutable from ordinary UI intent: the authenticated Operator is captured when a CensusRecord is created, first becomes a Notizia, is marked appraised or first enters an agency-held engagement. Existing rows are not backfilled from their current responsible operator because that would invent history. Current overdue/expiry workload is attributed to `responsibleOperatorId`; monthly production uses the captured event actor and timestamp.
 
 Legacy person columns remain on `census_records` only to preserve already-loaded LAB data and are no longer authoritative for new writes. Whole-building levels are distinct from the partial-building `floor_code`, `total_floors` and `is_top_floor` fields; `floor_label` remains only as backward-compatible legacy display data.
 
 `Subject N ↔ N CensusRecord` is traversed internally in both directions. In the UX this appears inside the Contact sheet as “Altri immobili / contesti collegati”; there is no autonomous Subjects macro-area in Milestone 1. `CensusRecord 1 → N CensusInterview` preserves context-specific history: interviews never move to or become shared through the registry subject. A record starts with zero interviews; latest interview, next recall and “Non ancora contattato” remain derived from actual children.
+
+New `CensusInterview.response` values are controlled as `Risposto` or `Nessuna risposta`. Historical free text is preserved and is not silently reclassified.
 
 Editing a Contact is one atomic command over its primary `Subject`, `CensusRecord` and primary `CensusRecordSubject` relationship. Subject identity changes therefore remain shared registry changes, while address/property/operational changes remain scoped to the selected record. The command does not create, alter or synthesize interviews.
 

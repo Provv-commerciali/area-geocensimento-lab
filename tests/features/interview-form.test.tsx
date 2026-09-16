@@ -8,10 +8,16 @@ describe("explicit interview form",()=>{
     const user=userEvent.setup(); const formAction=vi.fn().mockResolvedValue({});
     render(<InterviewForm recordId="record-1" operators={[{id:"op-1",name:"Elena Rossi"}]} databaseMode formAction={formAction}/>);
     await user.selectOptions(screen.getByLabelText("Operatore *"),"op-1");
-    await user.type(screen.getByLabelText("Data intervista *"),"2026-09-11");
+    await user.click(screen.getByLabelText("Data intervista *"));
+    await user.selectOptions(screen.getByLabelText("Mese Data intervista *"),"8");
+    await user.selectOptions(screen.getByLabelText("Anno Data intervista *"),"2026");
+    await user.click(screen.getByRole("button",{name:"11 settembre 2026"}));
+    await user.selectOptions(screen.getByLabelText("Risposta"),"Nessuna risposta");
     await user.click(screen.getByRole("button",{name:"Registra intervista"}));
     await waitFor(()=>expect(formAction).toHaveBeenCalledOnce());
     const data=formAction.mock.calls[0][1] as FormData;
     expect(data.get("recordId")).toBe("record-1");
+    expect(data.get("interviewDate")).toBe("2026-09-11");
+    expect(data.get("response")).toBe("Nessuna risposta");
   });
 });

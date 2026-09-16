@@ -67,7 +67,7 @@ export const complexSchema = z.object({
 
 export const interviewSchema = z.object({
   operatorId: z.string().min(1), interviewDate: z.string().date(), recallDate: z.string().date().optional().or(z.literal("")),
-  response: optionalText, reason: optionalText, outcome: optionalText,
+  response: z.enum(["Risposto","Nessuna risposta"]).optional().or(z.literal("")), reason: optionalText, outcome: optionalText,
 });
 
 export const operationalSettingsSchema = z.object({

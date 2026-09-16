@@ -1,5 +1,13 @@
 # Codex worklog
 
+## 2026-09-16 — Import catastale, date intervista e riordino GitHub
+
+**Correzioni:** il parser gratuito AdE riconosce anche i riferimenti nazionali con sezione catastale esplicita; il calendario applicativo è usato nelle interviste e permette il salto diretto di mese/anno; `Risposta` è controllata; gli spazi della scadenza incarico sono stati riequilibrati.
+
+**Repository:** individuati cinque upload manuali con copie dei sorgenti nella radice. Il riordino conserva i file canonici e rimuove le copie fuori struttura senza riscrivere la cronologia remota.
+
+**Verifica:** parser sui due formati ufficiali, calendario con salto anno, form intervista, vocabolario Zod e contratto migration.
+
 ## 2026-09-14 — Documenti catastali e comparabili
 
 - Added the explicit unit-led flow for property data, ordinary report and planimetric elaboration, with private document handling.
@@ -232,3 +240,9 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **Migration:** `202609150002_dashboard_event_attribution.sql`, `202609150003_engagement_expiry.sql`.
 
 **Correzione deploy:** dopo l'aggiunta delle relazioni di attribuzione, l'embed PostgREST dell'operatore responsabile è stato qualificato tramite la FK esplicita per evitare l'ambiguità tra le cinque relazioni `census_records → operators`.
+
+## 2026-09-15 — Correzione permesso, import catastale e calendario
+
+**Modifiche:** il lookup autenticato dell'operatore è confinato nel trigger di audit senza esporre `auth_user_id`; Nuovo contatto importa foglio e particella dal picker GeoCensimento gratuito dopo la selezione del civico; nascita e scadenza incarico usano un calendario applicativo italiano con valore ISO.
+
+**Migration:** `202609150004_dashboard_operator_audit_permission.sql`.
