@@ -246,3 +246,9 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **Modifiche:** il lookup autenticato dell'operatore è confinato nel trigger di audit senza esporre `auth_user_id`; Nuovo contatto importa foglio e particella dal picker GeoCensimento gratuito dopo la selezione del civico; nascita e scadenza incarico usano un calendario applicativo italiano con valore ISO.
 
 **Migration:** `202609150004_dashboard_operator_audit_permission.sql`.
+
+## 2026-09-16 — Elenco contatti adattivo e layout compatto
+
+**Modifiche:** titoli pagina ridotti globalmente; filtri Contatti chiusi di default con riepilogo di risultati e filtri attivi. Su desktop/tablet l’elenco usa un’area di scorrimento interna con intestazione e prima colonna fisse; su mobile la tabella larga diventa una lista di schede senza scorrimento laterale.
+
+**Verifica:** aggiunto uno scenario Playwright per filtri chiusi, tabella desktop e schede mobile.
