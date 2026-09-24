@@ -1,5 +1,19 @@
 # Domain model
 
+## ANNCSU territorial cutover (2026-09-24; supersedes legacy Civic sections below)
+
+The canonical structure is `Municipality → Street → AddressAccess`; `CensusZone ↔ Street` remains N:N. `Street` and `AddressAccess` each have `OFFICIAL_ANNCSU` global-reference and motivated `MANUAL` tenant-operational variants in unified tables. Official identity is `PROGRESSIVO_NAZIONALE` for Street and `PROGRESSIVO_ACCESSO` for AddressAccess, never a normalized name or displayed number. Official names, locality labels and access numbering may repeat. Exact source locality is retained on Street and optionally grouped through non-authoritative municipality-scoped `Locality`.
+
+`CensusRecord` references Zone and AddressAccess, with the Street derived from Access; `Complex ↔ AddressAccess` is N:N. Database constraints reject cross-municipality Zone–Street links and Access links outside an associated Zone Street. ANNCSU import runs, issues and structured revisions persist permanently, including first/last/current snapshot state. Original source ZIP retention defaults to 12 months, without automatic deletion.
+
+Each geographic observation preserves raw ANNCSU coordinate text, `EPSG:6706` source CRS, numeric(10,7) horizontal ordinates, method and source provenance, and a canonical PostGIS `geometry(Point,6706)` only for validated points. Anomalies are quarantined; missing coordinates do not remove an Access. Operational observations and explicit effective selections are separate, so a verified choice is not replaced by monthly official data. Browser rendering must use a documented EPSG:6706 transform, not an implicit WGS84 cast.
+
+GeoCensimento territory consists of all AddressAccesses on the Streets assigned to the agency's Zones, including accesses with no CensusRecord. Record, Complex, commercial state and Catasto are overlays. In the first LAB cutover the database-mode map is deliberately degraded to a bounded territorial foundation panel until the Access-based map is implemented; historical Civic/map prose below documents the pre-cutover LAB only.
+
+The LAB retains logical `ownership_scope` but has no invented production tenant key or master RBAC. Physical multi-tenant RLS and approval authority remain production bindings. The `civicId` label in some contact forms is a transitional UI adapter carrying an AddressAccess UUID; there is no `civics` persistence table.
+
+The transitional Contact location projection explicitly transforms effective EPSG:6706 points to EPSG:4326 in PostGIS for the existing coordinate picker. It does not mutate the source point or treat the frames as aliases. The canonical GeoCensimento map will consume AddressAccess observations directly in a later approved milestone.
+
 ## Territory
 
 `Country → Region → Province → Municipality → CensusZone`. `Province` represents the ISTAT unità territoriale sovracomunale valida a fini statistici, including Province, Province autonome, Città metropolitane, Liberi consorzi and the statistical ex Province of Friuli-Venezia Giulia. Italian regions, intermediate units and municipalities carry stable official ISTAT codes, source release metadata and an active flag. NUTS3 is a separate one-to-many code relation because its boundaries are not always identical to the current ISTAT intermediate units. `CensusZone` stores only `municipality_id`: Region and Province are derived through real FKs rather than duplicated text. `CensusZone ↔ Street` uses `CensusZoneStreet`; `Street → Civic`, where `Civic.number` and optional free-text `Civic.extension` are distinct. A Street is the shared municipality identity: renaming it from an associated Zone updates that Street for every Zone and Contact that references it, while the authenticated command verifies the selected Zone association and municipality before writing.

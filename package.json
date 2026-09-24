@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "territories:sync": "tsx scripts/sync-istat-territories.ts"
+    "territories:sync": "tsx scripts/sync-istat-territories.ts",
+    "anncsu:sync": "tsx scripts/sync-anncsu.ts"
   },
   "dependencies": {
     "@supabase/ssr": "latest",
@@ -20,6 +21,7 @@
     "lucide-react": "latest",
     "next": "latest",
     "ol": "^10.10.0",
+    "proj4": "^2.22.0",
     "react": "latest",
     "react-dom": "latest",
     "zod": "latest"

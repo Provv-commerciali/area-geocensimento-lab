@@ -3,5 +3,28 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PageHeader } from "@/components/ui";
 import { loadCensusData } from "@/services/census-data";
+import { getZoneAccessCounts, listZoneAddressAccesses, listZoneStreets } from "@/repositories/territory-repository";
+import { accessLabel } from "@/domain/territory";
 
-export default async function ZoneDetail({ params }: { params: Promise<{ zoneId: string }> }) { const {zoneId}=await params;const {records,streets,zones,civics}=await loadCensusData(["records","streets","zones","civics"],{records:{zoneId}}); const zone=zones.find(z=>z.id===zoneId); if(!zone)notFound(); const associated=streets.filter(s=>zone.streetIds.includes(s.id)); return <><PageHeader eyebrow="Zona di censimento" title={zone.name} description={`${zone.municipality} · Assegnata a ${zone.operator.name}`} action={<Link className="button primary" href={`/geocensimento?zone=${zone.id}`}>Visualizza in GeoCensimento</Link>}/><section className="panel"><div className="panel-heading"><div><p className="eyebrow">Consultazione</p><h2>Vie della zona</h2></div><span>{associated.length} vie</span></div><div className="cards-list">{associated.map(s=>{const streetCivics=civics.filter(c=>c.streetId===s.id);return <article className="street-card" key={s.id}><div><strong>{s.name}</strong><span>{streetCivics.length} civici · {records.filter(r=>r.streetId===s.id).length} contatti censiti</span>{streetCivics.length>0&&<small className="street-civic-preview">{streetCivics.slice(0,12).map(c=>`${c.number}${c.extension?`/${c.extension}`:""}`).join(" · ")}{streetCivics.length>12?` · +${streetCivics.length-12}`:""}</small>}</div><Link className="button secondary" href={`/censimento/zone/${zone.id}/vie/${s.id}`}>Apri contatti <ArrowRight size={16}/></Link></article>})}{associated.length===0&&<p className="muted">Nessuna via associata a questa zona.</p>}</div></section></> }
+export default async function ZoneDetail({params}:{params:Promise<{zoneId:string}>}){
+  const{zoneId}=await params;
+  const[{records,zones},streets,accesses,counts]=await Promise.all([
+    loadCensusData(["records","zones"],{records:{zoneId}}),listZoneStreets(zoneId),
+    listZoneAddressAccesses(zoneId,100),getZoneAccessCounts(zoneId)]);
+  const zone=zones.find(item=>item.id===zoneId);if(!zone)notFound();
+  return <><PageHeader eyebrow="Zona di censimento" title={zone.name}
+    description={`${zone.municipality} · Assegnata a ${zone.operator.name}`}
+    action={<Link className="button primary" href={`/geocensimento?zone=${zone.id}`}>Visualizza in GeoCensimento</Link>}/>
+    <section className="panel"><div className="panel-heading"><div><p className="eyebrow">Territorio ANNCSU</p><h2>Vie e accessi della zona</h2></div><span>{counts.streetCount} vie · {counts.accessCount} accessi</span></div>
+      <p className="muted">{counts.locatedCount} accessi con coordinate ANNCSU valide · {counts.unlocatedCount} senza coordinate utilizzabili. Gli accessi sono disponibili anche senza Contatti censiti.</p>
+      <div className="cards-list">{streets.map(street=>{
+        const preview=accesses.filter(access=>access.streetId===street.id);
+        return <article className="street-card" key={street.id}><div><strong>{street.name}</strong>
+          <span>{street.localityName??"Località non indicata"} · {street.totalAccesses} accessi ANNCSU · {records.filter(record=>record.streetId===street.id).length} contatti</span>
+          <small>{street.sourceKind==="OFFICIAL_ANNCSU"?`Progressivo ${street.anncsuProgressivoNazionale}`:"Eccezione manuale"}</small>
+          {preview.length>0&&<small className="street-civic-preview">{preview.slice(0,12).map(accessLabel).join(" · ")}{preview.length>12?" · …":""}</small>}
+        </div><Link className="button secondary" href={`/censimento/zone/${zone.id}/vie/${street.id}`}>Apri contatti <ArrowRight size={16}/></Link></article>;
+      })}{streets.length===0&&<p className="muted">Nessuna via associata a questa Zona.</p>}</div>
+      {counts.accessCount>100&&<p className="muted">Anteprima dei primi 100 accessi; il repository consente paginazione per l’intera Zona.</p>}
+    </section></>;
+}

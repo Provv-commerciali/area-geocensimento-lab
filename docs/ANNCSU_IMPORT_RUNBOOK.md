@@ -1,0 +1,12 @@
+# ANNCSU Toscana — first LAB import
+
+Scope: isolated `area-geocensimento-lab` only. Never use production or ProvviOne credentials. The three `202609240002`–`004` migrations are a breaking demo-data reset. Apply them only after verifying the target project and making any desired LAB backup. Run the ISTAT territorial sync first: all 273 Toscana municipalities must exist with matching ISTAT and cadastral codes.
+
+1. Validate source files without a database: `npm run anncsu:sync`. This parses both original ZIPs, verifies headers, UTF-8, IDs, municipality pairing, Street/Access relations, numbering, access totals, coordinate methods and territorial envelope. It prints SHA-256 and anomalies.
+2. Set `ANNCSU_DATABASE_URL` only in the local process environment, using the dedicated LAB direct PostgreSQL connection. Do not commit it or put it in `NEXT_PUBLIC_*`.
+3. After applying the versioned migrations, run `npm run anncsu:sync -- --apply`. The importer validates the complete pair before database writes, gates the municipality joins, stages rows in one transaction, uses official progressive keys for upsert, records revisions/observations and marks missing official rows not current without deleting operational FKs. The same SHA-256 pair is a no-op. A changed hash for the same release date fails closed.
+4. Execute `tests/database/anncsu-live-verification.sql` on the same dedicated LAB target for PostGIS numeric/round-trip and source-count controls. Verify `anncsu_import_runs`, issue rows, quarantined points, zero-access Streets, repeated import no-op, Zone↔Street municipality guards, and access visibility without records. Exercise authenticated RLS and review proposed MANUAL exceptions. Do not claim database validation from the offline dry run alone.
+
+No source-artifact deletion job exists. Audit, SHA-256, first/last/current state and structured revisions are permanent. Original ZIP retention is configurable through `ANNCSU_SOURCE_RETENTION_MONTHS` / `artifact_retention_months` (default 12), but cleanup requires a separately designed job.
+
+The current batch importer prioritizes integrity and transactionality over throughput; staging ~1.9 million rows and maintaining revisions/observations requires a dedicated maintenance window, disk-space monitoring and a full LAB dry run before any production-shaped deployment. Browser endpoints are bounded and never return the full catalog.

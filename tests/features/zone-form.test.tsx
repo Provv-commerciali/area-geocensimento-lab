@@ -22,7 +22,6 @@ describe("New Zone territorial selects", () => {
         { id: "rom", provinceId: "rm", name: "Roma", istatCode: "058091" },
       ]}
       operators={[{ id: "op", name: "Elena Rossi" }]}
-      streets={[]}
     />);
 
     await user.selectOptions(screen.getByLabelText("Nazione *"), "it");

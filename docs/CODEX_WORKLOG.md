@@ -1,5 +1,23 @@
 # Codex worklog
 
+## 2026-09-24 — Chiusura decisioni ANNCSU e verifica CRS
+
+**Decisioni registrate:** approvato il modello greenfield e chiuse le questioni su boundary tenant, retention, governance MANUAL e coordinate. Il LAB mantiene la separazione global-reference/tenant-operational senza inventare tenant FK/RLS o RBAC di produzione; retention sorgenti configurabile con default 12 mesi e metadati/revisioni permanenti; riconciliazione MANUAL→OFFICIAL sempre esplicita e auditata.
+
+**Verifica geospaziale:** le specifiche ANNCSU dichiarano ETRF2000 epoca 2008.0/RDN2008; la raccomandazione è `geometry(Point,6706)`, coordinate sorgente lossless, quota ortometrica separata, trasformazione esplicita a EPSG:3857 per OpenLayers e test numerici incrociati PostGIS/browser. GeoCensimento viene ridefinito come proiezione territoriale degli AddressAccess delle Street assegnate alle Zone, indipendentemente dall'esistenza di CensusRecord. Nessuna migration o modifica applicativa è stata eseguita.
+
+## 2026-09-24 — Revisione greenfield del dominio ANNCSU
+
+**Decisioni recepite:** ANNCSU diventa master data globale per aree di circolazione e accessi esterni; progressivi nazionali come identità ufficiali; omonimi sempre distinti; località esplicita; fallback MANUAL nello stesso dominio; coordinate multi-provenance senza overwrite della scelta verificata.
+
+**Proposta:** un'unica entità Street e un'unica entità AddressAccess con invarianti OFFICIAL_ANNCSU/MANUAL, Locality ibrida, Zone tenant N:N con Street e GeoCensimento proiettato sugli accessi. Il modello LAB attuale potrà essere sostituito con una breaking migration e seed rigenerato dopo approvazione. Nessuna migration o modifica applicativa è stata eseguita.
+
+## 2026-09-24 — Analisi integrazione ANNCSU
+
+**Analisi:** verificati integralmente Stradario e Indirizzario Toscana del 15 settembre 2026, inclusi tracciati, encoding, cardinalità, chiavi, coordinate e coerenza referenziale. Confrontati schema, RPC e flussi Zone/Vie/Civici/Contatti del LAB.
+
+**Proposta:** catalogo ANNCSU read-only aggiornabile più mapping esplicito alle Street esistenti, senza import diretto nelle entità operative, rinomine automatiche o modifica dei riferimenti dei Contatti. L'implementazione resta sospesa in attesa di approvazione e delle decisioni su tenant, omonimi/località e civici non standard.
+
 ## 2026-09-16 — Import catastale, date intervista e riordino GitHub
 
 **Correzioni:** il parser gratuito AdE riconosce anche i riferimenti nazionali con sezione catastale esplicita; il calendario applicativo è usato nelle interviste e permette il salto diretto di mese/anno; `Risposta` è controllata; gli spazi della scadenza incarico sono stati riequilibrati.
@@ -268,3 +286,13 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **Migration:** `202609240001_subject_multi_property_search.sql` aggiunge la proiezione di ricerca generata e indicizzata.
 
 **Verifica:** lint, typecheck, 205 test Vitest e build production superati; 22 scenari Playwright hanno completato il flusso applicativo previsto.
+
+## 2026-09-24 — Prima implementazione ANNCSU LAB (in verifica DB)
+
+**Decisione:** approvazione architetturale DEC-050–055 e autorizzazione al primo milestone. Migration breaking `202609240002`–`004`: Street ufficiale/manuale, AddressAccess ufficiale/manuale, Locality, run/issues/revisioni, osservazioni EPSG:6706, selezione posizione, riconciliazione, Zone/Complex/Record su Access. Seed demo territoriale eliminato. La chiave tenant reale e il RBAC responsabile/master non sono inventati.
+
+**Import:** parser ZIP/CSV offline e sync Toscana transazionale con SHA-256, gate Comuni/relazioni/cardinalità, upsert idempotente e quarantena coordinate. `npm run anncsu:sync` ha validato 87.147 vie, 1.901.458 accessi, 273 Comuni, 1.555.651 coordinate, 345.807 accessi senza coordinate, 10.965 vie senza accessi e 4 posizioni in quarantena secondo il gate conservativo LAB. SHA Stradario `2c4978b2636f44b16efb400eab16f6b189a94ba78c1e9da77d1016744489dccd`; SHA Indirizzario `8c755d866901adf3a53b4395595f8a9c9bbf4ffaea8077be57b8fbee16337291`.
+
+**UX:** Zona con ricerca selettiva vie ufficiali e accessi indipendenti dai contatti; eccezioni manuali motivate. Form Contatto mantiene un adattatore di etichetta `civicId` ma salva l'UUID AddressAccess e ricerca accessi on demand. GeoCensimento database-mode mostra la fondazione territoriale senza fingere marker derivati dai record; mappa demo read-only invariata.
+
+**Verifica locale:** lint, typecheck, 215 test Vitest, trasformazione EPSG:6706 → EPSG:3857 nel browser e build superati. Il tentativo Playwright mirato non ha prodotto un esito conclusivo perché il server dev non ha terminato la sessione. Migration, import persistito, verifica numerica PostGIS, RLS e UI con Supabase non eseguiti: nessuna connessione `ANNCSU_DATABASE_URL`, CLI PostgreSQL/Docker/Supabase o `NEXT_PUBLIC_SUPABASE_URL` disponibile nella sessione. Non dichiarare milestone completo prima di un test dedicato LAB.

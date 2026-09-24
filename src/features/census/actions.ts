@@ -35,7 +35,7 @@ export async function createCensusRecordAction(
   const db = await createClient();
   const gateway: CensusRecordGateway = {
     async createRecord(payload) {
-      const { data: id, error } = await db.rpc("create_census_record_lab", { p_record: {...payload,subject:{subjectType:payload.subjectType,firstName:payload.firstName,lastName:payload.lastName,companyName:payload.companyName,vatNumber:payload.vatNumber,phone:payload.phone,email:payload.email,taxCode:payload.taxCode,birthDate:payload.birthDate,notes:payload.notes}}, p_interview: null });
+      const { data: id, error } = await db.rpc("create_census_record_lab", { p_record: {...payload,addressAccessId:payload.civicId,subject:{subjectType:payload.subjectType,firstName:payload.firstName,lastName:payload.lastName,companyName:payload.companyName,vatNumber:payload.vatNumber,phone:payload.phone,email:payload.email,taxCode:payload.taxCode,birthDate:payload.birthDate,notes:payload.notes}}, p_interview: null });
       if (error) throw new Error(error.message);
       if (typeof id !== "string") throw new Error("Supabase non ha restituito l'identificativo del record.");
       const location = await db.from("census_records").update({ staircase: payload.staircase || null, unit_identifier: payload.unitIdentifier || null,cadastral_class:value(data,"cadastralClass")||null,cadastral_consistency:value(data,"cadastralConsistency")||null,cadastral_income:value(data,"cadastralIncome")||null,cadastral_census_zone:value(data,"cadastralCensusZone")||null,cadastral_registry_lot:value(data,"cadastralRegistryLot")||null,cadastral_address:value(data,"cadastralAddress")||null }).eq("id", id);

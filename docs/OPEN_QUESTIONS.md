@@ -17,3 +17,7 @@
 - **TBD-CATASTO-001** — Contract-specific OpenAPI prices and whether they can be obtained from an authoritative account endpoint. The LAB currently shows the configured 2026 list-price estimate; a manager must align it with the actual account contract before production.
 - **TBD-CATASTO-002** — Business-approved freshness duration per paid operation. Until approved, completed equal data is reused indefinitely and only the explicit “Aggiorna dati” action creates a new request.
 - **TBD-CATASTO-003** — Final operational process for granting `can_use_paid_cadastral_services` to LAB operators. The database defaults to denied and no self-service role system is invented.
+
+The ANNCSU architectural questions `TBD-ANNCSU-001`, `004`, `006` and `007` are closed by DEC-051 through DEC-055. The physical production tenant/RLS and definitive RBAC bindings remain deferred integration contracts, not open domain decisions.
+
+The first LAB milestone still requires an accessible dedicated LAB PostgreSQL/PostGIS target for migration, transactional import and SQL/RLS integration tests. This is an execution blocker, not an unresolved domain decision. Do not apply the breaking migration to any unverified or production database.

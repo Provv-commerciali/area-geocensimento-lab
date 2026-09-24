@@ -7,7 +7,7 @@ import { persistCadastralAssociation, persistCivicLocation, type GeographyGatewa
 async function gateway(): Promise<GeographyGateway> {
   const db = await createClient();
   return {
-    async saveCivicLocation(civicId, payload) { const { error } = await db.rpc("save_civic_location_lab", { p_civic_id: civicId, p_location: payload }); if (error) throw new Error(error.message); },
+    async saveCivicLocation(civicId, payload) { const { error } = await db.rpc("save_access_location_lab", { p_address_access_id: civicId, p_location: payload }); if (error) throw new Error(error.message); },
     async confirmCadastralAssociation(recordId, payload) { const { error } = await db.rpc("confirm_cadastral_association_lab", { p_record_id: recordId, p_feature: payload }); if (error) throw new Error(error.message); },
   };
 }
