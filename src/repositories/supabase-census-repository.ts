@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { CensusRecordQuery, CensusRepository, CivicQuery } from "./census-repository";
-import type { CensusRecord, CensusZone, Civic, Complex, Country, Municipality, Operator, Province, Region, Street, Subject } from "@/domain/census";
-import { contactTypes, engagementTypes, formatFloor, occupancies, qualifications } from "@/domain/census";
+import type { CensusRecord, CensusZone, Civic, Complex, Country, Municipality, Operator, Province, Region, Street, Subject, SubjectSearchResult } from "@/domain/census";
+import { contactTypes, engagementTypes, formatFloor, occupancies, qualifications, searchTokens, subjectDisplayName } from "@/domain/census";
 import { createClient } from "@/lib/supabase/server";
 import { parsePostgisPoint } from "@/services/postgis-point";
 
@@ -20,7 +20,13 @@ export const supabaseCensusRepository:CensusRepository={
   async listProvinces():Promise<Province[]>{const db=await createClient();return checked(db.from("provinces").select("id,region_id,code,name,istat_code,territorial_unit_type").eq("is_active",true).order("name"),r=>({id:String(r.id),regionId:String(r.region_id),code:text(r.code),name:String(r.name),istatCode:text(r.istat_code),territorialUnitType:r.territorial_unit_type==null?undefined:Number(r.territorial_unit_type)}))},
   async listMunicipalities(provinceId?:string):Promise<Municipality[]>{const db=await createClient();return checkedPaged((from,to)=>{let query=db.from("municipalities").select("id,province_id,name,istat_code,cadastral_code").eq("is_active",true);if(provinceId)query=query.eq("province_id",provinceId);return query.order("name").order("istat_code").range(from,to)},r=>({id:String(r.id),provinceId:String(r.province_id),name:String(r.name),istatCode:text(r.istat_code),cadastralCode:text(r.cadastral_code)}))},
   async listSubjects(ids?:string[]):Promise<Subject[]>{if(ids&&ids.length===0)return[];const db=await createClient();let query=db.from("subjects").select("id,subject_type,first_name,last_name,company_name,tax_code,vat_number,phone,email,birth_date,notes").order("created_at");if(ids)query=query.in("id",ids);return checked(query,mapSubject)},
-  async searchSubjects(query:string):Promise<Subject[]>{const db=await createClient();return checked(db.from("subjects").select("id,subject_type,first_name,last_name,company_name,tax_code,vat_number,phone,email,birth_date,notes").ilike("search_text",`%${query.trim().toLocaleLowerCase("it")}%`).order("created_at").limit(20),mapSubject)},
+  async searchSubjects(query:string):Promise<SubjectSearchResult[]>{
+    const db=await createClient();let request=db.from("subjects").select("id,subject_type,first_name,last_name,company_name,tax_code,vat_number,phone,email,birth_date,notes");
+    for(const token of searchTokens(query))request=request.ilike("search_document",`%${token}%`);
+    const found=await checked(request.order("created_at").limit(20),mapSubject);if(!found.length)return[];
+    const links=await checked(db.from("census_record_subjects").select("subject_id,role,census_records(id,census_zones(name),streets(name),civics(number,extension))").in("subject_id",found.map(subject=>subject.id)),value=>value);
+    return found.map(subject=>{const contexts=links.filter(link=>String(link.subject_id)===subject.id).map(link=>{const record=object(link.census_records);const zone=object(record?.census_zones),street=object(record?.streets),civic=object(record?.civics);const number=String(civic?.number??"");const extension=text(civic?.extension);return{recordId:String(record?.id??""),role:qualifications.find(role=>role===link.role)??"Non specificato" as const,address:`${String(zone?.name??"")} · ${String(street?.name??"")}, ${number}${extension?`/${extension}`:""}`}});return{...subject,contextCount:contexts.length,contexts}});
+  },
   async getOperationalSettings(){const db=await createClient();const {data,error}=await db.from("census_operational_settings").select("stale_news_days").eq("id",1).single();if(error)throw new Error(error.message);const parsed=row.parse(data);return{staleNewsDays:z.number().int().positive().parse(parsed.stale_news_days)}},
   async listOperators():Promise<Operator[]>{const db=await createClient();return checked(db.from("operators").select("id,display_name"),r=>({id:String(r.id),name:String(r.display_name)}))},
   async listStreets(municipalityId?:string):Promise<Street[]>{const db=await createClient();let query=db.from("streets").select("id,municipality_id,name,municipalities(name)");if(municipalityId)query=query.eq("municipality_id",municipalityId);return checked(query.order("name"),r=>({id:String(r.id),municipalityId:String(r.municipality_id),name:String(r.name),municipality:String(object(r.municipalities)?.name??"")}))},
@@ -42,7 +48,7 @@ export const supabaseCensusRepository:CensusRepository={
       const r=raw;
       const zone=object(r.census_zones),street=object(r.streets),civic=object(r.civics),complex=object(r.complexes),ct=object(r.contact_types),op=object(r.responsible_operator);
       const rawLinks=Array.isArray(r.census_record_subjects)?r.census_record_subjects.map(value=>row.parse(value)):[];
-      const subjectLinks=rawLinks.map(link=>({subjectId:String(link.subject_id),role:qualifications.find(value=>value===link.role)??"Non specificato" as const,isPrimary:Boolean(link.is_primary)}));
+      const subjectLinks=rawLinks.map(link=>{const linkedSubject=object(link.subjects);return{subjectId:String(link.subject_id),role:qualifications.find(value=>value===link.role)??"Non specificato" as const,isPrimary:Boolean(link.is_primary),subjectName:linkedSubject?subjectDisplayName(mapSubject(linkedSubject)):undefined,subjectTaxCode:text(linkedSubject?.tax_code)}});
       const primaryLink=rawLinks.find(link=>Boolean(link.is_primary))??rawLinks[0]; const primarySubject=object(primaryLink?.subjects);
       const interviews=Array.isArray(r.census_interviews)?r.census_interviews.map(value=>row.parse(value)).map(interview=>({id:String(interview.id),recordId:String(interview.census_record_id),operatorId:String(interview.operator_id),operatorName:String(object(interview.operators)?.display_name??""),interviewDate:String(interview.interview_date),recallDate:text(interview.recall_date),response:text(interview.response),reason:text(interview.reason),outcome:text(interview.outcome)})):[];
       const contactType=contactTypes.find(value=>value===ct?.label)??"Generico";const engagementType=engagementTypes.find(value=>value===r.engagement_type)??"Nessuno";const floorCode=text(r.floor_code);const totalFloors=typeof r.total_floors==="number"?r.total_floors:undefined;const occupancy=occupancies.find(value=>value===r.occupancy);const elevator=typeof r.has_elevator==="boolean"?r.has_elevator:undefined;

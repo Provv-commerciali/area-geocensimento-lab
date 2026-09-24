@@ -29,7 +29,9 @@ export interface Subject {
   id: string; subjectType: SubjectType; firstName?: string; lastName?: string; companyName?: string;
   taxCode?: string; vatNumber?: string; phone?: string; email?: string; birthDate?: string; notes?: string;
 }
-export interface CensusRecordSubject { subjectId: string; role: Qualification | "Non specificato"; isPrimary: boolean; ownershipShare?: number }
+export interface SubjectSearchContext { recordId: string; role: Qualification | "Non specificato"; address: string }
+export interface SubjectSearchResult extends Subject { contextCount: number; contexts: SubjectSearchContext[] }
+export interface CensusRecordSubject { subjectId: string; role: Qualification | "Non specificato"; isPrimary: boolean; ownershipShare?: number; subjectName?: string; subjectTaxCode?: string }
 export interface CensusZone { id: string; name: string; municipalityId: string; municipality: string; municipalityCadastralCode?: string; province?: string; provinceCode?: string; operator: Operator; streetIds: string[] }
 export interface Street { id: string; municipalityId: string; name: string; municipality: string }
 export type GeocodingStatus = "NOT_GEOLOCATED" | "AUTO_GEOLOCATED" | "VERIFIED";
@@ -67,6 +69,8 @@ export interface CensusRecord {
 export function subjectDisplayName(subject: Subject): string {
   return subject.subjectType === "AZIENDA" ? subject.companyName ?? "Azienda" : [subject.lastName, subject.firstName].filter(Boolean).join(" ");
 }
+export function searchTokens(query:string):string[]{return query.trim().toLocaleLowerCase("it").split(/\s+/).map(token=>token.replace(/[%_]/g,"")).filter(Boolean).slice(0,8)}
+export function matchesSearchTokens(query:string,values:Array<string|undefined>):boolean{const haystack=values.filter(Boolean).join(" ").toLocaleLowerCase("it");return searchTokens(query).every(token=>haystack.includes(token))}
 export function recordsForSubject(records: CensusRecord[], subjectId: string): CensusRecord[] { return records.filter(record=>record.subjectLinks.some(link=>link.subjectId===subjectId)); }
 export function subjectsForRecord(record: Pick<CensusRecord,"subjectLinks">, subjects: Subject[]): Subject[] { return record.subjectLinks.map(link=>subjects.find(subject=>subject.id===link.subjectId)).filter((subject):subject is Subject=>Boolean(subject)); }
 

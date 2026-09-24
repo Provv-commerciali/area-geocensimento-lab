@@ -260,3 +260,11 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 ## 2026-09-24 — Chiarezza aggiunta Vie alla Zona
 
 **Modifiche:** il selettore per associare una Via già registrata nello stesso Comune è visibile solo quando contiene candidati reali e usa un’etichetta esplicita. Quando non esistono Vie disponibili, la gestione mostra soltanto “Aggiungi nuova via” senza un’alternativa vuota.
+
+## 2026-09-24 — Anagrafica prima e gestione multiproprietà
+
+**Modifiche:** Nuovo contatto parte dalla ricerca dell’anagrafica, mostra esiti vuoti/errori e apre la creazione solo su scelta esplicita. La ricerca è indipendente dall’ordine nome/cognome e restituisce conteggio e anteprima degli immobili collegati. Elenco Contatti ricerca anche comproprietari/soggetti secondari e mantiene un risultato per immobile; la scheda mostra il portafoglio completo incluso il contesto corrente.
+
+**Migration:** `202609240001_subject_multi_property_search.sql` aggiunge la proiezione di ricerca generata e indicizzata.
+
+**Verifica:** lint, typecheck, 205 test Vitest e build production superati; 22 scenari Playwright hanno completato il flusso applicativo previsto.

@@ -8,7 +8,7 @@
 
 `Subject` is the unique registry entity. It is either `PRIVATO`, with personal name fields and optional tax code, or `AZIENDA`, with company name and optional VAT/tax identifiers. Normalized tax code and VAT number are strong duplicate signals and database uniqueness keys. Names and company names never trigger automatic merging.
 
-`Subject.search_text` is a generated persistence-only search projection over names and strong identifiers. It supports bounded, on-demand registry lookup and is never authoritative domain state.
+`Subject.search_document` is a generated persistence-only search projection over both name orders, company name, strong identifiers, phone and email. Bounded lookup applies every normalized query token to this document, so word order is irrelevant. The projection is never authoritative domain state.
 
 `CensusRecord` is exposed operationally as a Census Contact: one private person or company in one property/civic context, with its own contact classification and interview history. It references a zone, street, civic, optional complex and responsible operator. `CensusRecordSubject` implements the internal many-to-many registry relationship and carries the role `Proprietario`, `Comproprietario` or `Inquilino`; migrated legacy links may temporarily be `Non specificato` rather than inventing historical meaning. Therefore one registry subject may span different streets, zones and municipalities, and one context may have several related people or companies.
 
@@ -20,7 +20,7 @@ Dashboard event attribution is explicit and immutable from ordinary UI intent: t
 
 Legacy person columns remain on `census_records` only to preserve already-loaded LAB data and are no longer authoritative for new writes. Whole-building levels are distinct from the partial-building `floor_code`, `total_floors` and `is_top_floor` fields; `floor_label` remains only as backward-compatible legacy display data.
 
-`Subject N ↔ N CensusRecord` is traversed internally in both directions. In the UX this appears inside the Contact sheet as “Altri immobili / contesti collegati”; there is no autonomous Subjects macro-area in Milestone 1. `CensusRecord 1 → N CensusInterview` preserves context-specific history: interviews never move to or become shared through the registry subject. A record starts with zero interviews; latest interview, next recall and “Non ancora contattato” remain derived from actual children.
+`Subject N ↔ N CensusRecord` is traversed internally in both directions. In the UX, registry search projects the linked-context count and address previews; the Contact sheet shows a portfolio containing the current context and all other linked contexts. The Contact list deliberately retains one row per CensusRecord, allowing one Subject search to return all their properties without collapsing distinct operational histories. There is no autonomous Subjects macro-area in Milestone 1. `CensusRecord 1 → N CensusInterview` preserves context-specific history: interviews never move to or become shared through the registry subject. A record starts with zero interviews; latest interview, next recall and “Non ancora contattato” remain derived from actual children.
 
 New `CensusInterview.response` values are controlled as `Risposto` or `Nessuna risposta`. Historical free text is preserved and is not silently reclassified.
 

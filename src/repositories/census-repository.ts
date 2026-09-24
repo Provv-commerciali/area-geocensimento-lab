@@ -1,4 +1,4 @@
-import type { CensusRecord, CensusZone, Civic, Complex, Country, Municipality, Operator, Province, Region, Street, Subject } from "@/domain/census";
+import type { CensusRecord, CensusZone, Civic, Complex, Country, Municipality, Operator, Province, Region, Street, Subject, SubjectSearchResult } from "@/domain/census";
 import type { CensusOperationalSettings } from "@/domain/census-operational-status";
 
 export type CensusRecordQuery = {
@@ -22,6 +22,6 @@ export interface CensusRepository {
   listProvinces(): Promise<Province[]>;
   listMunicipalities(provinceId?: string): Promise<Municipality[]>;
   listSubjects(ids?: string[]): Promise<Subject[]>;
-  searchSubjects(query: string): Promise<Subject[]>;
+  searchSubjects(query: string): Promise<SubjectSearchResult[]>;
   getOperationalSettings(): Promise<CensusOperationalSettings>;
 }

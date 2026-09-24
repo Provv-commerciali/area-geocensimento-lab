@@ -53,7 +53,7 @@ export const records: CensusRecord[] = Array.from({ length: 36 }, (_, index) => 
     engagementType,engagementExpiresOn,createdAt,
     ...(isNews&&index%8===7?{appraisedAt:createdAt,appraisedByOperatorId:responsible.id,appraisedByOperatorName:responsible.name}:{}),
     ...(["In esclusiva","Verbale","Non esclusivo"].includes(engagementType)?{engagementAcquiredAt:createdAt,engagementAcquiredByOperatorId:responsible.id,engagementAcquiredByOperatorName:responsible.name}:{}),
-    subjectLinks: [{ subjectId: `subject-${index + 1}`, role: index % 3 === 0 ? "Proprietario" : "Inquilino", isPrimary: true }],
+    subjectLinks: [{ subjectId: `subject-${index + 1}`, role: index % 3 === 0 ? "Proprietario" : "Inquilino", isPrimary: true,subjectName:`${surnames[(index * 3) % surnames.length]} ${names[index % names.length]}`,subjectTaxCode:index===0?"FRRNNA80A41A944X":undefined }],
     interviews: Array.from({ length: interviewCount }, (_, j) => ({
       id: `int-${index}-${j}`, recordId: `rec-${index + 1}`, operatorId: operators[(index + j) % operators.length].id,
       operatorName: operators[(index + j) % operators.length].name, interviewDate: `2026-0${Math.min(9, (index % 8) + 1)}-${String(8 + j).padStart(2, "0")}`,

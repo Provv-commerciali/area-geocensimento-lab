@@ -6,6 +6,7 @@
 - **TBD-CENSUS-005** — Complete semantics and validation rules for special civic extension values. It remains flexible text.
 - **TBD-CENSUS-006** — Exact semantics and lifecycle of “Probabile Incarico”. “Tipo di Incarico”, its required expiries and first acquisition attribution are now controlled by DEC-045/046.
 - **TBD-CENSUS-007** — Final response vocabulary. Cadastral categories now use the official Catasto Fabbricati selection.
+- **TBD-CENSUS-008** — Whether operators must manually record legal ownership shares on the Subject–CensusRecord relationship. Current census roles express Proprietario/Comproprietario/Inquilino only; provider-returned rights and shares remain lossless Catasto enrichment and are not silently promoted to census ownership data.
 - **TBD-MAP-001** — Production basemap capacity/provider and service-level requirements; OSM Standard is LAB-only.
 - **TBD-MAP-003** — Authoritative geometry model for a Complex spanning several civics/extensions. Milestone 2 indicates a Complex through its associated civic features.
 - **TBD-MAP-004** — Reliable official WFS availability. The endpoint tested on 2026-09-11 returned Access Denied, so no WFS capability is claimed.

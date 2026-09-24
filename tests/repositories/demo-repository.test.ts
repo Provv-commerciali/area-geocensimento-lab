@@ -14,7 +14,8 @@ describe("demo repository contract", () => {
   it("bounds on-demand subject searches",async()=>{
     const first=(await demoCensusRepository.listSubjects())[0];
     expect(first).toBeDefined();
-    expect(await demoCensusRepository.searchSubjects(first!.lastName??first!.companyName??"")).toContainEqual(first);
+    expect((await demoCensusRepository.searchSubjects(first!.lastName??first!.companyName??"")).find(subject=>subject.id===first!.id)).toMatchObject(first!);
+    expect((await demoCensusRepository.searchSubjects(`${first!.lastName} ${first!.firstName}`))[0]?.id).toBe(first!.id);
     expect((await demoCensusRepository.searchSubjects("a")).length).toBeLessThanOrEqual(20);
   });
 });

@@ -63,35 +63,43 @@ describe("contact form", () => {
 
   it("supports private, company and existing-subject flows",async()=>{
     const user=userEvent.setup();render(<ContactForm/>);
+    expect(screen.getByLabelText("Cerca anagrafica")).toBeInTheDocument();
+    await user.click(screen.getByRole("button",{name:"Non è presente? Crea nuova anagrafica"}));
     expect(screen.getByLabelText("Cognome *")).toBeInTheDocument();
     await user.click(screen.getByLabelText("Azienda"));
     expect(screen.getByLabelText("Ragione sociale *")).toBeInTheDocument();
     expect(screen.getByLabelText("Partita IVA")).toBeInTheDocument();
-    await user.click(screen.getByLabelText("Anagrafica già presente"));
-    expect(screen.getByLabelText("Contatto già presente *")).toBeInTheDocument();
+    await user.click(screen.getByRole("button",{name:"Cerca un’anagrafica già presente"}));
+    expect(screen.getByLabelText("Cerca anagrafica")).toBeInTheDocument();
   });
 
   it("suggests linking an existing subject only from a strong identifier",async()=>{
     const user=userEvent.setup();render(<ContactForm/>);
+    await user.click(screen.getByRole("button",{name:"Non è presente? Crea nuova anagrafica"}));
     await user.type(screen.getByLabelText("Codice fiscale"),"FRRNNA80A41A944X");
-    expect(screen.getByText(/Questo soggetto è già presente/)).toBeInTheDocument();
-    await user.click(screen.getByRole("button",{name:"Usa anagrafica esistente"}));
-    expect(screen.getByLabelText("Contatto già presente *")).toHaveValue("subject-1");
+    expect(screen.getByText(/Questa anagrafica è già presente/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button",{name:/Usa Ferri Anna/}));
+    expect(screen.getByText("Anagrafica selezionata")).toBeInTheDocument();
   });
 
   it("searches the registry on demand in database mode",async()=>{
-    const user=userEvent.setup();vi.stubGlobal("fetch",vi.fn().mockResolvedValue(new Response(JSON.stringify({subjects:[{id:"subject-db",subjectType:"PRIVATO",firstName:"Ada",lastName:"Lovelace"}]}),{status:200})));
+    const user=userEvent.setup();vi.stubGlobal("fetch",vi.fn().mockResolvedValue(new Response(JSON.stringify({subjects:[{id:"subject-db",subjectType:"PRIVATO",firstName:"Ada",lastName:"Lovelace",contextCount:2,contexts:[{recordId:"one",role:"Proprietario",address:"Centro · Via Uno, 1"}]}]}),{status:200})));
     render(<ContactForm databaseMode subjects={[]}/>);
-    await user.click(screen.getByLabelText("Anagrafica già presente"));
-    await user.type(screen.getByLabelText("Cerca anagrafica"),"Lovelace");
+    await user.type(screen.getByLabelText("Cerca anagrafica"),"Lovelace Ada");
     await user.click(screen.getByRole("button",{name:"Cerca"}));
-    await waitFor(()=>expect(screen.getByLabelText("Contatto già presente *")).toHaveTextContent("Lovelace Ada"));
+    await waitFor(()=>expect(screen.getByText("Lovelace Ada")).toBeInTheDocument());
+    expect(screen.getByText("2 immobili collegati")).toBeInTheDocument();
+    await user.click(screen.getByRole("button",{name:"Seleziona"}));
+    expect(screen.getByText("Anagrafica selezionata")).toBeInTheDocument();
     expect(fetch).toHaveBeenCalledTimes(1);
   });
+
+  it("reports an empty registry search and offers new identity creation",async()=>{const user=userEvent.setup();vi.stubGlobal("fetch",vi.fn().mockResolvedValue(new Response(JSON.stringify({subjects:[]}),{status:200})));render(<ContactForm databaseMode subjects={[]}/>);await user.type(screen.getByLabelText("Cerca anagrafica"),"Nessuno Presente");await user.click(screen.getByRole("button",{name:"Cerca"}));await waitFor(()=>expect(screen.getByText("Nessuna anagrafica trovata")).toBeInTheDocument());await user.click(screen.getByRole("button",{name:"Crea nuova anagrafica"}));expect(screen.getByLabelText("Cognome *")).toBeInTheDocument()});
 
   it("shows persistence errors instead of a false success", async () => {
     const user=userEvent.setup(); const formAction=vi.fn().mockResolvedValue({error:"Database non disponibile"});
     render(<ContactForm databaseMode formAction={formAction}/>);
+    await user.click(screen.getByRole("button",{name:"Non è presente? Crea nuova anagrafica"}));
     await user.selectOptions(screen.getByLabelText("Zona di censimento *"),"zone-1");
     await user.selectOptions(screen.getByLabelText("Via *"),"st-1");
     await user.selectOptions(screen.getByLabelText("Civico *"),"cv-1");

@@ -1,4 +1,4 @@
-import type { CensusRecord } from "@/domain/census";
+import { matchesSearchTokens, type CensusRecord } from "@/domain/census";
 import { deriveCensusOperationalStatus, type CensusOperationalSettings } from "@/domain/census-operational-status";
 
 export interface CensusFilters {
@@ -18,14 +18,14 @@ export function filterCensusRecords(records: CensusRecord[], f: CensusFilters, c
   return records.filter((r) => {
     const civic = Number.parseInt(r.civicNumber, 10);
     const latest = [...r.interviews].sort((a, b) => b.interviewDate.localeCompare(a.interviewDate))[0];
-    const haystack = `${r.firstName ?? ""} ${r.lastName} ${r.streetName} ${r.civicNumber} ${r.civicExtension ?? ""}`;
+    const queryCandidates=[`${r.firstName??""} ${r.lastName}`,`${r.lastName} ${r.firstName??""}`,`${r.streetName} ${r.civicNumber} ${r.civicExtension??""}`,...r.subjectLinks.map(link=>`${link.subjectName??""} ${link.subjectTaxCode??""}`)];const queryMatch=!f.query||queryCandidates.some(candidate=>matchesSearchTokens(f.query!,[candidate]));
     const operational = deriveCensusOperationalStatus({ contactType: r.contactType, interviews: r.interviews, staleNewsDays: context.staleNewsDays, today: context.today });
     const operationalMatch = !f.operationalStatus
       || (f.operationalStatus === "never" && operational.isNeverContacted)
       || (f.operationalStatus === "recallOverdue" && operational.isRecallOverdue)
       || (f.operationalStatus === "staleNews" && operational.isStaleNews)
       || (f.operationalStatus === "actionRequired" && (operational.isNeverContacted || operational.isRecallOverdue || operational.isStaleNews));
-    return has(haystack, f.query) && has(r.lastName, f.lastName) && has(r.firstName, f.firstName) && has(r.phone, f.phone)
+    return queryMatch && has(r.lastName, f.lastName) && has(r.firstName, f.firstName) && has(r.phone, f.phone)
       && (!f.contactType || r.contactType === f.contactType) && (!f.zoneId || r.zoneId === f.zoneId)
       && (!f.streetId || r.streetId === f.streetId) && (!f.complexId || r.complexId === f.complexId)
       && has(r.floorLabel, f.floor) && (!f.civicFrom || civic >= f.civicFrom) && (!f.civicTo || civic <= f.civicTo)
