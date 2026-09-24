@@ -252,3 +252,8 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **Modifiche:** titoli pagina ridotti globalmente; filtri Contatti chiusi di default con riepilogo di risultati e filtri attivi. Su desktop/tablet l’elenco usa un’area di scorrimento interna con intestazione e prima colonna fisse; su mobile la tabella larga diventa una lista di schede senza scorrimento laterale.
 
 **Verifica:** aggiunto uno scenario Playwright per filtri chiusi, tabella desktop e schede mobile.
+## 2026-09-23 — Separazione consultazione e modifica Zone
+
+**Modifiche:** l’elenco Zone espone “Apri” e “Modifica”. La consultazione mostra soltanto vie, civici e accesso ai contatti; la nuova route di modifica gestisce associazione/creazione vie, rinomina e inserimento civici senza selezionare automaticamente la prima via.
+
+**Migration:** `202609230001_zone_street_editing.sql` aggiunge la rinomina autenticata e vincolata alla relazione Zona–Via e al Comune.

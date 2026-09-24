@@ -35,7 +35,17 @@ export async function attachStreetAction(_state: ZoneActionState,data:FormData):
   const zoneId=value(data,"zoneId");const db=await createClient();const {error}=await db.rpc("attach_street_to_zone_lab",{
     p_zone_id:zoneId,p_existing_street_id:value(data,"existingStreetId")||null,p_new_street_name:value(data,"newStreetName")||null,
   });
-  if(error)return{error:error.message};revalidatePath(`/censimento/zone/${zoneId}`);return{success:"Via associata correttamente."};
+  if(error)return{error:error.message};revalidatePath("/censimento/zone");revalidatePath(`/censimento/zone/${zoneId}`);revalidatePath(`/censimento/zone/${zoneId}/modifica`);return{success:"Via associata correttamente."};
+}
+
+export async function renameStreetAction(_state:ZoneActionState,data:FormData):Promise<ZoneActionState>{
+  if(!hasSupabaseEnvironment())return{error:"Modalità demo: il nome della via non è stato modificato."};
+  const zoneId=value(data,"zoneId");const streetName=value(data,"streetName");
+  if(!streetName)return{error:"Inserisci il nome della via."};
+  const db=await createClient();const {error}=await db.rpc("rename_zone_street_lab",{p_zone_id:zoneId,p_street_id:value(data,"streetId"),p_name:streetName});
+  if(error)return{error:error.code==="23505"?"Esiste già una via con questo nome nel Comune selezionato.":error.message};
+  revalidatePath("/censimento/zone");revalidatePath(`/censimento/zone/${zoneId}`);revalidatePath(`/censimento/zone/${zoneId}/modifica`);
+  return{success:"Nome della via aggiornato correttamente."};
 }
 
 export async function addCivicsAction(_state:ZoneActionState,data:FormData):Promise<ZoneActionState>{
