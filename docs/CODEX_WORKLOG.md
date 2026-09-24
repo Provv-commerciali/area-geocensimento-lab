@@ -257,3 +257,6 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **Modifiche:** l’elenco Zone espone “Apri” e “Modifica”. La consultazione mostra soltanto vie, civici e accesso ai contatti; la nuova route di modifica gestisce associazione/creazione vie, rinomina e inserimento civici senza selezionare automaticamente la prima via.
 
 **Migration:** `202609230001_zone_street_editing.sql` aggiunge la rinomina autenticata e vincolata alla relazione Zona–Via e al Comune.
+## 2026-09-24 — Chiarezza aggiunta Vie alla Zona
+
+**Modifiche:** il selettore per associare una Via già registrata nello stesso Comune è visibile solo quando contiene candidati reali e usa un’etichetta esplicita. Quando non esistono Vie disponibili, la gestione mostra soltanto “Aggiungi nuova via” senza un’alternativa vuota.
