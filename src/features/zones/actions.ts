@@ -42,7 +42,7 @@ export async function detachStreetAction(_state: ZoneActionState,data:FormData):
   const zoneId=value(data,"zoneId"),streetId=value(data,"streetId");
   if(!zoneId||!streetId)return{error:"Via o zona non validi."};
   const db=await createClient();
-  const {count,error:recordError}=await db.from("census_records").select("id",{count:"exact",head:true}).eq("census_zone_id",zoneId).eq("street_id",streetId);
+  const {count,error:recordError}=await db.from("census_records").select("id,address_accesses!inner(street_id)",{count:"exact",head:true}).eq("census_zone_id",zoneId).eq("address_accesses.street_id",streetId);
   if(recordError)return{error:recordError.message};
   if((count??0)>0)return{error:"Non puoi rimuovere una via che ha già contatti nella zona."};
   const {error}=await db.from("census_zone_streets").delete().eq("census_zone_id",zoneId).eq("street_id",streetId);
