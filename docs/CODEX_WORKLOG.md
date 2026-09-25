@@ -310,3 +310,13 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **Flussi:** Zona test Bagni di Lucca con due omonime VIA CHIESA distinte per Locality: 137 accessi ufficiali, tutti visibili senza CensusRecord; filtro LUGLIANO e rilettura della Zona verificati. Aggiunte una Street e un AddressAccess MANUAL motivati, `PROPOSED`, autore/data e scope tenant-operational, senza ID ANNCSU; Zona finale tre vie/138 accessi. Stessa Street associabile a due Zone in prova transazionale annullata. RLS/grant anon/authenticated e guard Comune↔Zona verificati. EXPLAIN ANALYZE: ricerca Street 1.383 ms, Locality 0.870 ms, vie Zona 0.108 ms, conteggi 5.709 ms, pagina 100 accessi 5.219 ms sul LAB; indici territoriali in uso.
 
 **Stato test:** lint, strict TypeScript, 216 Vitest, SQL live Lucca e build production superati dopo il filtro provincia. Playwright headless su build reale ha confermato il redirect della Zona protetta a `/login`; il percorso UI autenticato resta non eseguito perché manca la password Supabase Auth dell'utente LAB (non la password PostgreSQL). Non dichiarare UI verificata finché non eseguito.
+
+## 2026-09-25 — ANNCSU Territorial Foundation completata
+
+**Playwright autenticato:** verifica eseguita sulla deployment `area-geocensimento-lab.vercel.app` tramite sessione Chrome autenticata al progetto Supabase LAB. Il banner applicativo identifica l'operatore `Elena Rossi`; il percorso `/login` redirige alla dashboard autenticata e non presenta errori console.
+
+**UI verificata:** Gestione Zone, apertura e modifica della Zona `ANNCSU LAB Bagni di Lucca 2026-09-25`, ricerca Street ANNCSU per odonimo, filtro Locality, selezione e associazione di una Street ufficiale (`CORSO UMBERTO`, `CASOLI`, 9 accessi), persistenza e riapertura della Zona. La Zona è stata riletta con 4 vie e 147 accessi, inclusa l'eccezione MANUAL motivata `VIA TEST ANNCSU NON PRESENTE` in revisione.
+
+**GeoCensimento:** la base territoriale mostra 4 vie, 147 AddressAccess, 146 con posizione e 1 senza posizione; gli accessi sono visualizzati con zero CensusRecord e con origine `OFFICIAL_ANNCSU`/ANNCSU. Nessun bug UI o funzionale riconducibile al milestone è stato trovato; nessuna modifica applicativa o import è stata eseguita.
+
+**Esito:** milestone `ANNCSU Territorial Foundation` completato. La verifica è stata eseguita sulla sessione autenticata già presente nel browser; non è stata modificata alcuna credenziale.
