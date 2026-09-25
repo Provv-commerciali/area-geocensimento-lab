@@ -31,15 +31,34 @@ function mapAccess(input:unknown):AddressAccess {const r=accessRow.parse(input);
 
 const streetSelect="id,municipality_id,name,locality_name,locality_id,total_accesses,source_kind,anncsu_progressivo_nazionale,is_present_in_latest_snapshot,manual_review_state";
 
-export async function searchStreetCatalog(municipalityId:string,query="",locality="",limit=100):Promise<CanonicalStreet[]> {
+export async function searchStreetCatalog(municipalityId:string,query="",locality="",limit=100,offset=0):Promise<CanonicalStreet[]> {
   if(!hasSupabaseEnvironment())return demoStreets.filter(street=>street.municipalityId===municipalityId&&street.name.toLocaleLowerCase("it").includes(query.toLocaleLowerCase("it"))).slice(0,limit).map(street=>({id:street.id,municipalityId:street.municipalityId,name:street.name,totalAccesses:demoCivics.filter(c=>c.streetId===street.id).length,sourceKind:"MANUAL",isPresentInLatestSnapshot:false,manualReviewState:"PROPOSED"}));
   const db=await createClient();
   let request=db.from("streets").select(streetSelect).eq("municipality_id",municipalityId)
     .eq("source_kind","OFFICIAL_ANNCSU").eq("is_present_in_latest_snapshot",true);
   if(query.trim())request=request.ilike("name",`%${query.trim().replace(/[%,_]/g,"")}%`);
   if(locality.trim())request=request.ilike("locality_name",`%${locality.trim().replace(/[%,_]/g,"")}%`);
-  const {data,error}=await request.order("name").order("anncsu_progressivo_nazionale").limit(Math.min(Math.max(limit,1),100));
+  const size=Math.min(Math.max(limit,1),100), start=Math.max(offset,0);
+  const {data,error}=await request.order("name").order("anncsu_progressivo_nazionale").range(start,start+size-1);
   if(error)throw new Error(error.message);return z.array(streetRow).parse(data).map(mapStreet);
+}
+
+export async function listLocalityCatalog(municipalityId:string,query="",limit=100):Promise<{id:string;name:string}[]> {
+  if(!hasSupabaseEnvironment())return [];
+  const db=await createClient();let request=db.from("localities").select("id,display_name").eq("municipality_id",municipalityId);
+  if(query.trim())request=request.ilike("display_name",`%${query.trim().replace(/[%,_]/g,"")}%`);
+  const {data,error}=await request.order("display_name").limit(Math.min(Math.max(limit,1),100));
+  if(error)throw new Error(error.message);
+  return z.array(z.object({id:z.string(),display_name:z.string()})).parse(data).map(row=>({id:row.id,name:row.display_name}));
+}
+
+export async function listStreetAddressAccesses(streetId:string,limit=200):Promise<AddressAccess[]> {
+  if(!hasSupabaseEnvironment())return [];
+  const db=await createClient();const {data,error}=await db.from("address_accesses")
+    .select("id,street_id,source_kind,anncsu_progressivo_accesso,civic,exponent,specificity,metric,progressivo_snc")
+    .eq("street_id",streetId).order("anncsu_progressivo_accesso").limit(Math.min(Math.max(limit,1),200));
+  if(error)throw new Error(error.message);
+  return z.array(accessRow.omit({street_name:true})).parse(data).map(row=>mapAccess({...row,street_name:""}));
 }
 
 export async function listZoneStreets(zoneId:string):Promise<CanonicalStreet[]>{

@@ -34,7 +34,7 @@ export function ZoneForm({countries,regions,provinces,municipalities=[],operator
   }
   return <form className="record-form" action={action}>
     {state.error&&<div className="error-banner" role="alert"><AlertTriangle/>{state.error}</div>}
-    <section className="form-section"><div className="section-title"><span>01</span><div><h2>Territorio e assegnazione</h2><p>Selezione gerarchica delle entità persistenti</p></div></div><div className="fields-grid">
+    <section className="form-section"><div className="section-title"><span>01</span><div><h2>Territorio e assegnazione</h2><p>Indica dove lavorerà la Zona e chi la seguirà.</p></div></div><div className="fields-grid">
       <label>Nazione *<select name="countryId" required value={countryId} onChange={event=>{setCountryId(event.target.value);setRegionId("");selectProvince("")}}><option value="">Seleziona…</option>{countries.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}</select></label>
       <label>Regione *<select name="regionId" required value={regionId} disabled={!countryId} onChange={event=>{setRegionId(event.target.value);selectProvince("")}}><option value="">Seleziona…</option>{allowedRegions.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}</select></label>
       <label>Provincia *<select name="provinceId" required value={provinceId} disabled={!regionId} onChange={event=>selectProvince(event.target.value)}><option value="">Seleziona…</option>{allowedProvinces.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}</select></label>
@@ -42,9 +42,9 @@ export function ZoneForm({countries,regions,provinces,municipalities=[],operator
       <label>Nome zona *<input name="name" required placeholder="es. Centro"/></label>
       <label>Assegnatario *<select name="operatorId" required defaultValue=""><option value="">Seleziona…</option>{operators.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}</select></label>
     </div></section>
-    <section className="form-section"><div className="section-title"><span>02</span><div><h2>Vie ANNCSU della zona</h2><p>Cerca per odonimo o località e seleziona più vie. Gli omonimi restano distinti per progressivo.</p></div></div>
+    <section className="form-section"><div className="section-title"><span>02</span><div><h2>Vie e indirizzi della zona</h2><p>Scegli le vie e gli indirizzi che fanno parte di questa zona.</p></div></div>
       {municipalityId?<StreetCatalogPicker key={municipalityId} municipalityId={municipalityId} inputName="streetIds" multiple/>:<p className="muted">Seleziona prima il Comune.</p>}
-      <p className="muted">Non trovi la via? Dopo il salvataggio apri “Modifica zona” e crea un’eccezione manuale motivata.</p>
+      <p className="muted">Non trovi l’indirizzo? Potrai inserirlo manualmente dopo il salvataggio della Zona.</p>
     </section>
     <div className="form-footer"><span>{databaseMode?"Salvataggio nel database Supabase LAB":"Fallback demo in sola lettura"}</span><ZoneSubmitButtons databaseMode={databaseMode}/></div>
   </form>;

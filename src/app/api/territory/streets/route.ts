@@ -8,8 +8,10 @@ export async function GET(request: Request) {
   if (!parsed.success) return Response.json({ error: "Comune non valido" }, { status: 400 });
   try {
     const params=new URL(request.url).searchParams;
+    const limit=Math.min(Math.max(Number(params.get("limit")??100)||100,1),100);
+    const offset=Math.max(Number(params.get("offset")??0)||0,0);
     return Response.json(
-      { streets: await searchStreetCatalog(parsed.data,params.get("q")??"",params.get("locality")??"") },
+      { streets: await searchStreetCatalog(parsed.data,params.get("q")??"",params.get("locality")??"",limit,offset) },
       { headers: { "Cache-Control": "private, max-age=300" } },
     );
   } catch {

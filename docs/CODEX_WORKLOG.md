@@ -320,3 +320,11 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **GeoCensimento:** la base territoriale mostra 4 vie, 147 AddressAccess, 146 con posizione e 1 senza posizione; gli accessi sono visualizzati con zero CensusRecord e con origine `OFFICIAL_ANNCSU`/ANNCSU. Nessun bug UI o funzionale riconducibile al milestone è stato trovato; nessuna modifica applicativa o import è stata eseguita.
 
 **Esito:** milestone `ANNCSU Territorial Foundation` completato. La verifica è stata eseguita sulla sessione autenticata già presente nel browser; non è stata modificata alcuna credenziale.
+
+## 2026-09-25 — Censimento UX cleanup dopo ANNCSU
+
+**Modifiche:** Zone usa soltanto il linguaggio operativo Comune, Area/località, Via/indirizzo e Civico. La ricerca del catalogo non mostra più automaticamente le prime 100 vie: richiede un nome, un filtro Area/località o il comando esplicito “Mostra tutti”; i risultati restano paginati e selezionabili in gruppo. Le denominazioni ufficiali come `LOCALITA' …` restano inalterate e sono visivamente separate dalla località filtrata. Elenco e dettaglio Zona diventano compatti con KPI, ricerca locale e percorso Via → Civici → Contatti; i civici senza contatto rimangono visibili. L’eccezione manuale è secondaria e indicata come “Inserito manualmente”. La rimozione della Via dalla Zona è bloccata quando vi sono già contatti nella Zona.
+
+**Confini:** nessuna migration, modifica ANNCSU/import, cambio di modello tenant/RBAC o redesign GeoCensimento; il pannello GeoCensimento riceve soltanto un lessico coerente.
+
+**Verifica prevista:** lint, strict TypeScript, Vitest, build e Playwright autenticato sulla deployment LAB, inclusi i casi Massarosa e Camaiore.

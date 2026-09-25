@@ -7,11 +7,12 @@ const street={id:"street-1",municipalityId:"municipality",name:"Via Uno",localit
 const counts={streetCount:1,accessCount:1,locatedCount:0,unlocatedCount:1};
 
 describe("Zone territory management",()=>{
-  it("shows the official identity and independent access count",()=>{
-    render(<ZoneTerritoryManager zone={zone} streets={[street]} accesses={[{id:"access-1",streetId:street.id,streetName:street.name,sourceKind:"OFFICIAL_ANNCSU",civic:"7"}]} counts={counts} databaseMode={false}/>);
-    expect(screen.getByText(/1 vie · 1 accessi/)).toBeInTheDocument();
-    expect(screen.getByText(/ANNCSU 123/)).toBeInTheDocument();
-    expect(screen.getByText("Associa una via ANNCSU")).toBeInTheDocument();
-    expect(screen.getByText("Non trovi la via? Crea eccezione manuale")).toBeInTheDocument();
+  it("uses operational language while keeping the address count",()=>{
+    render(<ZoneTerritoryManager zone={zone} streets={[street]} counts={counts} databaseMode={false}/>);
+    expect(screen.getByText(/1 civico/)).toBeInTheDocument();
+    expect(screen.getByText("Vie e indirizzi della zona")).toBeInTheDocument();
+    expect(screen.getByText("Cerca via o indirizzo")).toBeInTheDocument();
+    expect(screen.getByText("Inserisci manualmente")).toBeInTheDocument();
+    expect(screen.queryByText(/ANNCSU 123/)).not.toBeInTheDocument();
   });
 });
