@@ -20,13 +20,14 @@ function numericId(value: string, name: string, row: number): void {
   if (!/^\d+$/.test(value)) throw new Error(`${name} invalid at row ${row}`);
 }
 
-export async function validateAnncsu(streetZip: string, accessZip: string): Promise<AnncsuValidation> {
+export async function validateAnncsu(streetZip: string, accessZip: string, provinceCode?: string): Promise<AnncsuValidation> {
   const streets = new Map<string,Street>();
   const municipalityPairs = new Map<string,string>();
   let streetRow = 1;
   for await (const cells of readAnncsuCsv(streetZip,STREET_HEADER)) {
     streetRow++;
     const [municipalityCode,istatCode,progressive,,odonym,locality,totalText] = cells;
+    if(provinceCode && !istatCode.startsWith(provinceCode))continue;
     numericId(progressive,"Street progressive",streetRow);
     if (!/^[A-Z][0-9A-Z]{3}$/.test(municipalityCode) || !/^\d{6}$/.test(istatCode) || !odonym || !/^\d+$/.test(totalText))
       throw new Error(`Invalid Stradario fields at row ${streetRow}`);
@@ -42,6 +43,7 @@ export async function validateAnncsu(streetZip: string, accessZip: string): Prom
   for await (const cells of readAnncsuCsv(accessZip,ACCESS_HEADER)) {
     accessRow++;
     const [municipalityCode,istatCode,streetProgressive,,odonym,locality,,,accessProgressive,,civic,exponent,specificity,metric,snc,x,y,quota,method] = cells;
+    if(provinceCode && !istatCode.startsWith(provinceCode))continue;
     numericId(accessProgressive,"Access progressive",accessRow);
     if (accesses.has(accessProgressive)) throw new Error(`Duplicate Access progressive ${accessProgressive}`);
     accesses.add(accessProgressive);
@@ -78,13 +80,14 @@ async function sha256(path: string): Promise<string> {
 const streetColumns = ["codice_comune","codice_istat","progressivo_nazionale","codice_comunale","odonimo","localita","totale_accessi","dizione_lingua1","dizione_lingua2","source_fingerprint"];
 const accessColumns = ["codice_comune","codice_istat","progressivo_nazionale","codice_comunale","odonimo","localita","dizione_lingua1","dizione_lingua2","progressivo_accesso","codice_comunale_accesso","civico","esponente","specificita","metrico","progressivo_snc","coord_x_comune","coord_y_comune","quota","metodo","coordinate_state","source_fingerprint"];
 
-async function stage(client:Client, table:string, columns:string[], zip:string, header:string[]):Promise<number>{
+async function stage(client:Client, table:string, columns:string[], zip:string, header:string[], provinceCode?:string):Promise<number>{
   let count=0; let batch:Record<string,string>[]=[];
   async function flush(){if(!batch.length)return;
     await client.query(`insert into pg_temp.${table} select * from jsonb_populate_recordset(null::pg_temp.${table},$1::jsonb)`,[JSON.stringify(batch)]);
     batch=[];
   }
   for await(const cells of readAnncsuCsv(zip,header)){
+    if(provinceCode && !cells[1].startsWith(provinceCode))continue;
     const values=header===STREET_HEADER?
       [...cells,createHash("sha256").update(cells.join("\u001f")).digest("hex")]:
       [...cells,cells[15]?coordinateWarning(Number(decimalComma(cells[15])),Number(decimalComma(cells[16])))??"VALID":"MISSING",
@@ -103,42 +106,45 @@ function releaseDate(path:string):string {
   return date;
 }
 
-async function upsertRun(client:Client,type:string,path:string,hash:string):Promise<{id:string;alreadyApplied:boolean}>{
+async function upsertRun(client:Client,type:string,path:string,hash:string,scope:string):Promise<{id:string;alreadyApplied:boolean}>{
   const released=releaseDate(path);
   const retention=Number(process.env.ANNCSU_SOURCE_RETENTION_MONTHS??"12");
   if(!Number.isSafeInteger(retention)||retention<1)throw new Error("ANNCSU_SOURCE_RETENTION_MONTHS must be a positive integer");
   const existing=await client.query<{id:string;state:string;source_sha256:string}>(
-    "select id,state,source_sha256 from public.anncsu_import_runs where dataset_type=$1 and territorial_scope='TOSCANA' and release_date=$2 and state='APPLIED'",[type,released]);
+    "select id,state,source_sha256 from public.anncsu_import_runs where dataset_type=$1 and territorial_scope=$2 and release_date=$3 and state='APPLIED'",[type,scope,released]);
   if(existing.rows[0] && existing.rows[0].source_sha256!==hash)throw new Error(`${type}: conflicting hash for release ${released}`);
   if(existing.rows[0])return{id:existing.rows[0].id,alreadyApplied:true};
   const newer=await client.query<{release_date:string}>(
-    "select release_date from public.anncsu_import_runs where dataset_type=$1 and territorial_scope='TOSCANA' and state='APPLIED' and release_date>$2 order by release_date desc limit 1",[type,released]);
+    "select release_date from public.anncsu_import_runs where dataset_type=$1 and territorial_scope=$2 and state='APPLIED' and release_date>$3 order by release_date desc limit 1",[type,scope,released]);
   if(newer.rows.length)throw new Error(`${type}: refusing to regress latest snapshot from ${newer.rows[0].release_date} to ${released}`);
   const size=(await stat(path)).size;
   const result=await client.query<{id:string}>(`insert into public.anncsu_import_runs
     (dataset_type,territorial_scope,release_date,source_file,source_sha256,source_size_bytes,parser_version,artifact_retention_months,state)
-    values($1,'TOSCANA',$6,$2,$3,$4,$5,$7,'STARTED')
+    values($1,$8,$6,$2,$3,$4,$5,$7,'STARTED')
     on conflict (dataset_type,territorial_scope,source_sha256) do update set state='STARTED',error_summary=null
-    returning id`,[type,path.split(/[\\/]/).at(-1),hash,size,PARSER_VERSION,released,retention]);
+    returning id`,[type,path.split(/[\\/]/).at(-1),hash,size,PARSER_VERSION,released,retention,scope]);
   return{id:result.rows[0].id,alreadyApplied:false};
 }
 
-export async function applyAnncsu(streetZip:string,accessZip:string,summary:AnncsuValidation,databaseUrl:string):Promise<string>{
+export async function applyAnncsu(streetZip:string,accessZip:string,summary:AnncsuValidation,databaseUrl:string,provinceCode?:string):Promise<string>{
   if(!databaseUrl)throw new Error("ANNCSU_DATABASE_URL is required for --apply");
+  if(provinceCode !== undefined && !/^\d{3}$/.test(provinceCode))throw new Error("Province code must be three ISTAT digits");
   if(releaseDate(streetZip)!==releaseDate(accessZip))throw new Error("Stradario and Indirizzario release dates differ");
+  const scope=provinceCode?`PROVINCE:${provinceCode}`:"TOSCANA";
   const client=new Client({connectionString:databaseUrl});await client.connect();
   let streetRun:{id:string;alreadyApplied:boolean}|undefined,accessRun:{id:string;alreadyApplied:boolean}|undefined;
   try{
+    await client.query("set statement_timeout = '30min'");
     const [streetHash,accessHash]=await Promise.all([sha256(streetZip),sha256(accessZip)]);
-    streetRun=await upsertRun(client,"STRADARIO",streetZip,streetHash);
-    accessRun=await upsertRun(client,"INDIRIZZARIO",accessZip,accessHash);
+    streetRun=await upsertRun(client,"STRADARIO",streetZip,streetHash,scope);
+    accessRun=await upsertRun(client,"INDIRIZZARIO",accessZip,accessHash,scope);
     if(streetRun.alreadyApplied && accessRun.alreadyApplied)return"Already applied: same SHA-256 snapshots";
     await client.query("begin");
     await client.query("select pg_advisory_xact_lock(hashtext('ANNCSU:TOSCANA'))");
     await client.query(`create temporary table anncsu_stage_streets (${streetColumns.map(column=>`${column} text`).join(",")}) on commit drop`);
     await client.query(`create temporary table anncsu_stage_accesses (${accessColumns.map(column=>`${column} text`).join(",")}) on commit drop`);
-    const streetCount=await stage(client,"anncsu_stage_streets",streetColumns,streetZip,STREET_HEADER);
-    const accessCount=await stage(client,"anncsu_stage_accesses",accessColumns,accessZip,ACCESS_HEADER);
+    const streetCount=await stage(client,"anncsu_stage_streets",streetColumns,streetZip,STREET_HEADER,provinceCode);
+    const accessCount=await stage(client,"anncsu_stage_accesses",accessColumns,accessZip,ACCESS_HEADER,provinceCode);
     if(streetCount!==summary.streets || accessCount!==summary.accesses)throw new Error("Staging count changed after validation");
     await client.query("create unique index on anncsu_stage_streets(progressivo_nazionale)");
     await client.query("create unique index on anncsu_stage_accesses(progressivo_accesso)");
@@ -186,9 +192,11 @@ export async function applyAnncsu(streetZip:string,accessZip:string,summary:Annc
       from anncsu_stage_streets t join public.streets s on s.anncsu_progressivo_nazionale=t.progressivo_nazionale
       on conflict(street_id,source_fingerprint) do nothing`,[streetRun.id]);
     await client.query(`update public.streets s set is_present_in_latest_snapshot=false
-      from public.municipalities m where s.municipality_id=m.id and m.istat_code like '09%'
+      from public.municipalities m join public.provinces p on p.id=m.province_id
+      join public.regions r on r.id=p.region_id
+      where s.municipality_id=m.id and (($1::text is null and r.istat_code='09') or p.istat_code=$1)
       and s.source_kind='OFFICIAL_ANNCSU' and not exists
-      (select 1 from anncsu_stage_streets t where t.progressivo_nazionale=s.anncsu_progressivo_nazionale)`);
+      (select 1 from anncsu_stage_streets t where t.progressivo_nazionale=s.anncsu_progressivo_nazionale)`,[provinceCode??null]);
     await client.query(`insert into public.address_accesses(street_id,source_kind,ownership_scope,
       anncsu_progressivo_accesso,codice_comunale_accesso,civic,exponent,specificity,metric,progressivo_snc,
       quota_raw,first_seen_run_id,last_seen_run_id,is_present_in_latest_snapshot)
@@ -224,19 +232,21 @@ export async function applyAnncsu(streetZip:string,accessZip:string,summary:Annc
       on conflict(address_access_id,source_kind,source_fingerprint) do nothing`,[accessRun.id,accessHash]);
     await client.query(`update public.address_accesses a set is_present_in_latest_snapshot=false
       from public.streets s join public.municipalities m on m.id=s.municipality_id
-      where a.street_id=s.id and m.istat_code like '09%' and a.source_kind='OFFICIAL_ANNCSU'
-        and not exists(select 1 from anncsu_stage_accesses t where t.progressivo_accesso=a.anncsu_progressivo_accesso)`);
+      join public.provinces p on p.id=m.province_id join public.regions r on r.id=p.region_id
+      where a.street_id=s.id and (($1::text is null and r.istat_code='09') or p.istat_code=$1)
+        and a.source_kind='OFFICIAL_ANNCSU'
+        and not exists(select 1 from anncsu_stage_accesses t where t.progressivo_accesso=a.anncsu_progressivo_accesso)`,[provinceCode??null]);
     for(const issue of summary.issues) await client.query(`insert into public.anncsu_import_issues
       (import_run_id,row_number,source_id,issue_code,severity,detail) values($1,$2,$3,$4,$5,$6)`,
       [accessRun.id,issue.rowNumber,issue.sourceId,issue.code,issue.severity,"Source point excluded from effective location"]);
     await client.query(`update public.anncsu_import_runs set state='APPLIED',row_count=$2,
-      inserted_count=$3,updated_count=$4,quarantined_count=0,warning_count=0,finished_at=now() where id=$1`,
+      inserted_count=$3,updated_count=$4,quarantined_count=0,warning_count=0,finished_at=clock_timestamp() where id=$1`,
       [streetRun.id,summary.streets,summary.streets-existingStreets,existingStreets]);
     await client.query(`update public.anncsu_import_runs set state='APPLIED',row_count=$2,
-      inserted_count=$3,updated_count=$4,quarantined_count=$5,warning_count=$5,finished_at=now() where id=$1`,
+      inserted_count=$3,updated_count=$4,quarantined_count=$5,warning_count=$5,finished_at=clock_timestamp() where id=$1`,
       [accessRun.id,summary.accesses,summary.accesses-existingAccesses,existingAccesses,summary.quarantinedCoordinates]);
     await client.query("commit");
-    return `Applied Toscana: ${summary.streets} Streets, ${summary.accesses} AddressAccesses, ${summary.quarantinedCoordinates} quarantined points`;
+    return `Applied ${scope}: ${summary.streets} Streets, ${summary.accesses} AddressAccesses, ${summary.quarantinedCoordinates} quarantined points`;
   }catch(error){
     await client.query("rollback").catch(()=>{});
     const message=error instanceof Error?error.message:"Unknown import error";
@@ -250,10 +260,14 @@ function option(name:string):string|undefined{const index=process.argv.indexOf(n
 async function main(){
   const streetZip=resolve(option("--stradario")??DEFAULT_STREET_ZIP);
   const accessZip=resolve(option("--indirizzario")??DEFAULT_ACCESS_ZIP);
-  const summary=await validateAnncsu(streetZip,accessZip);
+  const provinceCode=option("--province");
+  if(process.argv.includes("--province") && !/^\d{3}$/.test(provinceCode??""))throw new Error("Province code must be three ISTAT digits");
+  if(process.argv.includes("--apply") && provinceCode===undefined)throw new Error("LAB apply requires an explicit --province scope");
+  const summary=await validateAnncsu(streetZip,accessZip,provinceCode);
+  if(provinceCode && summary.municipalities===0)throw new Error(`No municipalities found for province ${provinceCode}`);
   const [streetHash,accessHash]=await Promise.all([sha256(streetZip),sha256(accessZip)]);
-  console.log(JSON.stringify({summary,sha256:{stradario:streetHash,indirizzario:accessHash}},null,2));
-  if(process.argv.includes("--apply"))console.log(await applyAnncsu(streetZip,accessZip,summary,process.env.ANNCSU_DATABASE_URL??""));
+  console.log(JSON.stringify({scope:provinceCode?`PROVINCE:${provinceCode}`:"TOSCANA",summary,sha256:{stradario:streetHash,indirizzario:accessHash}},null,2));
+  if(process.argv.includes("--apply"))console.log(await applyAnncsu(streetZip,accessZip,summary,process.env.ANNCSU_DATABASE_URL??"",provinceCode));
 }
 if(process.argv[1]&&pathToFileURL(resolve(process.argv[1])).href===import.meta.url)
   main().catch(error=>{console.error(error instanceof Error?error.message:error);process.exitCode=1});
