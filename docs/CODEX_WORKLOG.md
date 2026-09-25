@@ -328,3 +328,7 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 **Confini:** nessuna migration, modifica ANNCSU/import, cambio di modello tenant/RBAC o redesign GeoCensimento; il pannello GeoCensimento riceve soltanto un lessico coerente.
 
 **Verifica locale:** lint, strict TypeScript, 217 test Vitest e build superati; 20/21 smoke Playwright demo superati. L’unico scenario non riuscito è il click della scheda catastale simulata, area non toccata dal cleanup né dal suo test; non è stato modificato perché il milestone esclude il redesign GeoCensimento. La verifica browser autenticata sulla deployment LAB resta da rieseguire dopo il ripristino della connessione Chrome/Codex; includerà Massarosa e Camaiore.
+
+## 2026-09-25 — Censimento UX polish
+
+**Modifiche:** toolbar Zone con ricerca per Zona, Via o Civico e filtri Comune/Operatore; azioni Apri, Modifica ed Elimina con guard su Contatti/Complessi. Dettagli Zona e Via condividono KPI operativi (Notizie, In valutazione, Altre agenzie, Esclusive) derivati da campi esistenti. Il Civico è apribile e il Nuovo Contatto riusa il form esistente con Zona/Via/Civico precompilati. Nessun dato territoriale ufficiale è modificabile o cancellabile; la rimozione della Via resta una sola associazione Zona↔Via con guard sui contatti.

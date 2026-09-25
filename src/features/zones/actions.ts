@@ -51,6 +51,13 @@ export async function detachStreetAction(_state: ZoneActionState,data:FormData):
   return{success:"Via o indirizzo rimosso dalla zona."};
 }
 
+export async function deleteZoneAction(_state:ZoneActionState,data:FormData):Promise<ZoneActionState>{
+  if(!hasSupabaseEnvironment())return{error:"Modalità demo: la zona non è stata eliminata."};const zoneId=value(data,"zoneId");const db=await createClient();
+  const [{count:records,error:recordError},{count:complexes,error:complexError}]=await Promise.all([db.from("census_records").select("id",{count:"exact",head:true}).eq("census_zone_id",zoneId),db.from("complexes").select("id",{count:"exact",head:true}).eq("census_zone_id",zoneId)]);
+  if(recordError||complexError)return{error:recordError?.message??complexError?.message??"Impossibile verificare la zona."};if((records??0)||(complexes??0))return{error:"La zona contiene contatti o complessi e non può essere eliminata. Rimuovi prima tali dati operativi."};
+  const {error}=await db.from("census_zones").delete().eq("id",zoneId);if(error)return{error:"Impossibile eliminare la zona. I dati territoriali non sono stati modificati."};revalidatePath("/censimento/zone");redirect("/censimento/zone");
+}
+
 export async function createManualStreetAction(_state:ZoneActionState,data:FormData):Promise<ZoneActionState>{
   if(!hasSupabaseEnvironment())return{error:"Modalità demo: eccezione non salvata."};
   const zoneId=value(data,"zoneId"),name=value(data,"name"),reason=value(data,"reason");
