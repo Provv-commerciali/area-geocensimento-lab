@@ -327,4 +327,4 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 
 **Confini:** nessuna migration, modifica ANNCSU/import, cambio di modello tenant/RBAC o redesign GeoCensimento; il pannello GeoCensimento riceve soltanto un lessico coerente.
 
-**Verifica prevista:** lint, strict TypeScript, Vitest, build e Playwright autenticato sulla deployment LAB, inclusi i casi Massarosa e Camaiore.
+**Verifica locale:** lint, strict TypeScript, 217 test Vitest e build superati; 20/21 smoke Playwright demo superati. L’unico scenario non riuscito è il click della scheda catastale simulata, area non toccata dal cleanup né dal suo test; non è stato modificato perché il milestone esclude il redesign GeoCensimento. La verifica browser autenticata sulla deployment LAB resta da rieseguire dopo il ripristino della connessione Chrome/Codex; includerà Massarosa e Camaiore.
