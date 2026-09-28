@@ -1,0 +1,84 @@
+import nextEnv from "@next/env";
+import { expect, test } from "@playwright/test";
+
+nextEnv.loadEnvConfig(process.cwd());
+const zoneId="664a2d00-7450-48d8-86b5-07862ac7c269";
+const streetId="cd3bc43e-d541-4777-9bb8-d0fea32067e4";
+
+test("authenticated LAB Zone → Street → Civic → Contact workflow",async({page})=>{
+  test.setTimeout(90000);
+  const email=process.env.ANNCSU_TEST_EMAIL,password=process.env.ANNCSU_TEST_PASSWORD;
+  expect(email,"ANNCSU_TEST_EMAIL required").toBeTruthy();
+  expect(password,"ANNCSU_TEST_PASSWORD required").toBeTruthy();
+  const errors:string[]=[];page.on("pageerror",error=>errors.push(error.message));
+  page.on("console",message=>{if(message.type()==="error")errors.push(message.text())});
+  const timings:Record<string,number>={};
+  const visit=async(name:string,path:string)=>{const started=performance.now();await page.goto(path);timings[name]=Math.round(performance.now()-started)};
+  await page.setViewportSize({width:1440,height:900});
+  await page.goto("/login");
+  await page.getByLabel("E-mail").fill(email!);
+  await page.getByLabel("Password").fill(password!);
+  await page.getByRole("button",{name:"Accedi"}).click();
+  await expect(page.getByRole("heading",{name:"Performance e attività",exact:true})).toBeVisible({timeout:30000});
+
+  await visit("zones","/censimento/zone");
+  await expect(page.getByRole("heading",{name:"Zone",exact:true})).toBeVisible();
+  await expect(page.locator("tbody tr")).toHaveCount(4);
+  const titleSize=Number.parseFloat(await page.locator(".page-header h1").evaluate(element=>getComputedStyle(element).fontSize));
+  expect(titleSize).toBeGreaterThanOrEqual(24);expect(titleSize).toBeLessThanOrEqual(26);
+  await page.screenshot({path:"test-results/census-ux-zones.png",fullPage:true,caret:"initial"});
+  await page.goto("/censimento/zone?q=Francesca");
+  await expect(page.locator("tbody tr")).toHaveCount(1);
+
+  await visit("zone",`/censimento/zone/${zoneId}`);
+  await expect(page.getByRole("heading",{name:"Vie e indirizzi della zona"})).toBeVisible();
+  await expect(page.locator("tbody tr")).toHaveCount(16);
+  await expect(page.locator(".page-header h1")).toHaveCSS("font-size",`${titleSize}px`);
+  await page.screenshot({path:"test-results/census-ux-zone.png",fullPage:true,caret:"initial"});
+  await page.goto(`/censimento/zone/${zoneId}?q=Matteucci`);
+  await expect(page.locator("tbody tr")).toHaveCount(1);
+
+  await visit("street",`/censimento/zone/${zoneId}/vie/${streetId}`);
+  await expect(page.getByRole("heading",{name:"Civici e contatti"})).toBeVisible();
+  await expect(page.locator("tbody tr")).toHaveCount(40);
+  await expect(page.getByText("1–40 di 164 civici")).toBeVisible();
+  await expect(page.locator(".page-header h1")).toHaveCSS("font-size",`${titleSize}px`);
+  const first=await page.locator("tbody tr td:first-child strong").first().innerText();
+  expect(first).toBe("19");
+  await page.screenshot({path:"test-results/census-ux-street-many.png",fullPage:true,caret:"initial"});
+  await page.goto(`/censimento/zone/${zoneId}/vie/${streetId}?page=2`);
+  await expect(page.locator("tbody tr")).toHaveCount(40);
+  await expect(page.getByText("41–80 di 164 civici")).toBeVisible();
+  await page.goto(`/censimento/zone/${zoneId}/vie/${streetId}?sort=civic_desc`);
+  await expect(page.locator("tbody tr")).toHaveCount(40);
+  await page.goto(`/censimento/zone/${zoneId}/vie/${streetId}?name=Matteucci`);
+  await expect(page.getByText("1–1 di 1 civici")).toBeVisible();
+  await expect(page.locator("details.street-advanced")).toHaveAttribute("open","");
+  await page.goto(`/censimento/zone/${zoneId}/vie/${streetId}`);
+  await page.getByLabel("Cerca civico o contatto").fill("59");
+  await page.getByRole("button",{name:"Cerca",exact:true}).click();
+  await expect(page.getByText("1–1 di 1 civici")).toBeVisible();
+  await expect(page.getByRole("link",{name:"Apri contatto"})).toBeVisible();
+  await page.screenshot({path:"test-results/census-ux-street-one.png",fullPage:true,caret:"initial"});
+  await page.getByRole("link",{name:"Apri contatto"}).click();
+  await expect(page.getByText("Scheda contatto")).toBeVisible();
+  await expect(page.locator(".page-header h1")).toHaveCSS("font-size",`${titleSize}px`);
+  const gap=await page.evaluate(()=>{const panels=[...document.querySelectorAll("main > .panel")].map(panel=>panel.getBoundingClientRect());return panels.length>1?panels[1].top-panels[0].bottom:null});
+  if(gap!==null)expect(gap).toBeGreaterThanOrEqual(16);
+  await page.screenshot({path:"test-results/census-ux-contact.png",fullPage:true,caret:"initial"});
+
+  await visit("streetFiltered",`/censimento/zone/${zoneId}/vie/${streetId}?q=19`);
+  await expect(page.getByText("Mai censito").first()).toBeVisible();
+  await page.getByRole("link",{name:"Apri civico"}).first().click();
+  await expect(page.getByRole("heading",{name:"Contatti del civico"})).toBeVisible();
+  await expect(page.locator(".page-header h1")).toHaveCSS("font-size",`${titleSize}px`);
+  await page.screenshot({path:"test-results/census-ux-civic-empty.png",fullPage:true,caret:"initial"});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
+  await page.setViewportSize({width:390,height:844});
+  await page.goto(`/censimento/zone/${zoneId}/vie/${streetId}?q=59`);
+  await expect(page.locator(".page-header h1")).toHaveCSS("font-size","24px");
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
+  await page.screenshot({path:"test-results/census-ux-street-mobile-auth.png",fullPage:true,caret:"initial"});
+  expect(errors).toEqual([]);
+  console.log(`LAB navigation page.goto() ms (single sample): ${JSON.stringify(timings)}`);
+});

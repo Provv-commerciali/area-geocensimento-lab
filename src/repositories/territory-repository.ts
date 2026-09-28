@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createClient, hasSupabaseEnvironment } from "@/lib/supabase/server";
-import { streets as demoStreets, civics as demoCivics, zones as demoZones } from "@/lib/demo-data";
+import { streets as demoStreets, civics as demoCivics, zones as demoZones, records as demoRecords } from "@/lib/demo-data";
 import type { AddressAccess, CanonicalStreet, ZoneAccessCounts } from "@/domain/territory";
 
 const streetRow = z.object({
@@ -61,6 +61,33 @@ export async function listStreetAddressAccesses(streetId:string,limit=200):Promi
   return z.array(accessRow.omit({street_name:true})).parse(data).map(row=>mapAccess({...row,street_name:""}));
 }
 
+const accessPageRow=accessRow.omit({street_name:true}).extend({total_count:z.union([z.number(),z.string()])});
+export async function getStreetAddressAccess(accessId:string):Promise<AddressAccess|undefined>{
+  if(!hasSupabaseEnvironment())return undefined;
+  const db=await createClient();const {data,error}=await db.from("address_accesses")
+    .select("id,street_id,source_kind,anncsu_progressivo_accesso,civic,exponent,specificity,metric,progressivo_snc")
+    .eq("id",accessId).maybeSingle();
+  if(error)throw new Error(error.message);return data?mapAccess({...accessRow.omit({street_name:true}).parse(data),street_name:""}):undefined;
+}
+export interface StreetAccessPageOptions {
+  zoneId:string;streetId:string;search?:string;candidateIds?:string[];searchContactIds?:string[];
+  sort?:string;page?:number;pageSize?:number;
+  civicFrom?:number;civicTo?:number;
+}
+export async function pageStreetAddressAccesses(options:StreetAccessPageOptions):Promise<{accesses:AddressAccess[];total:number}>{
+  if(!hasSupabaseEnvironment())return {accesses:[],total:0};
+  const db=await createClient();const pageSize=Math.min(Math.max(options.pageSize??40,1),100);
+  const {data,error}=await db.rpc("street_access_page_lab",{
+    p_zone_id:options.zoneId,p_street_id:options.streetId,p_search:options.search??"",
+    p_candidate_ids:options.candidateIds??null,p_search_contact_ids:options.searchContactIds??[],
+    p_sort:options.sort??"civic_asc",p_limit:pageSize,p_offset:(Math.max(options.page??1,1)-1)*pageSize,
+    p_civic_from:options.civicFrom??null,p_civic_to:options.civicTo??null,
+  });
+  if(error)throw new Error(error.message);
+  const parsed=z.array(accessPageRow).parse(data);
+  return {accesses:parsed.map(row=>mapAccess({...row,street_name:""})),total:Number(parsed[0]?.total_count??0)};
+}
+
 export async function listZoneStreets(zoneId:string):Promise<CanonicalStreet[]>{
   if(!hasSupabaseEnvironment()){const zone=demoZones.find(item=>item.id===zoneId);return zone?searchStreetCatalog(zone.municipalityId).then(rows=>rows.filter(row=>zone.streetIds.includes(row.id))):[];}
   const db=await createClient();const {data:links,error}=await db.from("census_zone_streets").select("street_id").eq("census_zone_id",zoneId);
@@ -82,4 +109,29 @@ export async function getZoneAccessCounts(zoneId:string):Promise<ZoneAccessCount
   if(error)throw new Error(error.message);
   const parsed=z.array(z.object({street_count:z.union([z.string(),z.number()]),access_count:z.union([z.string(),z.number()]),located_count:z.union([z.string(),z.number()]),unlocated_count:z.union([z.string(),z.number()])})).parse(data);
   const row=parsed[0];return{streetCount:Number(row?.street_count??0),accessCount:Number(row?.access_count??0),locatedCount:Number(row?.located_count??0),unlocatedCount:Number(row?.unlocated_count??0)};
+}
+
+export async function getZoneStreet(zoneId:string,streetId:string):Promise<CanonicalStreet|undefined>{
+  if(!hasSupabaseEnvironment())return (await listZoneStreets(zoneId)).find(street=>street.id===streetId);
+  const db=await createClient();const {data:link,error:linkError}=await db.from("census_zone_streets")
+    .select("street_id").eq("census_zone_id",zoneId).eq("street_id",streetId).maybeSingle();
+  if(linkError)throw new Error(linkError.message);if(!link)return undefined;
+  const {data,error}=await db.from("streets").select(streetSelect).eq("id",streetId).maybeSingle();
+  if(error)throw new Error(error.message);return data?mapStreet(data):undefined;
+}
+
+export async function pageZoneStreets(zoneId:string,search="",page=1,pageSize=30):Promise<{streets:CanonicalStreet[];total:number}>{
+  if(!hasSupabaseEnvironment()){const streets=await listZoneStreets(zoneId);const needle=search.toLocaleLowerCase("it");const filtered=streets.filter(street=>[street.name,street.localityName,...demoCivics.filter(civic=>civic.streetId===street.id).map(civic=>`${civic.number}/${civic.extension??""}`),...demoRecords.filter(record=>record.zoneId===zoneId&&record.streetId===street.id).map(record=>`${record.lastName} ${record.firstName} ${record.phone??""}`)].join(" ").toLocaleLowerCase("it").includes(needle));return {streets:filtered.slice((page-1)*pageSize,page*pageSize),total:filtered.length};}
+  const db=await createClient();const {data,error}=await db.rpc("zone_street_page_lab",{p_zone_id:zoneId,p_search:search.trim().replace(/[%,_]/g,"").slice(0,100),p_limit:Math.min(Math.max(pageSize,1),100),p_offset:(Math.max(page,1)-1)*pageSize});
+  if(error)throw new Error(error.message);
+  const parsed=z.array(streetRow.extend({total_count:z.union([z.number(),z.string()])})).parse(data);
+  return {streets:parsed.map(mapStreet),total:Number(parsed[0]?.total_count??0)};
+}
+
+export interface ZoneOverview {zoneId:string;streetCount:number;accessCount:number;recordCount:number}
+export async function listZoneOverview(search=""):Promise<ZoneOverview[]>{
+  if(!hasSupabaseEnvironment())return demoZones.filter(zone=>!search||[zone.name,zone.municipality,zone.operator.name,...demoStreets.filter(street=>zone.streetIds.includes(street.id)).map(street=>street.name),...demoCivics.filter(civic=>zone.streetIds.includes(civic.streetId)).map(civic=>`${civic.number}/${civic.extension??""}`)].join(" ").toLocaleLowerCase("it").includes(search.toLocaleLowerCase("it"))).map(zone=>({zoneId:zone.id,streetCount:zone.streetIds.length,accessCount:demoCivics.filter(civic=>zone.streetIds.includes(civic.streetId)).length,recordCount:demoRecords.filter(record=>record.zoneId===zone.id).length}));
+  const db=await createClient();const {data,error}=await db.rpc("zone_overview_lab",{p_search:search.trim().replace(/[%,_]/g,"").slice(0,100)});
+  if(error)throw new Error(error.message);
+  return z.array(z.object({zone_id:z.string(),street_count:z.union([z.number(),z.string()]),access_count:z.union([z.number(),z.string()]),record_count:z.union([z.number(),z.string()])})).parse(data).map(row=>({zoneId:row.zone_id,streetCount:Number(row.street_count),accessCount:Number(row.access_count),recordCount:Number(row.record_count)}));
 }

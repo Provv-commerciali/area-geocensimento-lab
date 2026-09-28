@@ -5,17 +5,19 @@ export type CensusRecordQuery = {
   recordId?: string;
   zoneId?: string;
   streetId?: string;
+  accessId?: string;
   complexId?: string;
   subjectId?: string;
 };
 export type CivicQuery = { civicId?: string; streetId?: string };
+export type ComplexQuery = { zoneId?:string };
 
 export interface CensusRepository {
   listRecords(query?: CensusRecordQuery): Promise<CensusRecord[]>;
   listZones(): Promise<CensusZone[]>;
   listStreets(municipalityId?: string): Promise<Street[]>;
   listCivics(query?: CivicQuery): Promise<Civic[]>;
-  listComplexes(): Promise<Complex[]>;
+  listComplexes(query?:ComplexQuery): Promise<Complex[]>;
   listOperators(): Promise<Operator[]>;
   listCountries(): Promise<Country[]>;
   listRegions(): Promise<Region[]>;

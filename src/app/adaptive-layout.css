@@ -1,5 +1,5 @@
 .page-header h1 {
-  font-size: clamp(1.45rem, 2.25vw, 2rem);
+  font-size: var(--page-title-size);
   letter-spacing: -0.03em;
 }
 

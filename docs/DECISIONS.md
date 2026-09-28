@@ -1,5 +1,7 @@
 # Decisions
 
+- **DEC-061** — The Censimento operating path is Zone → Street → AddressAccess (“Civico”) → CensusRecord (“Contatto”). A zero-contact Access exposes contextual creation; a one-contact Access opens the Contact directly unless it belongs to a Complex; multiple Contacts or a Complex use the Civic detail. Complex, unit/interior labels and CensusRecord remain distinct from territorial Access. Large Zone/Street lists use RLS-aware scoped server pagination, search and deterministic sorting; a shared page-title token and section-spacing token govern the operational screens.
+
 - **DEC-060** — In the operational territorial tables, “Censiti” is the count of CensusRecords/Contacts inserted in the scoped Zone, Via or Civico. It is independent of Contact type, interview history and territorial AddressAccess count.
 
 - **DEC-059** — The operational Zone hierarchy uses one compact, reusable KPI band. It reports only existing CensusRecord semantics: Notizie (`contactType=Notizia`), In valutazione (the existing explicit `isAppraised` flag), Altre agenzie (`engagementType=Incarico altre agenzie`) and Esclusive (`engagementType=In esclusiva`). Zone deletion removes only the operational Zone and its associations, is confirmed, and is refused while Contacts or Complexes exist; it never deletes global territorial catalog data.
