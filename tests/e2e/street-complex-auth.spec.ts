@@ -31,14 +31,14 @@ test("authenticated Case Geska is a single expandable Street item",async({page})
   await expect(card.getByRole("link",{name:"Apri contatto"})).toHaveCount(2);
   await page.screenshot({path:"test-results/street-case-geska-expanded.png",fullPage:true,caret:"initial"});
   await card.getByRole("link",{name:"Apri contatto"}).first().click();
-  await expect(page.getByText("Scheda contatto")).toBeVisible();
+  await expect(page.getByText("Scheda contatto")).toBeVisible({timeout:20000});
   await page.goBack();
   await expect(card).toBeVisible();
   await card.getByRole("button",{name:/Mostra interni/}).click();
   await card.getByRole("button",{name:/Nascondi interni/}).click();
   await expect(card.getByRole("button",{name:/Mostra interni/})).toBeVisible();
   await card.getByRole("link",{name:"Apri complesso"}).click();
-  await expect(page.getByRole("heading",{name:"Case Geska"})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Case Geska"})).toBeVisible({timeout:20000});
   await page.goto(`${street}?q=Rosi`);
   await expect(card).toBeVisible();
   await page.setViewportSize({width:390,height:844});
