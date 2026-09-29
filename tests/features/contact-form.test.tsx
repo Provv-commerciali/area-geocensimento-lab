@@ -107,5 +107,24 @@ describe("contact form", () => {
     await user.selectOptions(screen.getByLabelText("Ruolo nel contesto *"),"Proprietario");
     await user.click(screen.getByRole("button",{name:"Salva contatto"}));
     await waitFor(()=>expect(screen.getByRole("alert")).toHaveTextContent("Database non disponibile"));
+    expect(screen.getByLabelText("Cognome *")).toHaveValue("Ferri");
+    expect(screen.getByLabelText("Zona di censimento *")).toHaveValue("zone-1");
+    expect(screen.getByLabelText("Civico *")).toHaveValue("cv-1");
+    expect(screen.getByRole("button",{name:"Salva contatto"}).closest(".form-footer")).toHaveTextContent("Database non disponibile");
+  });
+
+  it("stops a missing identity at save without discarding the property draft",async()=>{
+    const user=userEvent.setup();const formAction=vi.fn().mockResolvedValue({});
+    render(<ContactForm databaseMode formAction={formAction}/>);
+    await user.selectOptions(screen.getByLabelText("Zona di censimento *"),"zone-1");
+    await user.selectOptions(screen.getByLabelText("Via *"),"st-1");
+    await user.selectOptions(screen.getByLabelText("Civico *"),"cv-1");
+    await user.type(screen.getByLabelText("Interno"),"4");
+    await user.selectOptions(screen.getByLabelText("Ruolo nel contesto *"),"Proprietario");
+    await user.click(screen.getByRole("button",{name:"Salva contatto"}));
+    expect(formAction).not.toHaveBeenCalled();
+    expect(screen.getByRole("button",{name:"Salva contatto"}).closest(".form-footer")).toHaveTextContent("Completa l’anagrafica");
+    expect(screen.getByLabelText("Interno")).toHaveValue("4");
+    expect(screen.getByLabelText("Civico *")).toHaveValue("cv-1");
   });
 });

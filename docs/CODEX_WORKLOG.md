@@ -356,3 +356,11 @@ Added the loopback-only FastAPI LAB EXPERIMENT under `tools/doorbell-ocr-service
 ## 2026-09-29 — Correzione feedback navigazione
 
 La prima verifica visiva dell'utente sul deployment ha mostrato il pannello provvisorio “Caricamento dei dati in corso…” durante il cambio pagina. Rimossi i cinque `loading.tsx` introdotti dallo slice, il relativo componente e lo stile: la navigazione client conserva la pagina corrente fino alla risposta della destinazione. Nessuna modifica alle query o pretesa di miglioramento dei tempi reali.
+
+## 2026-09-29 — Street Complex projection e bozza Nuovo Contatto
+
+Il salvataggio Nuovo Contatto non perde più la bozza su errore server: l'azione parte in transizione senza reset nativo del form; l'errore è visibile presso Salva. L'anagrafica assente è rilevata in modalità ricerca e l'assenza del cognome/ragione sociale in modalità nuova è evidenziata dalla validazione del browser con messaggio applicativo. RTL e Playwright autenticato verificano il mantenimento di civico, Interno e Foglio.
+
+La Via ora pagina elementi territoriali coerenti (Access libero o Complex) con RPC security-invoker `202609290006`; il Complex non si ripete sotto i civici collegati. Card autonoma con foto privata firmata, indirizzo primario, unità dichiarate, conteggio CensusRecord, espansione inline degli Access/Contatti reali. Query Access/foto/record dei soli Complex visibili sono batch; nessun fetch per Complex o espansione. Migration applicata al solo database LAB verificato; probe SQL autenticato: Case Geska 3 Access, 13 unità dichiarate, 2 CensusRecord, 1 foto, 1 riga visuale; Via Francesca 164 Access grezzi → 162 elementi visuali. Nessun cambiamento ANNCSU, OCR o mappa.
+
+Playwright autenticato su build production locale: percorso Case Geska desktop/mobile, foto realmente caricata, Rosi Davide/Monica, Apri contatto/Complesso, Mostra/Nascondi interni e bozza Nuovo Contatto passano. Il runner inoltra alla vera API Auth Supabase le richieste del browser isolato; nessuna risposta è simulata. Il server locale deve avere accesso di rete al LAB. Misure e conteggio richieste in `STREET_COMPLEX_PERFORMANCE.md`. Il deploy Vercel va verificato separatamente dopo push.

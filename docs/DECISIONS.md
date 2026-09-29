@@ -83,3 +83,7 @@
 # DEC-056 — Contact-selected Complex Access (2026-09-29)
 
 In Nuovo Contatto, a Complex is offered when it already has an AddressAccess on the selected Zone–Street, regardless of whether the currently selected AddressAccess is linked. Choosing that Complex and saving the Contact is the operator's authorization to add the selected Access. A security-invoker database command creates the Access link and CensusRecord atomically; it does not change the Complex's primary Access. No Access is linked merely because its civic number or suffix resembles an existing Complex address, and there is no extra confirmation step.
+
+# DEC-057 — Street Complex visual projection (2026-09-29)
+
+The operational Street list pages one visual item per unlinked AddressAccess or linked Complex, never both representations for the same Access. A Complex is anchored to its primary Access on the Street, otherwise its first local Access. Search and filters match any linked Access/Contact, but server-side paging and natural civic order operate on the grouped visual items. The card can show `unit_count` as declared units and the count of actual CensusRecords as census Contacts; the schema cannot justify an “units censused” metric. “Mostra interni” is a historical UX label for persisted Access and Contact context, not a new property-unit concept. The card reads private photos and visible Complex details in fixed batch requests; no per-Complex fetch is allowed.

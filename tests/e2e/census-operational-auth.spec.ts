@@ -1,5 +1,6 @@
 import nextEnv from "@next/env";
 import { expect, test } from "@playwright/test";
+import { forwardLabAuth } from "./lab-auth-proxy";
 
 nextEnv.loadEnvConfig(process.cwd());
 const zoneId="664a2d00-7450-48d8-86b5-07862ac7c269";
@@ -10,6 +11,7 @@ test("authenticated LAB Zone → Street → Civic → Contact workflow",async({p
   const email=process.env.ANNCSU_TEST_EMAIL,password=process.env.ANNCSU_TEST_PASSWORD;
   expect(email,"ANNCSU_TEST_EMAIL required").toBeTruthy();
   expect(password,"ANNCSU_TEST_PASSWORD required").toBeTruthy();
+  await forwardLabAuth(page);
   const errors:string[]=[];page.on("pageerror",error=>errors.push(error.message));
   page.on("console",message=>{if(message.type()==="error")errors.push(message.text())});
   const timings:Record<string,number>={};
@@ -39,25 +41,25 @@ test("authenticated LAB Zone → Street → Civic → Contact workflow",async({p
   await expect(page.locator("tbody tr")).toHaveCount(1);
 
   await visit("street",`/censimento/zone/${zoneId}/vie/${streetId}`);
-  await expect(page.getByRole("heading",{name:"Civici e contatti"})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Civici, complessi e contatti"})).toBeVisible();
   await expect(page.locator("tbody tr")).toHaveCount(40);
-  await expect(page.getByText("1–40 di 164 civici")).toBeVisible();
+  await expect(page.getByText("1–40 di 162 elementi (civici o complessi)")).toBeVisible();
   await expect(page.locator(".page-header h1")).toHaveCSS("font-size",`${titleSize}px`);
   const first=await page.locator("tbody tr td:first-child strong").first().innerText();
   expect(first).toBe("19");
   await page.screenshot({path:"test-results/census-ux-street-many.png",fullPage:true,caret:"initial"});
   await page.goto(`/censimento/zone/${zoneId}/vie/${streetId}?page=2`);
   await expect(page.locator("tbody tr")).toHaveCount(40);
-  await expect(page.getByText("41–80 di 164 civici")).toBeVisible();
+  await expect(page.getByText(/41–80 di \d+ elementi/)).toBeVisible();
   await page.goto(`/censimento/zone/${zoneId}/vie/${streetId}?sort=civic_desc`);
   await expect(page.locator("tbody tr")).toHaveCount(40);
   await page.goto(`/censimento/zone/${zoneId}/vie/${streetId}?name=Matteucci`);
-  await expect(page.getByText("1–1 di 1 civici")).toBeVisible();
+  await expect(page.getByText("1–1 di 1 elementi (civici o complessi)")).toBeVisible();
   await expect(page.locator("details.street-advanced")).toHaveAttribute("open","");
   await page.goto(`/censimento/zone/${zoneId}/vie/${streetId}`);
-  await page.getByLabel("Cerca civico o contatto").fill("59");
+  await page.getByLabel("Cerca civico, contatto o complesso").fill("59");
   await page.getByRole("button",{name:"Cerca",exact:true}).click();
-  await expect(page.getByText("1–1 di 1 civici")).toBeVisible();
+  await expect(page.getByText("1–1 di 1 elementi (civici o complessi)")).toBeVisible();
   await expect(page.getByRole("link",{name:"Apri contatto"})).toBeVisible();
   await page.screenshot({path:"test-results/census-ux-street-one.png",fullPage:true,caret:"initial"});
   await page.getByRole("link",{name:"Apri contatto"}).click();

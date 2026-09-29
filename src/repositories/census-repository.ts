@@ -7,6 +7,7 @@ export type CensusRecordQuery = {
   streetId?: string;
   accessId?: string;
   complexId?: string;
+  complexIds?: string[];
   subjectId?: string;
 };
 export type CivicQuery = { civicId?: string; civicIds?: string[]; streetId?: string };

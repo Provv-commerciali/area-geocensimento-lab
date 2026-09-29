@@ -73,6 +73,7 @@ export interface StreetAccessPageOptions {
   zoneId:string;streetId:string;search?:string;candidateIds?:string[];searchContactIds?:string[];
   sort?:string;page?:number;pageSize?:number;
   civicFrom?:number;civicTo?:number;
+  complexId?:string;
 }
 export async function pageStreetAddressAccesses(options:StreetAccessPageOptions):Promise<{accesses:AddressAccess[];total:number}>{
   if(!hasSupabaseEnvironment())return {accesses:[],total:0};
@@ -86,6 +87,23 @@ export async function pageStreetAddressAccesses(options:StreetAccessPageOptions)
   if(error)throw new Error(error.message);
   const parsed=z.array(accessPageRow).parse(data);
   return {accesses:parsed.map(row=>mapAccess({...row,street_name:""})),total:Number(parsed[0]?.total_count??0)};
+}
+
+export interface StreetRepresentation {access:AddressAccess;complexId?:string}
+const representationRow=accessPageRow.extend({complex_id:z.string().nullable()});
+export async function pageStreetRepresentations(options:StreetAccessPageOptions):Promise<{items:StreetRepresentation[];total:number}>{
+  if(!hasSupabaseEnvironment())return {items:[],total:0};
+  const db=await createClient();const pageSize=Math.min(Math.max(options.pageSize??40,1),100);
+  const {data,error}=await db.rpc("street_representation_page_lab",{
+    p_zone_id:options.zoneId,p_street_id:options.streetId,p_search:options.search??"",
+    p_candidate_ids:options.candidateIds??null,p_search_contact_ids:options.searchContactIds??[],
+    p_sort:options.sort??"civic_asc",p_limit:pageSize,p_offset:(Math.max(options.page??1,1)-1)*pageSize,
+    p_civic_from:options.civicFrom??null,p_civic_to:options.civicTo??null,
+    p_complex_id:options.complexId??null,
+  });
+  if(error)throw new Error(error.message);
+  const parsed=z.array(representationRow).parse(data);
+  return {items:parsed.map(row=>({access:mapAccess({...row,street_name:""}),complexId:row.complex_id??undefined})),total:Number(parsed[0]?.total_count??0)};
 }
 
 export async function listZoneStreets(zoneId:string):Promise<CanonicalStreet[]>{
