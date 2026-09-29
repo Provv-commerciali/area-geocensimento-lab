@@ -1,5 +1,7 @@
 # Decisions
 
+- **DEC-064** — The route-level `loading.tsx` panels introduced by DEC-062 are withdrawn after operator feedback: replacing the current page with an almost empty loading card is disruptive. On client navigation, keep the existing page visible until the destination is ready. This UX correction does not alter the data-layer optimizations or imply a measured performance gain.
+
 - **DEC-063** — Complex belongs to one CensusZone and may link to several AddressAccesses, including Accesses on different Streets assigned to that Zone. Exactly one linked Access is the persistent primary address (`complex_address_accesses.is_primary`), and an Access belongs to at most one Complex in the current operational domain. Creation/update are atomic authenticated commands; Zone–Street detach and Access unlink cannot invalidate an in-use Complex. AddressAccess, Complex and CensusRecord remain distinct entities.
 
 - **DEC-062** — Complex creation searches Zone Streets and Street Accesses in bounded server pages, including Accesses with zero Contacts. The Contact form creates a Complex in place and retains its draft. List navigation does not speculatively prefetch row-specific routes; main route links retain their existing navigation behavior. Authenticated repository reads combine Zone/Street/Complex relationships in one PostgREST request where safe under RLS, and the Complex list uses an aggregate count instead of full Contact payload. Loading boundaries are feedback, not a performance claim.

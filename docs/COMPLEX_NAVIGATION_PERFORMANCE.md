@@ -16,7 +16,7 @@ The user explicitly authorized an interim push to `main` while this authenticati
 
 The call counts above are traced from repository code, not browser network measurements. Supabase requests execute server-side and therefore are not visible as individual browser responses. The original audit's `Complessi` call count included the 2-ID/Access/location Civic chain; the new route does not request Civics, and it reads Contact counts through one aggregate RPC without fetching full Contact rows. `Zone`, `Street`, and `Complex` relationship reads have been folded into RLS-aware PostgREST embeds. Zone overview is parallel with Zone metadata. The main Contact route still loads its operational dataset, but removes one Zone and one Street/Complex follow-up round trip. Nuovo Contatto loads Accesses only after a Street is selected.
 
-Row-specific Zone, Street, Civic, Contact and Complex links now use `prefetch={false}`. Static/main navigation and pager links were not globally disabled. Loading boundaries were added after the data-layer changes and must not be counted as a reduction in real server cost.
+Row-specific Zone, Street, Civic, Contact and Complex links now use `prefetch={false}`. Static/main navigation and pager links were not globally disabled. The route-level loading cards were subsequently removed after operator feedback because they replaced the current page with an almost empty panel during navigation. This UI correction is not counted as a reduction in real server cost.
 
 ## Required follow-up measurement
 
