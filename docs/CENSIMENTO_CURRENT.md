@@ -1,5 +1,7 @@
 # Known current Censimento behavior
 
+The Complex workflow now creates persisted Complexes from Zone-assigned Streets and their AddressAccesses, regardless of whether Contacts exist. One Access is selected as the primary address; additional Accesses can be on other Streets of the same Zone. A Contact may create a Complex in place without losing its draft. The older sentence below describing the Complex selector as read-only and the older Civic-centric prose document the pre-correction LAB, not the current workflow.
+
 Operational consultation now pages Zone Streets (30 rows) and Street civics (40 rows) on the server, with search scoped to the Zone/Street and natural numeric civic order. Street search includes the displayed civic/SNC and names or telephone of linked Contacts; collapsible advanced filters use only persisted CensusRecord, Interview and Complex fields. Civic rows distinguish no Contact, exactly one Contact and multiple Contacts; the single-Contact action bypasses Civic detail unless a Complex makes that context necessary. Civic detail displays existing Contact summaries and the linked Complex/interiors. “Censiti” means CensusRecord count regardless of type or interview history. The Contact card has shared vertical spacing, without a redesign.
 
 Navigation: Censimento → Nuovo Contatto, Contatti, Zone (Elenco/Nuova), Complessi.

@@ -135,3 +135,11 @@ export async function listZoneOverview(search=""):Promise<ZoneOverview[]>{
   if(error)throw new Error(error.message);
   return z.array(z.object({zone_id:z.string(),street_count:z.union([z.number(),z.string()]),access_count:z.union([z.number(),z.string()]),record_count:z.union([z.number(),z.string()])})).parse(data).map(row=>({zoneId:row.zone_id,streetCount:Number(row.street_count),accessCount:Number(row.access_count),recordCount:Number(row.record_count)}));
 }
+
+export async function listComplexContactCounts():Promise<Map<string,number>>{
+  if(!hasSupabaseEnvironment()){const counts=new Map<string,number>();for(const record of demoRecords){if(record.complexId)counts.set(record.complexId,(counts.get(record.complexId)??0)+1)}return counts}
+  const db=await createClient();const {data,error}=await db.rpc("complex_contact_counts_lab");
+  if(error)throw new Error(error.message);
+  const parsed=z.array(z.object({complex_id:z.string(),contact_count:z.union([z.string(),z.number()])})).parse(data);
+  return new Map(parsed.map(row=>[row.complex_id,Number(row.contact_count)]));
+}

@@ -1,5 +1,9 @@
 # Decisions
 
+- **DEC-063** — Complex belongs to one CensusZone and may link to several AddressAccesses, including Accesses on different Streets assigned to that Zone. Exactly one linked Access is the persistent primary address (`complex_address_accesses.is_primary`), and an Access belongs to at most one Complex in the current operational domain. Creation/update are atomic authenticated commands; Zone–Street detach and Access unlink cannot invalidate an in-use Complex. AddressAccess, Complex and CensusRecord remain distinct entities.
+
+- **DEC-062** — Complex creation searches Zone Streets and Street Accesses in bounded server pages, including Accesses with zero Contacts. The Contact form creates a Complex in place and retains its draft. List navigation does not speculatively prefetch row-specific routes; main route links retain their existing navigation behavior. Authenticated repository reads combine Zone/Street/Complex relationships in one PostgREST request where safe under RLS, and the Complex list uses an aggregate count instead of full Contact payload. Loading boundaries are feedback, not a performance claim.
+
 - **DEC-061** — The Censimento operating path is Zone → Street → AddressAccess (“Civico”) → CensusRecord (“Contatto”). A zero-contact Access exposes contextual creation; a one-contact Access opens the Contact directly unless it belongs to a Complex; multiple Contacts or a Complex use the Civic detail. Complex, unit/interior labels and CensusRecord remain distinct from territorial Access. Large Zone/Street lists use RLS-aware scoped server pagination, search and deterministic sorting; a shared page-title token and section-spacing token govern the operational screens.
 
 - **DEC-060** — In the operational territorial tables, “Censiti” is the count of CensusRecords/Contacts inserted in the scoped Zone, Via or Civico. It is independent of Contact type, interview history and territorial AddressAccess count.

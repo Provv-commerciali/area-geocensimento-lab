@@ -46,7 +46,7 @@ export async function detachStreetAction(_state: ZoneActionState,data:FormData):
   if(recordError)return{error:recordError.message};
   if((count??0)>0)return{error:"Non puoi rimuovere una via che ha già contatti nella zona."};
   const {error}=await db.from("census_zone_streets").delete().eq("census_zone_id",zoneId).eq("street_id",streetId);
-  if(error)return{error:error.message};
+  if(error)return{error:error.code==="23503"?"Non puoi rimuovere una via usata da Contatti o Complessi nella Zona.":error.message};
   revalidatePath("/censimento/zone");revalidatePath(`/censimento/zone/${zoneId}`);revalidatePath(`/censimento/zone/${zoneId}/modifica`);
   return{success:"Via o indirizzo rimosso dalla zona."};
 }

@@ -23,9 +23,9 @@ export const civics: Civic[] = Array.from({ length: 20 }, (_, index) => ({
   ...(index === 19 ? {} : { location: { longitude: 11.3425 + (index % 5) * 0.0022, latitude: 44.4937 + Math.floor(index / 5) * 0.0018, source: "fixture LAB", method: index === 18 ? "GEOCODER" : "MANUAL_MAP", geocodedAt: "2026-09-11", verifiedAt: index === 18 ? undefined : "2026-09-11", quality: 1 } }),
 }));
 export const complexes: Complex[] = [
-  { id: "cx-1", name: "Corte Mercanti", zoneId: "zone-1", civicIds: ["cv-1", "cv-6", "cv-11"], sheet: "12", parcel: "88", units: 18, description: "Complesso multicivico LAB" },
-  { id: "cx-2", name: "Residenza Portico", zoneId: "zone-1", civicIds: ["cv-2", "cv-7"], sheet: "14", parcel: "102", units: 10 },
-  { id: "cx-3", name: "Palazzo del Canale", zoneId: "zone-2", civicIds: ["cv-3", "cv-8"], units: 14 },
+  { id: "cx-1", name: "Corte Mercanti", zoneId: "zone-1", civicIds: ["cv-1", "cv-6", "cv-11"], primaryAccessId:"cv-1", sheet: "12", parcel: "88", units: 18, description: "Complesso multicivico LAB" },
+  { id: "cx-2", name: "Residenza Portico", zoneId: "zone-1", civicIds: ["cv-2", "cv-7"], primaryAccessId:"cv-2", sheet: "14", parcel: "102", units: 10 },
+  { id: "cx-3", name: "Palazzo del Canale", zoneId: "zone-2", civicIds: ["cv-3", "cv-8"], primaryAccessId:"cv-3", units: 14 },
 ];
 const surnames = ["Ferri", "Romano", "Esposito", "Gallo", "De Luca", "Mancini", "Costa", "Giordano"];
 const names = ["Anna", "Luca", "Giulia", "Paolo", "Chiara", "Davide", "Marta", "Andrea"];

@@ -22,13 +22,13 @@ type ResourceLoaders = {
 };
 type Resource = keyof ResourceLoaders;
 type CensusData = { [Key in Resource]: Awaited<ReturnType<ResourceLoaders[Key]>> };
-type LoadOptions = { records?: CensusRecordQuery; civicId?: string; civicStreetId?: string; complexZoneId?:string; subjectIds?: string[]; municipalityProvinceId?: string; streetMunicipalityId?: string };
+type LoadOptions = { records?: CensusRecordQuery; civicId?: string; civicIds?: string[]; civicStreetId?: string; complexZoneId?:string; subjectIds?: string[]; municipalityProvinceId?: string; streetMunicipalityId?: string };
 
 export async function loadCensusData<const Keys extends readonly Resource[]>(resources: Keys, options: LoadOptions = {}) {
   const repo = censusRepository();
   const loaders: { [Key in Resource]: () => Promise<CensusData[Key]> } = {
     records: () => repo.listRecords(options.records), zones: () => repo.listZones(), streets: () => repo.listStreets(options.streetMunicipalityId),
-    civics: () => repo.listCivics({civicId:options.civicId,streetId:options.civicStreetId}), complexes: () => repo.listComplexes({zoneId:options.complexZoneId}), operators: () => repo.listOperators(), countries: () => repo.listCountries(),
+    civics: () => repo.listCivics({civicId:options.civicId,civicIds:options.civicIds,streetId:options.civicStreetId}), complexes: () => repo.listComplexes({zoneId:options.complexZoneId}), operators: () => repo.listOperators(), countries: () => repo.listCountries(),
     regions: () => repo.listRegions(), provinces: () => repo.listProvinces(), municipalities: () => repo.listMunicipalities(options.municipalityProvinceId),
     subjects: () => repo.listSubjects(options.subjectIds), operationalSettings: () => repo.getOperationalSettings(),
   };

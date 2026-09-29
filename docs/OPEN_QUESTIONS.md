@@ -12,6 +12,7 @@
 - **TBD-MAP-004** — Reliable official WFS availability. The endpoint tested on 2026-09-11 returned Access Denied, so no WFS capability is claimed.
 - **TBD-MAP-006** — Whether a future paid provider supplies stable parcel geometry/identity and which licensed fields it may enrich. It must extend the confirmed association and cannot infer ownership.
 - **TBD-OCR-001** — Final location, capacity, synchronous/queued mode, retry lease and service-level requirements for the separate free/self-hosted PaddleOCR service.
+- **DEPLOYMENT BLOCKER OCR** — The self-hosted PP-OCRv6 service must be reachable from the application deployment. `127.0.0.1:8091` is a local LAB endpoint and cannot serve a Vercel deployment. This milestone restores the Complex UI/workflow but does not approve or invent a production host; live OCR on Vercel remains unavailable until hosting/networking is decided and verified.
 - **TBD-OCR-002** — Final privacy retention duration for photos, raw text and detections. Until approved, deletion is operator-driven; provenance metadata remains while the blob is removed.
 - **TBD-OCR-003** — Whether Scala/Interno later normalize into an approved property-unit model. Milestone 3 keeps optional CensusRecord labels and infers no unit identity.
 - **TBD-CATASTO-001** — Contract-specific OpenAPI prices and whether they can be obtained from an authoritative account endpoint. The LAB currently shows the configured 2026 list-price estimate; a manager must align it with the actual account contract before production.

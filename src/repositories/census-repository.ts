@@ -9,7 +9,7 @@ export type CensusRecordQuery = {
   complexId?: string;
   subjectId?: string;
 };
-export type CivicQuery = { civicId?: string; streetId?: string };
+export type CivicQuery = { civicId?: string; civicIds?: string[]; streetId?: string };
 export type ComplexQuery = { zoneId?:string };
 
 export interface CensusRepository {

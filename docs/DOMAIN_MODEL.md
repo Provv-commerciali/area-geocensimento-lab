@@ -2,6 +2,12 @@
 
 ## ANNCSU territorial cutover (2026-09-24; supersedes legacy Civic sections below)
 
+### Complex operational correction (2026-09-29)
+
+`Complex` belongs to exactly one `CensusZone` and owns one or more `complex_address_accesses` links. Linked AddressAccesses may lie on different Streets, but every Street must be assigned to the Complex Zone. The link carries `is_primary`; exactly one primary is required at transaction commit. A global unique index on the linked AddressAccess enforces at most one Complex per Access. The creation and edit commands validate all requested IDs and write Complex plus links atomically. Removing a Zone–Street association used by a Complex is forbidden by a database trigger; removing an Access link used by a CensusRecord or doorbell review is forbidden. Deleting a Complex is refused while Contacts or photo/OCR audit exist. These rules do not make AddressAccess a property unit or duplicate ANNCSU territory.
+
+The Contact creation UI may create a Complex in a local modal using the selected Zone, Street and Access as its proposed primary. It updates the Complex choice without remounting the Contact form. Complex selectors require both Zone and Access membership. OCR remains an explicit photo→staging→operator-review→confirmation path and never creates a Contact merely from recognition.
+
 The canonical structure is `Municipality → Street → AddressAccess`; `CensusZone ↔ Street` remains N:N. `Street` and `AddressAccess` each have `OFFICIAL_ANNCSU` global-reference and motivated `MANUAL` tenant-operational variants in unified tables. Official identity is `PROGRESSIVO_NAZIONALE` for Street and `PROGRESSIVO_ACCESSO` for AddressAccess, never a normalized name or displayed number. Official names, locality labels and access numbering may repeat. Exact source locality is retained on Street and optionally grouped through non-authoritative municipality-scoped `Locality`.
 
 `CensusRecord` references Zone and AddressAccess, with the Street derived from Access; `Complex ↔ AddressAccess` is N:N. Database constraints reject cross-municipality Zone–Street links and Access links outside an associated Zone Street. ANNCSU import runs, issues and structured revisions persist permanently, including first/last/current snapshot state. Original source ZIP retention defaults to 12 months, without automatic deletion.
