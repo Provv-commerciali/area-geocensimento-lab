@@ -42,8 +42,17 @@ export class HttpDoorbellTextRecognitionProvider implements DoorbellTextRecognit
   }
 }
 
+export function isDoorbellOcrConfigured(): boolean {
+  const endpoint=process.env.DOORBELL_OCR_SERVICE_URL;
+  if(!endpoint)return false;
+  try {
+    const host=new URL(endpoint).hostname.toLowerCase();
+    return !(process.env.VERCEL&&["localhost","127.0.0.1","::1"].includes(host));
+  } catch { return false; }
+}
+
 export function doorbellRecognitionProvider(): DoorbellTextRecognitionProvider | undefined {
   const endpoint = process.env.DOORBELL_OCR_SERVICE_URL;
-  if (!endpoint) return undefined;
+  if (!endpoint||!isDoorbellOcrConfigured()) return undefined;
   return new HttpDoorbellTextRecognitionProvider(endpoint, process.env.DOORBELL_OCR_SERVICE_TOKEN);
 }

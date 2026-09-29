@@ -43,6 +43,18 @@ try{
   const single=(await client.query(createSql,[`LAB single ${Date.now()}`,otherZone.zone_id,otherZone.access_id,[],null,null,null,null])).rows[0];
   const singleLinks=(await client.query("select is_primary from public.complex_address_accesses where complex_id=$1",[single.id])).rows;
   if(singleLinks.length!==1||!singleLinks[0].is_primary)throw new Error("Single-access Complex mismatch");
+  const contactComplex=(await client.query(createSql,[`LAB contact link ${Date.now()}`,first.zone_id,first.access_id,[],null,null,null,null])).rows[0];
+  const record={zoneId:first.zone_id,streetId:first.street_id,addressAccessId:sameStreet.access_id,
+    complexId:contactComplex.id,relationshipRole:"Proprietario",engagementType:"Nessuno",buildingScope:"Intero edificio",
+    contactType:"Generico",subject:{subjectType:"PRIVATO",lastName:"LAB verification"}};
+  const contactSql="select public.create_census_record_with_complex_access_lab($1::jsonb,null) id";
+  await rejects(contactSql,[JSON.stringify({...record,relationshipRole:"INVALID"})],"22023");
+  if((await client.query("select 1 from public.complex_address_accesses where complex_id=$1 and address_access_id=$2",[contactComplex.id,sameStreet.access_id])).rowCount)throw new Error("Failed Contact left an Access link");
+  const contact=(await client.query(contactSql,[JSON.stringify(record)])).rows[0];
+  const linked=(await client.query("select is_primary from public.complex_address_accesses where complex_id=$1 and address_access_id=$2",[contactComplex.id,sameStreet.access_id])).rows[0];
+  const primary=(await client.query("select address_access_id from public.complex_address_accesses where complex_id=$1 and is_primary",[contactComplex.id])).rows[0];
+  if(!contact.id||linked?.is_primary!==false||primary?.address_access_id!==first.access_id)throw new Error("Contact/Complex link or primary mismatch");
+  await rejects(contactSql,[JSON.stringify({...record,streetId:otherStreet.street_id})],"23503");
   await client.query("rollback");tx=false;
-  console.log(JSON.stringify({status:"passed",checks:["single Access","three accesses across streets","one primary","exclusive access","zone coherence","street detach guard","unique primary","atomic update","guarded delete"],persisted:false}));
+  console.log(JSON.stringify({status:"passed",checks:["single Access","three accesses across streets","one primary","exclusive access","zone coherence","street detach guard","unique primary","atomic update","guarded delete","Contact-selected Access link","Contact failure rolls back link","primary Access preserved"],persisted:false}));
 }finally{if(tx)await client.query("rollback");await client.end()}

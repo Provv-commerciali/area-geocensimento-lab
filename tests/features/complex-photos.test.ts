@@ -1,10 +1,17 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { duplicateProposalIds, type DoorbellProposal } from "@/domain/complex-photos";
-import { doorbellRecognitionResultSchema } from "@/services/doorbell-text-recognition-provider";
+import { doorbellRecognitionResultSchema, isDoorbellOcrConfigured } from "@/services/doorbell-text-recognition-provider";
 
 const proposal = (id: string, photoId: string, lastName: string): DoorbellProposal => ({ id, photoId, sessionId: "session", sourceText: lastName, subjectType: "PRIVATO", lastName, warnings: [], status: "DRAFT", buildingScope: "Parte di edificio", contactType: "Generico", sourceDetectionIds: [] });
 
 describe("doorbell recognition contracts", () => {
+  afterEach(()=>vi.unstubAllEnvs());
+  it("does not advertise a Vercel OCR endpoint pointing at its own loopback",()=>{
+    vi.stubEnv("VERCEL","1");vi.stubEnv("DOORBELL_OCR_SERVICE_URL","http://127.0.0.1:8091/recognize");
+    expect(isDoorbellOcrConfigured()).toBe(false);
+    vi.stubEnv("DOORBELL_OCR_SERVICE_URL","https://ocr.example.test/recognize");
+    expect(isDoorbellOcrConfigured()).toBe(true);
+  });
   it("accepts five structured proposals without creating domain contacts", () => {
     const result = doorbellRecognitionResultSchema.parse({ schemaVersion: "1", rawText: "ROSSI MARIO\nBIANCHI ANNA\nSTUDIO VERDI SRL\nNERI LUCA\nCONTI PAOLA", warnings: [], proposals: [
       { sourceText: "ROSSI MARIO", proposedFirstName: "Mario", proposedLastName: "Rossi", proposedSubjectType: "PERSON", confidence: .96, warnings: [] },

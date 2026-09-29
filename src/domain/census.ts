@@ -44,7 +44,7 @@ export interface CadastralAssociation {
   recordId: string; municipalityCode: string; municipalityName?: string; section?: string; sheet: string; parcel: string;
   featureType?: string; source: string; sourceLayer: string; verifiedAt: string;
 }
-export interface Complex { id: string; name: string; zoneId: string; civicIds: string[]; primaryAccessId?: string; sheet?: string; parcel?: string; units?: number; description?: string }
+export interface Complex { id: string; name: string; zoneId: string; civicIds: string[]; streetIds?: string[]; primaryAccessId?: string; sheet?: string; parcel?: string; units?: number; description?: string }
 export interface CensusInterview {
   id: string; recordId: string; operatorId: string; operatorName: string;
   interviewDate: string; recallDate?: string; response?: string; reason?: string; outcome?: string;

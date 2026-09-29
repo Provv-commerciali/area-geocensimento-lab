@@ -1,5 +1,11 @@
 # Codex worklog
 
+## 2026-09-29 — Complex selezionato in Nuovo Contatto
+
+**Decisione utente:** Case Geska conserva il civico principale 270. I Complessi della stessa Zona e Via appaiono nella select del Nuovo Contatto anche se il civico scelto non è ancora associato; selezione e salvataggio del Contatto autorizzano il collegamento senza seconda conferma. Nessuna associazione automatica per somiglianza fra numeri o estensioni.
+
+**Realizzazione:** migration `202609290005` con comando security-invoker atomico; ricerca esplicita Via/Civico nel form Complesso al posto dei campi di ricerca separati e delle select paginabili; ricerca `numero/estensione` negli AddressAccess. Migration applicata al database LAB verificato `fomluksjubzimkfnzouf`. Verifica SQL autenticata con rollback passata: Contact+link, mancato link se Contact fallisce, primario invariato. L'interfaccia OCR ora non propone l'analisi quando Vercel è configurato verso loopback; l'OCR remoto resta bloccato da `TBD-OCR-001`, senza risultati simulati.
+
 ## 2026-09-24 — Chiusura decisioni ANNCSU e verifica CRS
 
 **Decisioni registrate:** approvato il modello greenfield e chiuse le questioni su boundary tenant, retention, governance MANUAL e coordinate. Il LAB mantiene la separazione global-reference/tenant-operational senza inventare tenant FK/RLS o RBAC di produzione; retention sorgenti configurabile con default 12 mesi e metadati/revisioni permanenti; riconciliazione MANUAL→OFFICIAL sempre esplicita e auditata.
